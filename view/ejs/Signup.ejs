@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sign up</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="icon" type="text/css" href="https://backpackerbible.org/wp-content/uploads/2016/09/Logo-TalkTalk-Final.png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style type="text/css">
+
+         body {
+            background:  #CCCCCC;;
+            font-family: 'Roboto', sans-serif;
+            color:#333;
+            line-height: 22px;   
+         }
+         h1, h2, h3, h4, h5, h6 {
+            font-family: 'Roboto Condensed', sans-serif;
+            font-weight: 400;
+            color:#111;
+            margin-top:5px;
+            margin-bottom:5px;
+         }
+         h1, h2, h3 {
+            text-transform:uppercase;
+         }
+
+         input.upload {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 1;
+            filter: alpha(opacity=1);    
+         }
+
+         .form-inline .form-group{
+            margin-left: 0;
+            margin-right: 0;
+         }
+         .control-label {
+            color:#333333;
+         }
+    </style>
+  </head>
+
+  <body>
+
+   <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+         <div class="navbar-header">
+            <a class="navbar-brand" href="#">English Language Exchange</a>
+         </div>
+         <div class="navbar-header">
+            <img src="http://inperugia.com/wp-content/uploads/2011/08/language-exchange-perugia.png" alt="Logo" style="width:40px;margin-top:10px;">
+         </div>
+      </div>
+   </nav>
+
+  	<div class="container">
+   <div class="row">
+    <div class="col-md-8">
+      <section>      
+        <h1 class="entry-title"><span>One Step to join with us !!!</span> </h1>
+        <hr>
+         <form class="form-horizontal" method="post" name="signup" id="signupforapp" action="/languageex/user/signup/api"> 
+
+            <div class="form-group">
+               <label class="control-label col-sm-3">Email <span class="text-danger">*</span></label>
+                  <div class="col-md-8 col-sm-9">
+                     <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                        <input type="email" class="form-control" name="email" id="exchangelanguage_email_input" placeholder="Enter your Email ID" value="">
+                     </div>
+                     <small> Your Email Id is being used for create the security of your account, authorization and access recovery. </small> 
+                    <p id="exchangelanguage_email_p"><span style="color: red;font-style: italic;"></span></p>
+               </div>
+            </div> 
+
+            <div class="form-group">
+               <label class="control-label col-sm-3">Full Name <span class="text-danger">*</span></label>
+               <div class="col-md-8 col-sm-9">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                  <input type="text" class="form-control" name="name" id="exchangelanguage_name_input" placeholder="Edit your Name here" value="">
+                 </div>
+                 <p id="exchangelanguage_name_p"></span><span style="color: red;font-style: italic;"></span></p>
+               </div>
+               
+            </div>
+      
+            <div class="form-group" >
+               <label class="control-label col-sm-3">Set Password <span class="text-danger">*</span></label>
+               <div class="col-md-5 col-sm-8">
+                  <div class="input-group">
+                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                     <input type="password" class="form-control" name="password" id="exchangelanguage_password_input" placeholder="Choose password (5-25 chars)" value="">
+                  </div> 
+                  <p id="exchangelanguage_password_p"> <span style="color: red;font-style: italic;"></span></p>
+               </div>
+            </div> 
+
+            <div class="form-group">
+               <label class="control-label col-sm-3">Confirm Password <span class="text-danger">*</span></label>
+               <div class="col-md-5 col-sm-8">
+                  <div class="input-group">
+                     <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                     <input type="password" id="exchangelanguage_confirm_input" class="form-control" name="cpassword" placeholder="Confirm your password" value="">
+                  </div>  
+
+                  <p id="exchangelanguage_confirm_p"><span style="color: red;font-style: italic;"></span></p>
+               </div>
+            </div>
+
+            <div class="form-group">
+               <div class="col-xs-offset-3 col-xs-10">
+                  <input type="button" class="btn btn-success" id="exchangelanguage_next_input" value="Next Step">
+               </div>
+            </div>
+
+      </form>
+
+   </section>
+
+    </div>
+</div>
+</div>
+
+  <script type="text/javascript">
+
+    var notify_pass = "", notify_name = "", notify_confirm = "", notify_email = "";
+    var exchangelanguage_span_notify = "<span class='glyphicon glyphicon-info-sign'></span>";
+
+    function validatePass(pass)
+    {
+
+      if(pass.length < 6)
+      {
+         notify_pass = " Password length is at least 5 characters."
+         return false;
+      }else if(pass.length > 25)
+      {
+         notify_pass = " Password length is at maximun 20 characters."
+         return false;
+      }else
+      {
+         var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+         if(format.test(pass)){
+            notify_pass = " The password only accept alphabet and number characters."
+            return false;
+         }
+            
+         var ind = 0, contain_num = false, contain_alphabet = false;
+         for(ind = 0; ind < pass.length; ind++){//is tring contain any number??
+            if(pass.charCodeAt(ind) > 47 && pass.charCodeAt(ind) < 58){
+               contain_num = true;//contain number
+            }
+
+            if((pass.charCodeAt(ind) > 64 && pass.charCodeAt(ind) < 91) || 
+               (pass.charCodeAt(ind) > 96 && pass.charCodeAt(ind) < 123)){
+               contain_alphabet = true;//contain number
+            }
+
+            if(contain_num && contain_alphabet)   break;
+
+         }
+
+         if(!contain_num || !contain_alphabet){
+            notify_pass = " The password must contains number and alphabet character."
+            return false;
+         }
+      }
+
+       return true;
+
+    }
+
+    function validateConfirm(pass, confirm)
+    {
+      if(confirm.length == ""){
+         notify_confirm = " Do not empty this field."
+         return false;
+      }
+
+      if(pass.length != confirm.length){
+         notify_confirm = " Not match with password."
+         return false;
+      }
+
+      return true;
+      
+    }
+
+    function validateEmail(email)
+    {
+      if(email.length == ""){
+         notify_email = " Do not empty this field.";
+         return false; 
+      }
+
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      if(!re.test(String(email).toLowerCase())){
+         notify_email = " Invalid format email."; 
+         return false;
+      }
+
+      return true;
+    }
+
+    function validateName(name)
+    {
+   
+      if(name.length < 5){
+         notify_name = " Name field length is at least 5 characters."
+         return false;
+      }
+      var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+      if(format.test(name)){
+         notify_name = " The name contains strange characters."
+         return false;
+      }
+
+      return true;
+   }
+
+   var email_input_form = document.getElementById("exchangelanguage_email_input")
+   var email_p_form = document.getElementById("exchangelanguage_email_p")
+
+   var name_input_form = document.getElementById("exchangelanguage_name_input")
+   var name_p_form = document.getElementById("exchangelanguage_name_p")
+
+   var pass_input_form = document.getElementById("exchangelanguage_password_input")
+   var pass_p_form = document.getElementById("exchangelanguage_password_p")
+
+   var confirm_input_form = document.getElementById("exchangelanguage_confirm_input")
+   var confirm_p_form = document.getElementById("exchangelanguage_confirm_p")
+
+   document.getElementById("exchangelanguage_next_input").onclick = function(){
+      if(validateName(name_input_form.value) && validateEmail(email_input_form.value) &&
+         validateConfirm(pass_input_form.value, confirm_input_form.value) 
+         && validatePass(pass_input_form.value)){
+           document.getElementById("signupforapp").submit();
+      }
+      
+      if(!validateName(name_input_form.value)){
+         name_p_form.getElementsByTagName("span")[0].innerHTML = exchangelanguage_span_notify + notify_name;
+      }
+
+      if(!validateEmail(email_input_form.value)){
+         //email_p_form.getElementsByTagName("span")[0].style.display = "block";
+         email_p_form.getElementsByTagName("span")[0].innerHTML = exchangelanguage_span_notify + notify_email;
+      }
+
+      if(!validateConfirm(pass_input_form.value, confirm_input_form.value) ){
+         confirm_p_form.getElementsByTagName("span")[0].innerHTML = exchangelanguage_span_notify + notify_confirm;
+      }
+
+      if(!validatePass(pass_input_form.value)){
+         pass_p_form.getElementsByTagName("span")[0].innerHTML = exchangelanguage_span_notify + notify_pass;
+      }
+   }
+
+   //onclick any event
+   name_input_form.onclick = function(){
+      name_p_form.getElementsByTagName("span")[0].innerHTML = ""
+   }
+
+   email_input_form.onclick = function(){
+      email_p_form.getElementsByTagName("span")[0].innerHTML = ""
+   }
+
+   pass_input_form.onclick = function(){
+      pass_p_form.getElementsByTagName("span")[0].innerHTML = ""
+   }
+
+   confirm_input_form.onclick = function(){
+      confirm_p_form.getElementsByTagName("span")[0].innerHTML = ""
+   }
+
+  </script>
+  </body>
+</html>
