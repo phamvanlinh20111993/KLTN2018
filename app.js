@@ -66,7 +66,7 @@ var publicrq = require('./controller/publicrequest');
 var registerinfo = require('./controller/registerinfo');
 var authenticateuser = require('./controller/authenticateuser');
 var homerq = require('./controller/homerequest');
-//var home = require('./controller/home')
+var home = require('./controller/home/home')
 //var admin = require('./controller/admin')
 
 app.use('/languageex', publicrq)
@@ -75,6 +75,7 @@ app.use('/languageex', signup)
 app.use('/languageex', registerinfo)
 app.use('/languageex', authenticateuser)
 app.use('/languageex', homerq)
+app.use('/languageex', home)
 
 
 

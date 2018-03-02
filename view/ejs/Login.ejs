@@ -51,18 +51,44 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Login</h4>
         </div>
+
         <div class="modal-body" style="background-color: #CCCCCC;">
-            <div class="wrapper" >
-               <form class="form-signin">       
+            <div class="wrapper">
+               <form class="form-signin" action="/languageex/user/login" method="post">       
                   <h2 class="form-signin-heading">Join us! </h2>
-                  <input type="text" class="form-control" name="username" placeholder="Email Address" required="" autofocus="" />
-                  <input type="password" class="form-control" name="password" placeholder="Password" required="" style="margin-top: 4%;" />  
+                  <% if(typeof email != 'undefined'){ %>
+                     <input type="email" class="form-control" name="username" placeholder="Email Address" required="" autofocus="" value = "<%= email%>"/>
+                  <%}else{%>
+                      <input type="email" class="form-control" name="username" placeholder="Email Address" required="" autofocus=""/>
+                   <%}%>
+                  <p id="login_email"><span style="color: red;font-style: italic;"></span></p>
+
+                   <% if(typeof pass != 'undefined'){ %>
+                     <input type="password" class="form-control" name="password" placeholder="Password" required="" style="margin-top: 4%;" value = "<%= pass%>" /> 
+                     <%}else{%>
+                       <input type="password" class="form-control" name="password" placeholder="Password" required="" style="margin-top: 4%;" /> 
+                   <%}%> 
+                  <p id="login_password"><span style="color: red;font-style: italic;"></span></p>
+
                   <div style="margin-left: 7%;">    
                      <label class="checkbox">
-                        <input type="checkbox" value="remember-me" id="rememberMe" name="rememberMe"> Remember me
+                        <input type="checkbox" value="checked" id="rememberMe" name="rememberMe"> Remember me
                      </label>
                   </div>
-                  <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button> 
+
+                  <input type="button" class="btn btn-lg btn-primary btn-block" value="Login"> 
+
+                  <% if(typeof infor != 'undefined'){ %>
+                     <p><span style="color: red;font-style: italic;margin-top: 2%;"><span class="glyphicon glyphicon-info-sign"></span>  <%= infor.error%>.</span></p>
+
+                     <p><span style="color:blue;font-style: italic;cursor:pointer;">
+                     <a href="<%= infor.link%>" style="text-decoration: underline;"> <%= infor.notify%> ? </a>
+                     </span></p>
+
+                     <script type="text/javascript">
+                         document.getElementById("myModal1").scrollTop = 100;
+                     </script>
+                  <%}%>
                </form>
 
                <div class="form-signin" style="margin-top: -4%;border-top: 0px;">
@@ -72,6 +98,7 @@
                         Login with Facebook
                      </button>
                   </form>
+
                   <form method="get" action="/languageex/user/signup/api">
                     <input type="hidden" name="key" value="google">
                     <button class="loginBtn loginBtn--google">
@@ -80,7 +107,27 @@
                   </form>
                </div>
 
+            </div>
+        </div>
 
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Oops !!!!</h4>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-warning">
+               <strong>Error!!!</strong> reset passwort fail. Please try again.
             </div>
         </div>
         <div class="modal-footer">
@@ -147,25 +194,84 @@
   <script type="text/javascript">
     var St = "<%= state %>"
     if(St == "1")
-        $('#myModal1').modal('show');
+      $('#myModal1').modal('show');
+    else 
+      $('#myModal').modal('show');
   </script>
   <%}%>
 
 <script type="text/javascript">
 
-   var Signupmodal = document.getElementById("myModal")
-   var Singupmodal_body = Signupmodal.getElementsByClassName("modal-body")[0]
-   var Singupmodal_body_login_fb = Singupmodal_body.getElementsByTagName("button")[0]
-   var Singupmodal_body_login_gg = Singupmodal_body.getElementsByTagName("button")[1]
+   var span_notify = "<span class='glyphicon glyphicon-info-sign'></span>";
+   var notify_pass = "", notify_email = "";
+   function validatePassword(pass)
+   {
+
+      if(pass.length == 0)
+      {
+         notify_pass = " This field was empty.";
+         return false;
+      }
+       return true;
+
+    }
+
+    function validateEmail(email)
+    {
+      if(email.length == ""){
+         notify_email = " This field was empty.";
+         return false; 
+      }
+
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      if(!re.test(String(email).toLowerCase())){
+         notify_email = " Invalid format email."; 
+         return false;
+      }
+
+      return true;
+    }
 
 
-   Singupmodal_body_login_fb.onclick = function(){
-      
+   var Loginmodal = document.getElementById("myModal1")
+   var Loginmodal_body = Loginmodal.getElementsByClassName("modal-body")[0]
+   
+   var Login_form = Loginmodal_body.getElementsByTagName('form')[0]
+   var Login_form_inputs = Loginmodal_body.getElementsByTagName("input")
+
+   var Login_form_input_email = Login_form_inputs[0]
+   var Login_form_p_email = document.getElementById("login_email")
+
+   var Login_form_input_pass = Login_form_inputs[1]
+   var Login_form_p_pass = document.getElementById("login_password")
+   var Login_form_input_login = Login_form_inputs[3]
+
+   Login_form_input_login.onclick = function(){
+      if(validateEmail(Login_form_input_email.value) 
+            && validatePassword(Login_form_input_pass.value)){
+         Login_form.submit()
+      }
+
+      if(!validateEmail(Login_form_input_email.value)){
+          Login_form_p_email.getElementsByTagName("span")[0].innerHTML = span_notify + notify_email;
+      }
+
+      if(!validatePassword(Login_form_input_pass.value)){
+          Login_form_p_pass.getElementsByTagName("span")[0].innerHTML = span_notify + notify_pass;
+      }
    }
 
-   Singupmodal_body_login_gg.onclick = function(){
-      
+   Login_form_input_email.onclick = function(){
+      Login_form_p_email.getElementsByTagName("span")[0].innerHTML = ""
    }
+
+   Login_form_input_pass.onclick = function(){
+      Login_form_p_pass.getElementsByTagName("span")[0].innerHTML = ""
+   }
+
+
+   
 </script>
 
 </body>

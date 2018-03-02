@@ -1,5 +1,4 @@
 var express = require('express')
-var app = express()
 var router = express.Router()
 var FacebookStrategy = require('passport-facebook').Strategy
 var GoogleStrategy = require('passport-google-oauth20').Strategy
@@ -7,30 +6,11 @@ var passport = require('passport')
 var CryptoJS = require("crypto-js")
 var md5 = require('md5') // su dung md5 ma hoa pass
 var mysql = require('mysql');
-//var sendmail = require('sendmail.js')
-var sendEmail = require('sendmail1')
-
-function makeuserid()
-{
-    var text = "";
-    var possible = "0123456789";
-
-    for( var i = 0; i < 26; i++ )//ma xac thuc co ngau nhien 45 ki tu
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
-
-function makemailid()
-{
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for( var i=0; i < 45; i++ )//ma xac thuc co ngau nhien 45 ki tu
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
+//var sendmail = require('../local_modules/lib/sendmail.js')
+var sendEmail = require('../local_modules/lib/sendmail1')
+var libfunction = require('../local_modules/customfunction')
+var multipart  = require('connect-multiparty')//upload file dung connect-multiparty
+var multipartMiddleware = multipart()
 
 
 passport.serializeUser(function(user, done) {
@@ -73,26 +53,27 @@ router.route('/user/signup/api')
 })
 .post(function(req, res)
 {  
-   req.session.user_id = makeuserid()//make random useid
+   req.session.user_id = libfunction.makeUserid()//make random useid
    req.session.email = req.body.email
    req.session.username = req.body.name//authenticate user
    req.session.password = req.body.password//save password
-   req.session.authenticatemail = makemailid()
    req.session.provider = "custom"
+
+   req.session.authenticatemail = libfunction.makeEmailid()//create session for another page
    
-   var aumail = CryptoJS.AES.encrypt(req.session.email, req.session.user_id);
-   var url = "signup/autenticate?key="+req.session.provider + "&user=" + aumail;
+   var aumail = CryptoJS.AES.encrypt(req.session.user_id, req.session.authenticatemail);
+   var url = "user/signup/authenticate?key="+req.session.provider + "&user=" + aumail;
    //sendmail.sendmailAuthenticate(req.session.email, makemailid(), url)
 
-   sendEmail(req.session.email, makemailid(), url, 0, function(err, data){
+   sendEmail(req.session.email, req.session.authenticatemail, url, 0, function(err, data){
       if(err)  console.log(err);
       else     console.log(data);
    })
+   res.redirect(307, '/languageex/user/signup/verify')
 
-   var value = encodeURIComponent(req.session.provider);
-   var id = encodeURIComponent(CryptoJS.AES.encrypt(req.session.user_id, md5(req.session.username)));
-   res.redirect('/languageex/user/signup/register?key=' + value + '&id=' + id);
 })
+
+
 
 
 router.route('/user/signup/api/auth/facebook').get(
@@ -137,6 +118,8 @@ passport.use(new GoogleStrategy({
   }
 ));
 
+
+
 router.route('/user/signup/api/auth/google').get(passport.authenticate('google',
    { scope: ['email', 'profile'] }), function(req, res){
     // The request will be redirected to Google for authentication, so
@@ -165,11 +148,10 @@ router.route('/user/signup/api/auth/google/callback').get(
   });
 
 
-
 router.route('/user/signup/register')
 .get(function(req, res){
-   
-   if(req.session)
+  
+   if(req.session.username && req.query.id)
    {
       var bytes = CryptoJS.AES.decrypt(req.query.id, md5(req.session.username));
       var userid = bytes.toString(CryptoJS.enc.Utf8);
@@ -191,6 +173,65 @@ router.route('/user/signup/register')
    }else{
       res.redirect('/languageex/user')
    }
+})
+.post(multipartMiddleware, function(req, res){
+    
+})
+
+
+
+//verify user
+router.route('/user/signup/verify')
+.post(function(req, res){
+   if(req.session.authenticatemail)//exist session for this page
+      res.render('ejs/authenticateUser')
+   else
+      res.redirect('/languageex/user/signup')
+})
+
+
+//authenticate user
+router.route('/user/signup/authenticate')
+.get(function(req, res)
+{
+
+   if(typeof req.session.authenticatemail != 'undefined' 
+      && typeof req.query.user != 'undefined')
+   {
+
+      var bytes = CryptoJS.AES.decrypt(req.query.user, req.session.authenticatemail);
+      var decode = bytes.toString(CryptoJS.enc.Utf8);
+
+      if(req.session.user_id == decode){
+         var value = encodeURIComponent(req.session.provider);
+         var id = encodeURIComponent(CryptoJS.AES.encrypt(req.session.user_id, md5(req.session.username)));
+         res.redirect('/languageex/user/signup/register?key=' + value + '&id=' + id);
+      }else{
+         res.render('ejs/authenticateUser', 
+            {err: 1, link: '/languageex/user/signup/'})
+      }
+
+      req.session.authenticatemail = null;
+      delete req.session.authenticatemail;
+
+   }else{
+      res.redirect('/languageex/user')
+   }
+
+})
+.post(function(req, res)
+{
+   if(req.body.code123 == req.session.authenticatemail){
+      var value = encodeURIComponent(req.session.provider);
+      var id = encodeURIComponent(CryptoJS.AES.encrypt(req.session.user_id, md5(req.session.username)));
+      res.redirect('/languageex/user/signup/register?key=' + value + '&id=' + id);
+   }else{
+      res.render('ejs/authenticateUser', 
+         {err: 1, link: '/languageex/user/signup/'})
+   }
+
+   req.session.authenticatemail = null;
+   delete req.session.authenticatemail;
 })
 
 

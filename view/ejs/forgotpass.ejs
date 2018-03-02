@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%= content.title %></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="https://www.easylanguageexchange.com/wp-content/uploads/2016/06/elelogo-340.png">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <style type="text/css">
+      .form-gap {
+          padding-top: 70px;
+      }
+
+      .form-inline .form-group{
+         margin-left: 0;
+         margin-right: 0;
+      }
+
+      .control-label {
+         color:#333333;
+      }
+  </style>
+
+</head>
+
+<body style="background:  #CCCCCC;">
+
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+         <div class="navbar-header">
+            <a class="navbar-brand" href="#">English Language Exchange</a>
+         </div>
+         <div class="navbar-header">
+            <img src="http://inperugia.com/wp-content/uploads/2011/08/language-exchange-perugia.png" alt="Logo" style="width:40px;margin-top:10px;">
+         </div>
+      </div>
+   </nav>
+
+<div class="form-gap"></div>
+
+<div class="container">
+  <div class="row">
+
+    <div class="col-md-4 col-md-offset-4" style="margin-top: -6%;">
+      <div class="panel panel-default">
+         <div class="panel-body">
+
+            <div class="text-center">
+               <h3><i class="fa fa-lock fa-4x"></i></h3>
+               <h2 class="text-center"><%= content.title %>?</h2>
+               <p><%= content.value %></p>
+               <div class="panel-body">
+                  
+                <%if(content.code == '0'){%>
+                  <form id="forgot-form" role="form" autocomplete="off" class="form" method="post" action="/languageex/user/login/resetpassword">
+                     <div class="form-group">
+                        <div class="input-group">
+                           <span class="input-group-addon"><i class="glyphicon glyphicon-envelope color-blue"> </i></span>
+                          
+                              <input id="email_reset" name="email" placeholder="email address" class="form-control"  type="email" value="<%= content.email %>">
+                          
+                        </div>
+                     </div>
+
+                     <div class="form-group">
+                        <p style="float: left;font-size: 130%;" id = "forgotpass_p_notify"><span style="color: red;font-style: italic;"></span></p>
+                     </div>
+
+                     <div class="form-group">
+                        <input name="recover-submit" class="btn btn-lg btn-primary btn-block" value="Reset Password" type="button">
+                     </div>
+                  </form>
+
+                  <script type="text/javascript">
+                     var notify_rsemail = "";
+                     var notify_rrcfpass = "", notify_rspass = "", notify_rssecuritycode = ""
+      
+                     function validateReSetEmail(email)
+                     {
+                        if(email.length == ""){
+                           notify_rsemail = " Do not empty this field.";
+                           return false; 
+                        }
+                        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                        if(!re.test(String(email).toLowerCase())){
+                           notify_rsemail = " Invalid format email."; 
+                           return false;
+                        }
+                        return true;
+                     }
+
+                     var Forgotform = document.getElementById("forgot-form")
+                     var Forgotform_email = Forgotform.getElementsByTagName("input")[0]
+                     var Forgotform_reset_button = Forgotform.getElementsByTagName("input")[1]
+                     var Forgotform_reset_p_notify = document.getElementById("forgotpass_p_notify")
+
+                     Forgotform_reset_button.addEventListener("click", function(){
+                        if(validateReSetEmail(Forgotform_email.value))
+                           Forgotform.submit()
+
+                        if(!validateReSetEmail(Forgotform_email.value)){
+                           Forgotform_reset_p_notify.getElementsByTagName("span")[0].innerHTML = exclanguage_span_notify + notify_rsemail
+                        }
+                     })
+
+                     Forgotform_email.addEventListener("click", function(){
+                        Forgotform_reset_p_notify.getElementsByTagName("span")[0].innerHTML = ""
+                     })
+
+                  </script>
+                <%}%>
+
+                 <%if(content.code == '1' || content.code == '2'){%>
+                  <form id="enter-form" role="form" autocomplete="off" class="form" method="post" action="/languageex/user/login/changepass">
+
+                    <%if(content.code == '2'){%>  
+                      <div class="form-group">
+                         <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-eye-open color-blue"> </i></span>
+                           <input type="text" name="captcha" id="captcha12" class="form-control label-warning" placeholder="Security code form email" autofocus="" />   
+                         </div>
+                          <div class="input-group">
+                             <p id = "securitycode_p_notify" style="color: red;font-style: italic;"></p>
+                           </div>
+                      </div>
+
+                      <script type="text/javascript">
+                           var notify_rssecuritycode = ""
+                           function validateSecurityCode(code)
+                           {
+                              if(code.length == 0){
+                                 notify_rssecuritycode = " Do not empty this field."
+                                 return false;
+                              }
+                              if(code.length > 45){
+                                 notify_rssecuritycode = " Not valid this code."
+                                 return false;
+                              }
+                              return true;
+                           }
+    
+                           var Changepass_form_capcha = document.getElementById("captcha12")
+                           var Changepass_form_capcha_p = document.getElementById("securitycode_p_notify")
+
+                           Changepass_form_capcha.onclick = function(){
+                              Changepass_form_capcha_p.innerHTML = ""
+                           }
+
+                      </script>
+
+                     <%}%>
+
+                     <div class="form-group">
+                        <div class="input-group" >
+                           <span class="input-group-addon"><i class="glyphicon glyphicon-lock color-blue"> </i></span>
+                           <input id="pass_reset" name="newpassword" placeholder="New password" class="form-control"  type="password">
+                        </div>
+                        <div class="input-group">
+                           <p id = "newpass_p_notify" style="color: red;font-style: italic;"></p>
+                        </div>
+                     </div>
+
+                     <div class="form-group">
+                        <div class="input-group">
+                           <span class="input-group-addon"><i class="glyphicon glyphicon-lock color-blue"> </i></span>
+                           <input id="cfnewpass_reset" name="cnewpassword" placeholder="Repeat password" class="form-control"  type="password">
+                        </div>
+                         <div class="input-group">
+                           <p id = "confirm_p_notify" style="color: red;font-style: italic;"></p>
+                        </div>
+                     </div>
+
+                     <div class="form-group">
+                        <input name="recover-submit" class="btn btn-lg btn-primary btn-block" value="Change Password" type="button" id="enter-form_button">
+                     </div>
+
+                  </form>
+
+                     <script type="text/javascript">
+                        var notify_rsconfirm = "", notify_rspass = "";
+                        var exclanguage_span_notify = "<span class='glyphicon glyphicon-info-sign'></span>";
+
+                        function validateReSetPass(pass)
+                        {
+                           if(pass.length < 6)
+                           {
+                              notify_rspass = " Password length is at least 5 characters."
+                              return false;
+                           }else if(pass.length > 25)
+                           {
+                              notify_rspass = " Password length is at maximun 20 characters."
+                              return false;
+                           }else
+                           {
+                              var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+                              if(format.test(pass)){
+                                 notify_rspass = " The password only accept alphabet and number characters."
+                                 return false;
+                              }
+                              var ind = 0, contain_num = false, contain_alphabet = false;
+                              for(ind = 0; ind < pass.length; ind++){//is tring contain any number??
+                                 if(pass.charCodeAt(ind) > 47 && pass.charCodeAt(ind) < 58){
+                                    contain_num = true;//contain number
+                                 }
+                                 if((pass.charCodeAt(ind) > 64 && pass.charCodeAt(ind) < 91) || 
+                                    (pass.charCodeAt(ind) > 96 && pass.charCodeAt(ind) < 123)){
+                                    contain_alphabet = true;//contain number
+                                 }
+                                 if(contain_num && contain_alphabet)   break;
+                              }
+                              if(!contain_num || !contain_alphabet){
+                                 notify_rspass = " The password must contains number and alphabet character."
+                                 return false;
+                              }
+                           }
+
+                           return true;
+                        }
+
+                        function validateReSetConfirm(pass, confirm)
+                        {
+                           if(confirm.length == ""){
+                              notify_rsconfirm = " Do not empty this field."
+                              return false;
+                           }
+                           if(pass.length != confirm.length){
+                              notify_rsconfirm = " Not match with password."
+                              return false;
+                           }
+
+                           return true;
+                        }
+
+
+                        var Changepass_form = document.getElementById("enter-form")
+                        var Changepass_form_div = Changepass_form.getElementsByClassName("form-group")
+                        var Changepass_form_newpass = document.getElementById("pass_reset")
+                        var Changepass_form_newpass_p = document.getElementById("newpass_p_notify")
+
+                        var Changepass_form_cfpass = document.getElementById("cfnewpass_reset")
+                        var Changepass_form_cfpass_p = document.getElementById("confirm_p_notify")
+
+                        document.getElementById("enter-form_button").onclick = function()
+                        {
+                           if(Changepass_form_div.length == 4){
+                              if(!validateSecurityCode(Changepass_form_capcha.value))
+                                 Changepass_form_capcha_p.innerHTML = "<span class='glyphicon glyphicon-info-sign'></span>" + notify_rssecuritycode
+
+                              if(validateSecurityCode(Changepass_form_capcha.value) && 
+                                 validateReSetConfirm(Changepass_form_newpass.value, Changepass_form_cfpass.value) 
+                                 && validateReSetPass(Changepass_form_newpass.value))
+                                 Changepass_form.submit();
+                           }else{
+                              if( validateReSetConfirm(Changepass_form_newpass.value, Changepass_form_cfpass.value) 
+                                 && validateReSetPass(Changepass_form_newpass.value))
+                                 Changepass_form.submit(); 
+                           }
+
+                           if(!validateReSetConfirm(Changepass_form_newpass.value, Changepass_form_cfpass.value))
+                              Changepass_form_cfpass_p.innerHTML = "<span class='glyphicon glyphicon-info-sign'></span>" + notify_rsconfirm
+
+                           if(!validateReSetPass(Changepass_form_newpass.value))
+                             Changepass_form_newpass_p.innerHTML = "<span class='glyphicon glyphicon-info-sign'></span>" + notify_rspass
+                        }
+
+                        Changepass_form_newpass.onclick = function(){
+                           Changepass_form_newpass_p.innerHTML = ""
+                        }
+
+                        Changepass_form_cfpass.onclick = function(){
+                           Changepass_form_cfpass_p.innerHTML = ""
+                        }
+
+                     </script>
+
+                  <%}%>
+
+               </div>
+            </div>
+
+         </div>
+      </div>
+   </div>
+
+  </div>
+</div>
+
+</body>
+</html>
