@@ -5,9 +5,9 @@ var CryptoJS = require("crypto-js")
 var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
 
-function APIComunity(cb)
+function APIComunity(id, cb)
 {
-	querysimple.selectUserCommunityNative(req.session.user_id, function(result, err){
+	querysimple.selectUserCommunityNative(id, function(result, err){
 	    if(err) throw err;
 	 	else{
 	 		var res = result

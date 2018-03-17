@@ -173,15 +173,14 @@ var deleteTable = function(tbname, whcondi, cb){
   });
 }
 
-
-
+//tao cau lenh truy van co ban co join bang
 var selectTableJoin = function(tbname, data, cb){
 
 }
 
 
-
-var selectUser = function(email, cb){//hien hti nguoi dung
+//tra ve thong tin nguoi dung email(params) hien thi trong trang home
+var selectUser = function(email, cb){//hien thi nguoi dung
 	var sqlString = "select user.id, user.name, user.email, user.photo,user.score, level.level from user inner join level "+
 				"on level.id = user.level_id where user.email = " + mysql.escape(email);
 
@@ -192,23 +191,62 @@ var selectUser = function(email, cb){//hien hti nguoi dung
 	})		
 }
 
-
+//hien thi tin nhan giua nguoi dung idme va nguoi dung idB
 var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
-	var sqlString = "SELECT u.id, u.name, u.photo, u.score, "+
-	            "me.data, me.content, me.check, me.time " +
-	 		    "FROM user u JOIN message me ON ((me.userA = "+idme+" AND me.userB = "+idB+")"+
-	 			" OR (me.userA = "+idB+" AND me.userB = "+idme+") ) " + 
-	 			" ORDER me.time DESC" +
 
-	var sqlString1 = ""//select setting from user A and B
+	var sqlString = "SELECT u.id, u.name, u.photo, u.score	" +
+	 		    "FROM user u JOIN message me ON (u.id = me.userA OR u.id = me.userB)"+
+	 		    " WHERE((me.userA = "+idme+" AND me.userB = "+idB+")" +
+	 			" OR (me.userA = "+idB+" AND me.userB = "+idme+")) LIMIT 2"//lay thong tin cua moi nguoi
 
+	var Listmessages = []
 	con.query(sqlString, function(err, result, fields){
-		if(err) cb(null, err)
-		else cb(result, null)
+		if(err) throw err;
+		else{
+			if(result.length > 0){
+				Listmessages.userA = {}
+				Listmessages.userA.id = result[0].id
+				Listmessages.userA.name = result[0].name
+				Listmessages.userA.photo = result[0].photo
+				Listmessages.userA.score = result[0].score
+
+				Listmessages.userB = {}
+				Listmessages.userB.id = result[1].id
+				Listmessages.userB.name = result[1].name
+				Listmessages.userB.photo = result[1].photo
+				Listmessages.userB.score = result[1].score
+
+				var sqlString1 = "SELECT me.id, me.userA, me.userB, me.data, me.content, "+
+						" me.check, me.time FROM message me"+
+	 		    		" WHERE((me.userA = "+idme+" AND me.userB = "+idB+")" +
+	 					" OR (me.userA = "+idB+" AND me.userB = "+idme+"))" +
+	 					"ORDER BY time DESC"
+
+	 			con.query(sqlString1, function(err, result, fields){
+
+	 			})
+
+			}else
+				cb(null, null)
+		}
 	})	
+
 }
 
 
+
+
+var loadMessageSetting = function(idme, idB, cb){
+	var sqlString1 = "SELECT ch.whocheck, ch.value, bl.time FROM checkmisspellings ch" + //select setting from user A and B
+					 "WHERE ch.whocheck = "+idme+ " AND ch.checkwho = " + idB
+
+	var sqlString2 = 
+
+}
+
+
+
+//tra ve full thong tin nguoi dung id
 var selectProfile = function(id, cb){//hien thi thong tin profile
 
 	var sqlString = "SELECT u.id, u.name as username, u.email, u.photo, u.score, u.des, u.gender, "+
@@ -282,6 +320,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 	})	
 }
 
+//tra ve cong dong nguoi dung su dung exchange language voi nguoi dung id
 var selectUserCommunityEx = function(id, cb){
 	//select my id, my nativelanguage
 	var sqlstr = "SELECT user.id, nativelg.language_id as natid FROM user "+
@@ -323,11 +362,11 @@ var selectUserCommunityEx = function(id, cb){
 	
 }
 
+//tra ve cong dong nguoi dung su dung native language voi nguoi dung id
 var selectUserCommunityNative = function(id, cb){
-
 	//select my id, my exchangelanguage
 	var sqlstr = "SELECT user.id, exchangelg.language_id as exid FROM user "+
-			  "JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+id
+			  "JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(id)
 
 	con.query(sqlstr, function(err, resu, fields){
 		if(err)	throw err;
@@ -354,7 +393,7 @@ var selectUserCommunityNative = function(id, cb){
 				"ex.degree_id = de.id WHERE u.id != " +id+ " AND "+orcondi+" AND "+
 				"u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
 				" ORDER BY u.state DESC, le.level ASC";
-			
+
 			con.query(sqlString, function(error, res, fields)
 			{
 				if(error)	cb(null, error)
@@ -366,10 +405,15 @@ var selectUserCommunityNative = function(id, cb){
 }
 
 
-var selectListUserMessenger = function(id, cb){
+var selectListUserMessenger = function(id, cb){//tra ve danh sach nguoi dung trong messenger
 	var sqlString = "SELECT "
 
 }
+
+var selectUserMessenger = function(userid, cb){
+	var sqlString = "SELECT "
+}
+
 
 module.exports = {
 	insertTable: insertString,

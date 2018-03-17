@@ -156,7 +156,7 @@
    															   '</div></li>' + 
    															'<li><a href="/exlanguage/messenger?uid='+id+'">Open in messenger</a></li>' + 
 														   '<li><div class="checkbox" style="margin-left:10%;">' +
-      																'<label><input type="checkbox" value="" > Block message</label>'+
+      																'<label><input type="checkbox" value="" > Block messages</label>'+
    															   '</div></li>' +
 														   '<li><a href="#">Delete Conversation</a></li>' + 
 														   '<li><a href="#">Report <span style="color:orange;">'+name+'</span></a></li>' +
