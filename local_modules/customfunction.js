@@ -3,7 +3,7 @@ function makeuserid()
     var text = "";
     var possible = "0123456789";
 
-    for( var i = 0; i < 26; i++ )//ma xac thuc co ngau nhien 45 ki tu
+    for( var i = 0; i < 18; i++ )//ma xac thuc co ngau nhien 45 ki tu
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
@@ -125,17 +125,13 @@ function validateDadeofBirth(day, month, year)
    return true;
 }
 
-function validatePhotoFile(file)
+function typeFile(ext)
 {
-   if(typeof file == 'undefined')
+   if(is_Strange_characters(ext))
       return false;
-
-   if(file.length < 5)
-      return false
-
-   var type = val.slice((Math.max(0, val.lastIndexOf(".")) || Infinity) + 1);//cach 1
-   switch(type.toString().toLowerCase())
-   {
+  
+  switch(ext)
+  {
       case "jpg":
       case "gif": 
       case "bmp": 
@@ -145,21 +141,50 @@ function validatePhotoFile(file)
       case "bpg": 
       case "bat":
       return true;
-   }
+  }
+
+   return false;
+}
+
+function validatePhotoFile(file)
+{
+   if(typeof file == 'undefined')
+      return false;
+
+   if(file.length < 5)
+      return false
+
+   var type = val.slice((Math.max(0, val.lastIndexOf(".")) || Infinity) + 1);//cach 1
+   if(!typeFile(type.toString().toLowerCase()))
+      return false;
                       
    return false;
 }
 
 function validateEmailId(code)
 {
+
    if(typeof code == 'undefined')
-      return false
+      return false;
+
    if(is_Strange_characters(code))
-      return false
-   if(code.length != 44)
+      return false;
+  
+   if(code.length != 45)
       return false;
 
    return true;
+}
+
+function validateGender(gender)
+{
+   if(typeof gender == 'undefined')
+      return false
+
+   if(gender == "male" || gender == "female" || gender == "unknown")
+      return true;
+   
+   return false;
 }
 
 
@@ -171,5 +196,7 @@ module.exports = {
     validateName: validateName,
     validateDadeofBirth: validateDadeofBirth,
     validatePhotoFile: validatePhotoFile,
-    validateEmailId: validateEmailId
+    validateEmailId: validateEmailId, 
+    typeFile: typeFile,
+    validateGender: validateGender
 }

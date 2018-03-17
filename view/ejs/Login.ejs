@@ -21,7 +21,7 @@
       để phát triển, vui lòng bật lại script. Thân ái.
   </div>
 </noscript>
-
+  
    <nav class="navbar navbar-inverse">
       <div class="container-fluid">
          <div class="navbar-header">
@@ -54,19 +54,19 @@
 
         <div class="modal-body" style="background-color: #CCCCCC;">
             <div class="wrapper">
-               <form class="form-signin" action="/languageex/user/login" method="post">       
+               <form class="form-signin" action="/languageex/user/filter" method="post">       
                   <h2 class="form-signin-heading">Join us! </h2>
                   <% if(typeof email != 'undefined'){ %>
                      <input type="email" class="form-control" name="username" placeholder="Email Address" required="" autofocus="" value = "<%= email%>"/>
                   <%}else{%>
-                      <input type="email" class="form-control" name="username" placeholder="Email Address" required="" autofocus=""/>
+                      <input type="email" class="form-control" name="username" placeholder="Email Address" required="" autofocus="" value="<%=(typeof email !== 'undefined')? email : ''%>" />
                    <%}%>
                   <p id="login_email"><span style="color: red;font-style: italic;"></span></p>
 
                    <% if(typeof pass != 'undefined'){ %>
                      <input type="password" class="form-control" name="password" placeholder="Password" required="" style="margin-top: 4%;" value = "<%= pass%>" /> 
                      <%}else{%>
-                       <input type="password" class="form-control" name="password" placeholder="Password" required="" style="margin-top: 4%;" /> 
+                       <input type="password" class="form-control" name="password" placeholder="Password" required="" style="margin-top: 4%;" value="<%=(typeof pass !== 'undefined')? pass : ''%>" /> 
                    <%}%> 
                   <p id="login_password"><span style="color: red;font-style: italic;"></span></p>
 

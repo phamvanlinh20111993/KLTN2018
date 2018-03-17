@@ -11,6 +11,8 @@ var cookieParser = require('cookie-parser')//su dung cookie trong nodejs
 var flash = require('connect-flash')//chuong trinh bi loi req.flash is not a funtion,
 var passport = require('passport')
 var mysql = require('mysql');
+var cloudinary = require('cloudinary')
+var engines = require('consolidate');
 
 var port = process.env.PORT||5050;
 app.use(passport.initialize());
@@ -23,7 +25,7 @@ app.use(session({
 	secret:'secret',
 	saveUninitialized: true,
 	resave: false,
-	cookie: {maxAge: 24*3600*1000}//neu de secure:true thi session khong duoc khoi tao???
+	cookie: { secure: false, maxAge: 48*3600*1000}//neu de secure:true thi session khong duoc khoi tao???
 }))
 
 app.use(flash())
@@ -33,6 +35,9 @@ app.get('/', function(req, res){
 	res.redirect('/languageex/user');
 })
 
+
+app.engine('html', engines.mustache);
+app.set('view engine', 'html');
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'view'))
 app.set('public', path.join(__dirname, 'public'))
@@ -51,22 +56,32 @@ var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
+  database: "KLTN_ExLanguage",
   charset: "utf8_general_ci"
 });
 
 con.connect(function(err) {
   if (err) throw err;
-  console.log("Mysql Connected!");
+  console.log("Mysql Connected Successful in Control App file!");
 });
 //var connection = mysql.createConnection('mysql://user:pass@host/db?debug=true&charset=BIG5_CHINESE_CI&timezone=-0700');
 
-var login = require('./controller/login')
-var signup = require('./controller/signup')
-var publicrq = require('./controller/publicrequest');
-var registerinfo = require('./controller/registerinfo');
-var authenticateuser = require('./controller/authenticateuser');
-var homerq = require('./controller/homerequest');
+
+//config cloudinary
+cloudinary.config({ 
+  cloud_name: 'uet', 
+  api_key: '992147968271347', 
+  api_secret: 'M9TfXOrwtKx0SklY5wOrxPJv-MU' 
+});
+
+var login = require('./controller/login_signup/login')
+var signup = require('./controller/login_signup/signup')
+var publicrq = require('./controller/login_signup/publicrequest');
+var registerinfo = require('./controller/login_signup/registerinfo');
+var authenticateuser = require('./controller/login_signup/authenticateuser');
+var homerq = require('./controller/home/homerequest');
 var home = require('./controller/home/home')
+var filter = require('./controller/filter')
 //var admin = require('./controller/admin')
 
 app.use('/languageex', publicrq)
@@ -76,6 +91,19 @@ app.use('/languageex', registerinfo)
 app.use('/languageex', authenticateuser)
 app.use('/languageex', homerq)
 app.use('/languageex', home)
+app.use('/languageex', filter)
+
+
+
+
+io.on('connection', function(client){
+	console.log('Client connected ' + client.id);
+
+	client.on('disconnect', function(){
+		client.leave(client.room);
+	})
+})
+
 
 
 

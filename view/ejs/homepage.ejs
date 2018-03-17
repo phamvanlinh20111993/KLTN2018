@@ -8,6 +8,7 @@
   <link rel="icon bar" type="text/css" href="https://www.waseda.jp/inst/icc/assets/uploads/2015/10/web_image1.jpg">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
     .navbar {
@@ -40,11 +41,62 @@
       }
       .row.content {height:auto;} 
     }
+  
+  html,body { height: 100%; margin: 0px; padding: 0px; }
+
+    .active{
+      border-left: 0px;
+      border-right: 0px;
+      border-radius: 0px;
+    }
+
+
+    .card {
+      max-width: 300px;
+      margin: auto;
+      text-align: center;
+      font-family: arial;
+   }
+
+   .title {
+      color: grey;
+      font-size: 16px;
+   }
+
+   .icon{
+      text-decoration: none;
+      font-size: 22px;
+      color: black;
+   }
+
+   button:hover, a:hover {
+      opacity: 0.7;
+   }
+
+   .inf-content{
+       border:1px solid #DDDDDD;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+       border-radius: 10px;
+      -moz-box-shadow: 0 0 8px #828282;
+      -webkit-box-shadow: 0 0 8px #828282;
+       box-shadow: 0 0 8px #828282;
+   }  
+
   </style>
+   <link rel="stylesheet" href="/css/processboxchat.css">
 </head>
+
 <body>
 
-<nav class="navbar navbar-inverse">
+<noscript>
+  <div class="alert alert-warning">
+      <strong>Cảnh báo!</strong> Bạn đã tắt javascript trên trang web này. Ứng dụng này sử dụng javacript
+      để phát triển, vui lòng bật lại script. Thân ái.
+  </div>
+</noscript>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
        <a class="navbar-brand" href="#">English Language Exchange</a>
@@ -57,53 +109,186 @@
     </div>
 
     <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Profile</a></li>
-        <li><a href="#">Comunity</a></li>
+      <ul id="nav_ul" class="nav navbar-nav">
+        <li class="active"><a href="/languageex/user/profile" onclick="Profile()">Profile</a></li>
+        <li><a href="#cádasd">Discussion</a></li>
         <li><a href="#">Group</a></li>
         <li><a href="#">Courses</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        <li><a href="/languageex/user/logout" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       </ul>
     </div>
   </div>
 </nav>
   
-<div class="container-fluid text-center">    
+<div class="container-fluid text-center" style="margin-top:50px;">    
   <div class="row content">
-    <div class="col-lg-2 sidenav" style="height:160%;width: 22%;">
+    <div class="col-lg-2 sidenav" style="height:100%;width: 18%;border-right: 1px solid #BBBBBB;position:fixed;">
 
-      <div class="well">
-        <h4><i>Pham Van Linh</i></h4>
+      <div class="well" style="background: #f6f9fc;">
+        <h4><i><%= user[0].name %></i></h4>
+        <p>Level: <span style="color: orange;"><%= user[0].level %></span></p>
+        <p>Score: <span style="color: orange;"><%= user[0].score %></span></p>
       </div>
 
       <div>
-        <img src="http://taimienphi.vn/tmp/cf/aut/hinh-anh-dep-2.jpg"  class="img-circle" alt="Avatar" height="120" width="120">
+        <!-- http://taimienphi.vn/tmp/cf/aut/hinh-anh-dep-2.jpg -->
+        <img src="<%=user[0].photo %>"  class="img-circle" alt="Avatar" height="120" width="120">
       </div>
 
-      <div style="margin-left: -40%;margin-top:16%;">
-        <h3><a href="#">
-          <span class="glyphicon glyphicon-user"></span>
-        </a> Comunity</h3>
+      <div style="margin-top: 18%;">
+     <!--  <div style="width: 70%;margin: 0 auto;">  
+         <table style="width: 100%;height: 100%;">
+            <tr style="text-align: left;">
+               <td><h4><span class="glyphicon glyphicon-user"></span></h4></td>
+               <td ><h4 style="margin-left: 18%;"><a href="#"> Community</a></h4></td>
+            </tr>
+            <tr style="text-align: left;">
+               <td><h4><span class="glyphicon glyphicon-bullhorn"></span></h4></td>
+               <td ><h4 style="margin-left: 18%;"><a href="#"> Notification </a><span style="color: red;">(0)</span></h4></td>
+            </tr>
+            <tr style="text-align: left;">
+               <td ><h4><span class="glyphicon glyphicon-comment"></span></h4></td>
+               <td><h4 style="margin-left: 18%;"><a href="#"> Messenger </a><span style="color: red;">(0)</span></h4></td>
+            </tr>
+         </table>
+      </div> -->
+    
+            <ul class="nav nav-pills nav-stacked" style="width: 114%;margin-left: -7%;">
+               <li class="active" style="text-align: left;"><a href="#"><span style="font-size: 130%;">
+                  <span class="glyphicon glyphicon-user"></span> <span style="margin-left: 10%;">Community</span>
+               </span></a></li>
 
-        <h3><a href="#">
-          <span class="glyphicon glyphicon-comment"></span>
-        </a>Message</h3></br>
+               <li style="text-align: left;margin-top:4%;"><a href="#"><span style="font-size: 130%;">
+                  <span class="glyphicon glyphicon-bullhorn"></span><span style="margin-left: 10%;"> Notification </span><span style="color: red;"> (0)</span>
+               </span></a></li>
 
+               <li style="text-align: left;margin-top:4%;"><a href="/languageex/messenger" onclick="Messenger()"><span style="font-size: 130%;">
+                   <span class="glyphicon glyphicon-comment"></span> <span style="margin-left: 10%;">Messenger</span> <span style="color: red;">(0)</span>
+               </span></a></li>
+            </ul>
+       </div>
+
+   </div>
+
+   <div class="col-sm-9 text-left" style="width: 80%;overflow: auto;margin-left:20%;"> 
+
+      <div style="border-style: outset;border-left: 0px;border-right: 0px;">
+          <h2 style="text-align: right;">My community <span style="color: red;"> (30)</span></h2>
       </div>
-    </div>
 
-
-    <div class="col-sm-8 text-left"> 
+      <div style="margin-left: 5%;">
+   
+          <div class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">
+             <div class="card inf-content">
+               <div style="width: 100%;height: 50%;" data-toggle="tooltip" title="View profile ">
+                  <img src="/data/img/402629716513658286/kApIh0hA7EoS0KxVIpEes6yDG7A8m9Zg5hEmZYVD1LUHJ.png" 
+            alt="John" style="width:100%;max-height: 100%;border-radius:8px;border:1px solid #696969; ">
+               </div>
+         <div style="line-height: 90%;">
+        <h4> <i class="fa fa-circle" style="color:red;"></i> Pham Linh Dep Trai Cute Va De Thuong </h4>
+        <p class="title">Leanrning: English</p>
+         <p class="title">Degree: Beginning</p>
+        <p class="title">Level: 1</p>
+        <p>Age: 22</p>
+        </div>
+               <div style="margin: 24px 0;">
+                  <a href="#" onclick="register_popup('qCccdsflock', 'QsaleGck');"  data-toggle="tooltip" title="Send message" class="icon"><i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a> 
+                  <a href="#"  data-toggle="tooltip" title="Follow Pham Linh"  class="icon"><i class="fa fa-eye" style="font-size:36px;color:#3399FF;"></i></a>
+               </div>
+            </div>
+          </div>
       
+      <div class="col-md-3" style="min-height: 360px;margin-top:3%;margin-left: 2%;">
+             <div class="card inf-content">
+               <div style="width: 100%;height: 50%;">
+                  <img src="https://4.bp.blogspot.com/-ldVdL8CSCOQ/WBBV1DlGi6I/AAAAAAAAHs8/Yp3gDv6E-wQtxMxl1uHe6RJ1mBGZ8_GDwCLcB/s1600/girl-xinh%2B%252838%2529.jpg" 
+            alt="John" style="max-width:100%;max-height: 100%;border-radius:8px;border:1px solid #696969; ">
+               </div>
+         
+         <div style="line-height: 90%;">
+        <h4> Pham Linh  <i class="fa fa-circle" style="color:green;"></i></h4>
+        <p class="title">Leanrning: English, VietNamese</p>
+        <p class="title">Degree: Beginning</p>
+        <p class="title">Level: 1</p>
+        <p>Age: 22</p>
+        </div>
+        
+               <div style="margin: 24px 0;">
+                  <a href="#" onclick="register_popup('qCccsflock', 'QsalwGck');"  data-toggle="tooltip" title="Send message" class="icon"><i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a> 
+                  <a href="#"  data-toggle="tooltip" title="Follow Pham Linh"  class="icon"><i class="fa fa-eye" style="font-size:36px;color:#3399FF;"></i></a>
+               </div>
+            </div>
+          </div>
+      
+      <div class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">
+             <div class="card inf-content">
+               <div style="width: 100%;height: 50%;">
+                  <img src="http://9mobi.vn/cf/images/2015/05/nkk/hinh-nen-gai-xinh-5.jpg" 
+            alt="John" style="max-width:100%;max-height: 100%;border-radius:8px;border:1px solid #696969; ">
+               </div>
+         
+         <div style="line-height: 90%;">
+            <h4> <i class="fa fa-circle" style="color:red;"></i> Pham Linh</h4>
+            <p class="title">Leanrning: English</p>
+            <p class="title">Degree: Beginning</p>
+            <p class="title">Level: 1</p>
+             <p>Age: 22</p>
+        </div>
+        
+               <div style="margin: 24px 0;">
+                  <a href="#" onclick="register_popup('qCccswlock', 'QsalưdwGck');"  data-toggle="tooltip" title="Send message" class="icon"><i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a> 
+                  <a href="#"  data-toggle="tooltip" title="Follow Pham Linh"  class="icon"><i class="fa fa-eye" style="font-size:36px;color:#3399FF;"></i></a>
+               </div>
+            </div>
+          </div>
+      </div>
     </div>
+
   </div>
+
 </div>
 
 <!-- <footer class="container-fluid text-center" style="margin-top: 0px;">
   <p>Footer Text</p>
 </footer>  -->
+<script type="text/javascript">
 
+  $('li > a').click(function(e) {
+      $('li').removeClass();
+      $(this).parent().addClass('active');
+      e.preventDefault();
+   });
+   
+   $('.dropdown').click(function(e) {
+      e.preventDefault();
+   });
+  
+   $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip().click(function(e){
+         e.preventDefault();
+      });
+   });
+</script>
+
+<script type="text/javascript">
+   function Logout(){
+      location.href = '/languageex/user/logout'
+   }
+
+   function Profile(){
+      location.href = '/languageex/user/profile?uid=' + encodeURIComponent("<%= user[0].id  %>")
+   }
+
+   function Messenger(){
+      location.href = '/languageex/messenger'
+   }
+
+</script>
+
+
+<!--<script type="text/javascript" src="../../public/js/ProcessBoxChat.js"></script> -->
+<script type="text/javascript" src="/js/ProcessBoxChat.js"></script>
 </body>
 </html>

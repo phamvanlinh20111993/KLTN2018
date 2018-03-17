@@ -91,7 +91,6 @@
          for(var ind = 0; ind < month.length; ind++)
             Choosemonth_select_option[month[ind]].style.display = "none"
          old_day = day;
-          console.log("da chay " + day)
       }
     }
 
@@ -103,28 +102,3 @@
       }
       select_year = false;
     }
-
-
-    /* ######################## another event ############################ */
-
-    var language_exchange = document.getElementById("language_exchange")
-    var language_exchange_button = language_exchange.getElementsByTagName("button")[0]
-    $("#language_exchange li").click(function() {
-      language_exchange_button.innerHTML = $(this).text() + "<span class='caret'></span>"
-      language_exchange_button.value = $(this).text() 
-
-    });
-
-    var country = document.getElementById("country")
-    var country_button = country.getElementsByTagName("button")[0]
-    $("#country li").click(function() {
-      country_button.innerHTML = $(this).text() + "<span class='caret'></span>"
-      country_button.value = $(this).text()
-    });
-
-    var level = document.getElementById("level")
-    var level_button = level.getElementsByTagName("button")[0]
-    $("#level li").click(function() {
-       level_button.innerHTML = $(this).text() + "<span class='caret'></span>"
-       level_button.value = $(this).text()
-    });

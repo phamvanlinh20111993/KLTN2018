@@ -50,7 +50,6 @@
   </head>
 
   <body>
-
    <nav class="navbar navbar-inverse">
       <div class="container-fluid">
          <div class="navbar-header">
@@ -75,10 +74,14 @@
                   <div class="col-md-8 col-sm-9">
                      <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-                        <input type="email" class="form-control" name="email" id="exchangelanguage_email_input" placeholder="Enter your Email ID" value="">
+                        <input type="email" class="form-control" name="email" id="exchangelanguage_email_input" placeholder="Enter your Email Address" value="<%=(typeof emailsg !== 'undefined')? emailsg : ''%>">
                      </div>
                      <small> Your Email Id is being used for create the security of your account, authorization and access recovery. </small> 
-                    <p id="exchangelanguage_email_p"><span style="color: red;font-style: italic;"></span></p>
+                    <p id="exchangelanguage_email_p"><span style="color: red;font-style: italic;">
+                      <%if(typeof err != 'undefined'){%>
+                        Oop!!! <%=err%>
+                       <%}%>
+                    </span></p>
                </div>
             </div> 
 
