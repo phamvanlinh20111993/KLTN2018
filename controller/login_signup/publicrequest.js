@@ -288,6 +288,11 @@ router.route('/messenger')
             	//create session
             	req.session.photo = "/data/img/" + req.session.user_id + '/' + imagename + ".png"
             	//save in database
+            	querysimple.updateTable("User", [{field: "photo", value: req.session.photo}],
+            		[{op:"", field: "id", value: req.session.user_id}], function(result, err){
+            			if (err) throw err;
+            			else console.log(result.affectedRows + " record(s) updated.")
+            		})
             	
         	}else{
             	fs.unlink(pathsave)

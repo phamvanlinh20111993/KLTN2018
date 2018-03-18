@@ -140,9 +140,9 @@
 				var element = '<div class="popup-box-chat" id="'+ id +'">' + 
 									'<div style="background-color:  #5b5bef;height: 10%;">' + 
                                         '<div style="height:100%;display:table;float:left;width:70%;">' + 
-				                            '<p style="font-size:110%;color:black;margin-left:6%;margin-top:4%;">' +
+				                            '<a href = "/languageex/user/profile?uid='+id+'"><p style="font-size:110%;color:black;margin-left:6%;margin-top:4%;">' +
                                                '<b><i>'+ name +'</i></b>' +
-											 '</p>' +
+											 '</p></a>' +
 									    '</div>' +   
                                         '<div style="float:right;width:30%;">' + 
 				                             '<div style="float:left;width:50%;margin-top:10%;">' + 
@@ -154,7 +154,7 @@
 													       '<li> <div class="checkbox" style="margin-left:10%;">' +
       																	'<label><input type="checkbox" value="" checked> Auto misspellings</label>'+
    															   '</div></li>' + 
-   															'<li><a href="/exlanguage/messenger?uid='+id+'">Open in messenger</a></li>' + 
+   															'<li><a href="/languageex/messenger?uid='+id+'">Open in messenger</a></li>' + 
 														   '<li><div class="checkbox" style="margin-left:10%;">' +
       																'<label><input type="checkbox" value="" > Block messages</label>'+
    															   '</div></li>' +

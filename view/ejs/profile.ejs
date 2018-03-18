@@ -195,33 +195,45 @@
                   <table class="table table-user-information">
                     <tbody>
                       <tr>
-                        <td>Department:</td>
-                        <td>Programming</td>
+                        <td>Email:</td>
+                        <td><%=User.infor.email%></td>
                       </tr>
+
                       <tr>
                         <td>Learning:</td>
-                        <td>English</td>
+                        <td><%=User.exlang.learning[0].langname%></td>
                       </tr>
+
                       <tr>
                         <td>Level:</td>
-                        <td>Begining</td>
+                        <td><%=User.infor.level%></td>
                       </tr>
+
+                      <tr>
+                        <td>Score:</td>
+                        <td><%=User.infor.score%></td>
+                      </tr>
+
                       <tr>
                         <td>Date of Birth</td>
-                        <td>01/24/1988</td>
+                        <td><%=User.infor.dateofbirth %></td>
                       </tr>
                    
-                         <tr>
-                             <tr>
-                        <td>Gender</td>
-                        <td>Female</td>
-                      </tr>
+                     <tr>
                         <tr>
-                        <td>Country</td>
-                        <td>Nepal</td>
-                      </tr>
-                           
-                      </tr>
+                           <td>Gender</td>
+                           <td><%=User.infor.gender%></td>
+                        </tr>
+                        <tr>
+                           <td>Native</td>
+                           <td><%=User.natlang.learning[0].langname%></td>
+                        </tr>
+                     </tr>
+
+                     <tr>
+                        <td>Describe</td>
+                        <td style="word-break: break-word;"><%=User.infor.describe%></td>
+                     </tr>
                      
                     </tbody>
                   </table>

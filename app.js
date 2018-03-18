@@ -98,11 +98,42 @@ app.use('/languageex', community)
 app.use('/languageex', messenger)
 
 
+var userOnorOffline_id = [];//dia chi email
+var ind = 0, Length, flag = false;
+
 
 io.on('connection', function(client){
 	console.log('Client connected ' + client.id);
 
+	client.on('notifyOnline', function(id)//tham so data la email cua nguoi dung
+    {
+    	client.user_id = id;
+    	for(index = 0; index < Length; index ++){
+        	if(Useronoroffline_id[index] == id){
+	     		client.emit('numofuseronline', yiduser)
+          		flag = true;
+          		break;
+        	}
+      	}
+    })
+
+    client.on('joinchat', function(){
+
+    })
+
+    client.on('typing', function(){
+    	
+    })
+
 	client.on('disconnect', function(){
+		console.log("User id = " + client.user_id + " offline.")
+
+		var sqlString = "UPDATE User SET state = 0 WHERE id = " + client.user_id
+		con.query(sqlString, function(err, result, fields){
+			if(err) throw err;
+			else console.log(result.affectedRows + " record(s) updated.");
+		})
+
 		client.leave(client.room);
 	})
 })
