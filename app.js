@@ -81,6 +81,8 @@ var registerinfo = require('./controller/login_signup/registerinfo');
 var authenticateuser = require('./controller/login_signup/authenticateuser');
 var homerq = require('./controller/home/homerequest');
 var home = require('./controller/home/home')
+var community = require('./controller/home/community')
+var messenger = require('./controller/home/messenger')
 var filter = require('./controller/filter')
 //var admin = require('./controller/admin')
 
@@ -92,7 +94,8 @@ app.use('/languageex', authenticateuser)
 app.use('/languageex', homerq)
 app.use('/languageex', home)
 app.use('/languageex', filter)
-
+app.use('/languageex', community)
+app.use('/languageex', messenger)
 
 
 

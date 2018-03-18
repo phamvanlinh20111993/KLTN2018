@@ -196,8 +196,8 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 
 	var sqlString = "SELECT u.id, u.name, u.photo, u.score	" +
 	 		    "FROM user u JOIN message me ON (u.id = me.userA OR u.id = me.userB)"+
-	 		    " WHERE((me.userA = "+idme+" AND me.userB = "+idB+")" +
-	 			" OR (me.userA = "+idB+" AND me.userB = "+idme+")) LIMIT 2"//lay thong tin cua moi nguoi
+	 		    " WHERE((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
+	 			" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+")) LIMIT 2"//lay thong tin cua moi nguoi
 
 	var Listmessages = []
 	con.query(sqlString, function(err, result, fields){
@@ -216,13 +216,19 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 				Listmessages.userB.photo = result[1].photo
 				Listmessages.userB.score = result[1].score
 
-				var sqlString1 = "SELECT me.id, me.userA, me.userB, me.data, me.content, "+
+				var sqlString1 = "SELECT del.whodel, del.delwho, del.time" +
+	                 " FROM delconversation del WHERE del.whodel = " +mysql.escape(idme)+ 
+	                 " AND del.delwho = "+mysql.escape(idB)+
+	                 " ORDER BY del.time DESC LIMIT 1"
+
+
+				var sqlString2 = "SELECT me.id, me.userA, me.userB, me.data, me.content, "+
 						" me.check, me.time FROM message me"+
-	 		    		" WHERE((me.userA = "+idme+" AND me.userB = "+idB+")" +
-	 					" OR (me.userA = "+idB+" AND me.userB = "+idme+"))" +
+	 		    		" WHERE((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
+	 					" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
 	 					"ORDER BY time DESC"
 
-	 			con.query(sqlString1, function(err, result, fields){
+	 			con.query(sqlString2, function(err, result, fields){
 
 	 			})
 
@@ -234,16 +240,43 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 }
 
 
+var loadMessageSetting = function(idme, idB, cb)
+{
+	var sqlString = "SELECT ch.whocheck, ch.value, cl.checkwho FROM checkmisspellings ch " + //select setting from user A and B
+					"WHERE ch.whocheck = "+mysql.escape(idme)+ " AND ch.checkwho = " + mysql.escape(idB);
 
+	var sqlString1 = "SELECT bl.whoblock, bl.blockwho, bl.time FROM blockmessages FROM " +
+					 "WHERE bl.whoblock = "+mysql.escape(idme)+ " AND bl.whocheck = " +mysql.escape(idB)
 
-var loadMessageSetting = function(idme, idB, cb){
-	var sqlString1 = "SELECT ch.whocheck, ch.value, bl.time FROM checkmisspellings ch" + //select setting from user A and B
-					 "WHERE ch.whocheck = "+idme+ " AND ch.checkwho = " + idB
+	var setting = {}
+	con.query(sqlString, function(err, result, fields){
+		if(err) throw err;
+		else{
+			if(result.length > 0){
+				setting.misspelling = {}
+				setting.misspelling.whocheck = result[0].whocheck
+				setting.misspelling.checkwith = result[0].checkwho
+				setting.misspelling.value = result[0].value
+			}
 
-	var sqlString2 = 
+			con.query(sqlString1, function(err1, result1, fields1){
+				if(err1) throw err1;
+				else{
+					if(result1.length > 0){
+						setting.blockmsg = {}
+						setting.blockmsg.whoblock = result2[0].whoblock
+						setting.blockmsg.blockwith = result2[0].blockwho
+						setting.misspelling.starttime = result2[0].time
+					}
+
+					cb(setting)
+				}
+			})
+
+		}
+	})
 
 }
-
 
 
 //tra ve full thong tin nguoi dung id
@@ -320,6 +353,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 	})	
 }
 
+
 //tra ve cong dong nguoi dung su dung exchange language voi nguoi dung id
 var selectUserCommunityEx = function(id, cb){
 	//select my id, my nativelanguage
@@ -361,6 +395,7 @@ var selectUserCommunityEx = function(id, cb){
 	})
 	
 }
+
 
 //tra ve cong dong nguoi dung su dung native language voi nguoi dung id
 var selectUserCommunityNative = function(id, cb){

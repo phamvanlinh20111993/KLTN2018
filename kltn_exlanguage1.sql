@@ -22,6 +22,9 @@ SET time_zone = "+00:00";
 -- Database: `kltn_exlanguage`
 --
 
+CREATE DATABASE IF NOT EXISTS `KLTN_ExLanguage` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `KLTN_ExLanguage`;
+
 -- --------------------------------------------------------
 
 --
