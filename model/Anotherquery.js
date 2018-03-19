@@ -1,6 +1,7 @@
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
+  connectionLimit : 20,
   host: "localhost",
   user: "root",
   password: "",
@@ -10,7 +11,7 @@ var con = mysql.createConnection({
 
 con.connect(function(err) {
   if (err) throw err;
-  console.log("Mysql Connected Successful!");
+  console.log("Mysql Connected Another query Successful!");
 });
 
 
@@ -50,9 +51,9 @@ var editMessage = function(idmsg, whoeditid, content, cb){
 
 function delMessages(idme, iduser, time)
 {
-	var sql = "DELETE FROM delconversation WHERE ((whodel = "+ mysql.escape(mysql.escape(mysql.escape(idme) + 
+	var sql = "DELETE FROM delconversation WHERE ((whodel = "+ mysql.escape(idme) + 
 		      " AND delwho = "+ mysql.escape(iduser) +
-			  ") OR ((whodel = "+ mysql.escape(mysql.escape(iduser) + " AND delwho = "+
+			  ") OR ((whodel = "+ mysql.escape(iduser) + " AND delwho = "+
 			   mysql.escape(idme)+")) AND "+
 			  "time <= " + mysql.escape(time)
 
@@ -123,7 +124,44 @@ var delConversation = function(idme, iduser, cb){
 
 }
 
+//tra ve so nguoi trong cong dong cua toi
+var selectListUsermyCommunityEx = function(id, cb){
+	//select my id, my exchangelanguage
+	var sqlstr = "SELECT exchangelg.language_id as exid FROM "+
+			  "exchangelg WHERE exchangelg.user_id = "+ parseInt(id)
+
+	con.query(sqlstr, function(err, result, fields){
+		if(err)	throw err;
+		else if(result.length > 0)
+		{	
+			var ind = 0, orcondi = "";
+			if(result.length > 1) orcondi +="("
+			while(ind < result.length){
+				orcondi += "ex.language_id = "+ result[ind].exid;
+				if(ind < parseInt(result.length) - 1)
+					orcondi += " OR "
+				ind++
+			}
+			if(result.length > 1) orcondi +=")"
+
+			var sqlString = "SELECT ex.user_id as id, u.state, ex.language_id FROM exchangelg ex "+
+							" JOIN user u ON ex.user_id = u.id "+
+							" WHERE ex.user_id != "+id +" AND "+
+							orcondi
+            
+         //   console.log(sqlString)
+
+		    con.query(sqlString, function(err1, result1, fields1){
+		    	if(err1) throw err1;
+		    	else  cb(result1)
+		    })
+		}
+	})
+}
+
 
 module.exports = {
-	editMessage: editMessage
+	editMessage: editMessage,
+	delConversation: delConversation,
+	selectListUsermyCommunityEx: selectListUsermyCommunityEx
 }

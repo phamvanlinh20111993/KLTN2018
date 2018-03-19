@@ -30,7 +30,7 @@ var showUserCommunity = function(User)
 	var Interface = '<div class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">'+
              			'<div class="card inf-content">' +
                				'<div style="width: 100%;height: 50%;" data-toggle="tooltip" title="View profile ">' +
-                  				'<a href="/languageex/user/profile?uid='+User.infor.id+'"><img src="'+User.infor.photo+'"'+
+                  				'<a href="/languageex/user/profile?uid='+encodeURIComponent(User.infor.id)+'"><img src="'+User.infor.photo+'"'+
             					'alt="'+User.infor.name+'" style="width:100%;max-height: 100%;border-radius:8px;border:1px solid #696969; ">'+
             					'</a>'+
               				'</div>'+
@@ -61,11 +61,11 @@ Object.size = function(obj) {
     return size;
 };
 
-getListUserCommnunity(myid, function(data){
-	console.log(data)
-    var size = Object.size(data.community);
+getListUserCommnunity(myid, function(data)
+{
+    var size = data.community.length;
     var ind = 0;
-    for(ind = 0; ind < size; ind++){
+    console.log(data)
+    for(ind = 0; ind < size; ind++)
     	showUserCommunity(data.community[ind])
-    }
 })

@@ -32,19 +32,18 @@
             //this is used to close a popup
             function close_popup(id)
             {
+            	console.log("gui tin hieu out room")
+                socket.emit('leaveroomchat', {myid: myid, pid: id}) 
+                
                 for(var iii = 0; iii < popups.length; iii++)
                 {
-                    if(id == popups[iii])
-                    {
-                        Array.remove(popups, iii);
-                        
+                    if(id == popups[iii]){
+                        Array.remove(popups, iii); 
                         document.getElementById(id).style.display = "none";
-                        
-                        calculate_popups();
-                        
+                        calculate_popups();  
                         return;
                     }
-                }   
+                }  
             }
         
             //displays the popups. Displays based on the maximum number of popups that can be displayed on the current viewport width
@@ -70,11 +69,49 @@
                     element.style.display = "none";
                 }
             }
+
+            var takecontentMessage = function(id, cb){
+            	$.ajax({
+                    type: "POST",
+                    url: "/languageex/user/messages",
+                    data:{anotherid: id},
+                    success: function(data)//hien thi message
+                    {
+                        if(typeof cb == "function")
+                       		cb(JSON.parse(data));//tra ve du lieu
+                    }
+                  })
+            }
+
+
+            var takeSettingMessage = function(id, cb){
+            	$.ajax({
+                    type: "POST",
+                    url: "/languageex/user/loadmsgsetting",
+                    data:{anotherid: id},
+                    success: function(data)//hien thi message
+                    {
+                        if(typeof cb == "function")
+                       		cb(JSON.parse(data));//tra ve du lieu
+                    }
+                  })
+            }
+
             
             //creates markup for a new popup. Adds the id to popups array.
             function register_popup(id, name)
             {
-                
+       
+           //     takecontentMessage(id, function(data){
+           //     	console.log(data)
+           //     })
+
+                takeSettingMessage(id, function(data){
+                	console.log(data)
+                })
+
+                socket.emit('createroomchat', {myid: myid, partnerid: id})
+
                 for(var iii = 0; iii < popups.length; iii++)
                 {   
                     //already registered. Bring it to front.
@@ -90,6 +127,9 @@
                     }
                 }               
                 
+                //tao roomchat
+
+
                 document.getElementsByTagName("nav")[0].innerHTML += Show_pop_up_message(id, name);  
 				$('#content_message').scrollTop($('#content_message')[0].scrollHeight);
                 popups.unshift(id);
@@ -115,18 +155,15 @@
             function calculate_popups()
             {
                 var width = window.innerWidth;
-                if(width < 540)
-                {
+                if(width < 540){
                     total_popups = 0;
                 }
-                else
-                {
+                else{
                     width = width - 200;
                     //320 is width of a single popup box
                     total_popups = parseInt(width/320);
                 }
                 display_popups();
-                
             }
             
             //recalculate when window is loaded and also when window is resized.
@@ -217,13 +254,19 @@
 						
 						'<div class="translate">translate</div>' +
 						'<div class="translate misspellings">misspellings</div>' +
-                    '</li>';   
+                    '</li>'; 
+
+                socket.emit('chatting', {
+                     id_send: yid,
+                     id_receive: Partner_id
+                  })  
 				
 				document.getElementById(id).innerHTML +=  control;	
 				
 				$('#content_message').scrollTop($('#content_message')[0].scrollHeight);
 			}
 			
+
 			function Message_receiver(id, content)
 			{
 				var date = formatAMPM(new Date());
@@ -249,15 +292,18 @@
 				
 				$('#content_message').scrollTop($('#content_message')[0].scrollHeight);
 			}
+
 			
 			function Translate(content){
 				alert(content)
 			}
 			
+
 			function Misspelling(content){
 				alert(content)
 			}
 			
+
 			function Editmessage(content){
 				alert(content)
 			}

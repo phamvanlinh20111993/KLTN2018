@@ -3,6 +3,7 @@ var app = express()
 var router = express.Router()
 var CryptoJS = require("crypto-js")
 var md5 = require('md5') // su dung md5 ma hoa pass
+var postcomment = require('../../model/post_comments')
 
 router.route('/user/signup/api/register')
 .get(function(req, res){

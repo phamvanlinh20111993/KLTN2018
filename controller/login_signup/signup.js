@@ -178,13 +178,19 @@ router.route('/user/signup/api/auth/google/callback').get(
             res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(6)))  
          else{
             req.session.api = true;
-            req.session.user_id = req.user.id//authenticate user
+            if(req.user.id > 18446744073709552000)
+               req.user.id = req.user.id/100
+            
+            req.session.user_id = parseInt(req.user.id)//authenticate user
             req.session.email = req.user.emails[0].value//authenticate user
             res.redirect('/languageex/home');
          }
       }
       else{
-         req.session.user_id = req.user.id  //authenticate user
+         if(req.user.id > 18446744073709552000)
+            req.user.id = req.user.id/100
+
+         req.session.user_id = parseInt(req.user.id)  //authenticate user
          req.session.email = req.user.emails[0].value
          req.session.username = req.user.displayName  //authenticate user
          req.session.photo = req.user.photos[0].value

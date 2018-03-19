@@ -181,7 +181,7 @@
    <div class="col-sm-9 text-left" style="width: 80%;overflow: auto;margin-left:20%;"> 
 
       <div style="border-style: outset;border-left: 0px;border-right: 0px;">
-          <h2 style="text-align: right;">My community <span style="color: red;" id="numofusersonline"> (30)</span></h2>
+          <h2 style="text-align: right;">My community <span style="color: red;" id="numofusersonline"> (0)</span></h2>
       </div>
 
       <div style="margin-left: 5%;" id="MycommunityExchange">
@@ -251,11 +251,25 @@
       location.href = '/languageex/messenger'
    }
 
+      //su dung socket.io
+      var socket = io.connect();
+      //   var socket = io();
+           
+      socket.on('connect', function(data) {
+         //ban dau la khi nguoi dung ket noi         
+         socket.emit('notifyOnline', myid);//client bao voi server la t online roi
+      });
+
+      socket.on('numofuseronline', function(signal){
+         if(signal < 0) signal = 0
+         document.getElementById("numofusersonline").innerHTML = " (" + signal + ")"
+      })
+
 </script>
 
 
 <!--<script type="text/javascript" src="../../public/js/ProcessBoxChat.js"></script> -->
-<script type="text/javascript" src="/js/ProcessBoxChat.js"></script>
 <script type="text/javascript" src="/js/SocketOnline.js"></script>
+<script type="text/javascript" src="/js/ProcessBoxChat.js"></script>
 </body>
 </html>

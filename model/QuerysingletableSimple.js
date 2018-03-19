@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 
 var con = mysql.createConnection({
-  connectionLimit : 10,
+  connectionLimit : 20,
   host: "localhost",
   user: "root",
   password: "",
@@ -11,7 +11,7 @@ var con = mysql.createConnection({
 
 con.connect(function(err) {
   if (err) throw err;
-  console.log("Mysql Connected Successful!");
+  console.log("Mysql Connected Querysingle table simple Successful!");
 });
 
 /* insert table */
@@ -41,7 +41,7 @@ var insertString = function(tbname, field, value, cb)
 
 	sqlString += " )";
 	
-	console.log("Query: " + sqlString)
+	//console.log("Query: " + sqlString)
 
 	//query
 	con.query(sqlString, function(err, result){
@@ -103,7 +103,7 @@ var selectTable = function(tbname, field, whcondi, ordcondi, grcondi, limitcondi
 	if(limitcondi)
 		sqlString += " LIMIT " + parseInt(limitcondi);
 
-	console.log("Query: " + sqlString)
+//	console.log("Query: " + sqlString)
 	//query
 	con.query(sqlString, function(err, result, fields){
 		if(err)
@@ -136,7 +136,7 @@ var updateTable = function(tbname, fields, whcondi, cb)
 		}
 	}
 
-	console.log("Query: " + sqlString)
+	//console.log("Query: " + sqlString)
 	//query
 	con.query(sqlString, function(err, result){
 		if(err)
@@ -164,7 +164,7 @@ var deleteTable = function(tbname, whcondi, cb){
 		}
 	}
 
-	console.log("Query: " + sqlString)
+	//console.log("Query: " + sqlString)
 
 	con.query(sqlString, function (err, result) {
     	if (err)
@@ -199,7 +199,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	 		    " WHERE((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
 	 			" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+")) LIMIT 2"//lay thong tin cua moi nguoi
 
-	var Listmessages = []
+	var Listmessages = {}
 	con.query(sqlString, function(err, result, fields){
 		if(err) throw err;
 		else{
@@ -225,6 +225,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	            con.query(sqlString1, function(err1, result1, fields1){
 	            	if(err) throw err;
 	            	else{
+
 	            		var deltime = ""
 	            		if(result1.length > 0)
 	            			deltime = " me.time <= " + new Date(result1[0].time)
@@ -232,15 +233,17 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	            		//select all message between idme and idB 
 						var sqlString2 = "SELECT me.id, me.userA, me.userB, me.data, me.content, "+
 						 " me.check, me.time, ed.whoedit as idedit, ed.newcontent as ncontent, ed.time as ntime "+
-						 " FROM message me LEFT JOIN edimessage ed ON ed.message_id = me.id "+
+						 " FROM message me LEFT JOIN editmessage ed ON ed.message_id = me.id "+
 	 		    		 " WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
 	 					 " OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
 	 					 deltime +
 	 					 " ORDER BY me.time DESC"
 
+	 					 console.log(sqlString2)
+
 	 					con.query(sqlString2, function(err2, result2, fields2)
 	 					{
-	 						if(err2) cb(null, err)
+	 						if(err2) cb(err2, null)
 	 						else{
 
 	 							Listmessages.messages = []
@@ -251,6 +254,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 
 	 							for(ind = 0; ind < result2.length; ind++)
 	 							{
+	 								Listmessages.messages[ind] = {}
 	 								Listmessages.messages[ind].messageid = result2[ind].id
 									Listmessages.messages[ind].idA = result2[ind].userA
 									Listmessages.messages[ind].idB = result2[ind].userB
@@ -262,7 +266,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 									var pos = 0;
 									Listmessages.messages[ind].edit = []
 
-									if(result2[ind].whoedit){
+									if(result2[ind].idedit){
 										Listmessages.messages[ind].edit[pos] = {}
 										Listmessages.messages[ind].edit[pos].whoedit = result2[ind].idedit 
 										Listmessages.messages[ind].edit[pos].newcontent = result2[ind].ncontent
@@ -273,7 +277,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 									 	continue;
 									}
 
-	 								for(ind1 = ind+1; ind < result2.length; ind1++){
+	 								for(ind1 = ind + 1; ind1 < result2.length; ind1++){
 	 									if(result2[ind].id == result2[ind1].id && mark[ind1]== 0){
 	 										mark[ind1] = 1;
 	 										Listmessages.messages[ind].edit[pos] = {}
@@ -285,6 +289,8 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	 								}
 	 								pos = 0;
 	 							}
+	 					
+	 							cb(null, Listmessages)
 	 						}
 	 					})
 
@@ -301,11 +307,11 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 
 var loadMessageSetting = function(idme, idB, cb)
 {
-	var sqlString = "SELECT ch.whocheck, ch.value, cl.checkwho FROM checkmisspellings ch " + //select setting from user A and B
-					"WHERE ch.whocheck = "+mysql.escape(idme)+ " AND ch.checkwho = " + mysql.escape(idB);
+	var sqlString = "SELECT ch.whocheck, ch.checkwho, ch.value FROM checkmisspellings ch" + //select setting from user A and B
+					" WHERE ch.whocheck="+mysql.escape(idme)+ " AND ch.checkwho=" + mysql.escape(idB);
 
-	var sqlString1 = "SELECT bl.whoblock, bl.blockwho, bl.time FROM blockmessages FROM " +
-					 "WHERE bl.whoblock = "+mysql.escape(idme)+ " AND bl.whocheck = " +mysql.escape(idB)
+	var sqlString1 = "SELECT bl.whoblock, bl.blockwho, bl.time FROM blockmessages bl" +
+					 " WHERE bl.whoblock="+mysql.escape(idme)+ " AND bl.blockwho=" +mysql.escape(idB)
 
 	var setting = {}
 	con.query(sqlString, function(err, result, fields){
@@ -343,7 +349,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 
 	var sqlString = "SELECT u.id, u.name as username, u.email, u.photo, u.score, u.des, u.gender, "+
 	                "u.dateofbirth, level.level FROM user u JOIN level on level.id = u.level_id"+
-	                " WHERE u.id = " + id
+	                " WHERE u.id = " + mysql.escape(id)
 
 	var userInfor = {}
 	con.query(sqlString, function(err, result, fields){
@@ -362,7 +368,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 
 			var sqlString1 = "SELECT ex.id, de.name as dename, la.symbol, la.name as laname FROM exchangelg  " +
 							 "ex INNER JOIN language la ON la.id = ex.language_id INNER JOIN degree de " +
-							 "ON de.id = ex.degree_id WHERE ex.user_id = " + id + " ORDER BY la.name DESC";
+							 "ON de.id = ex.degree_id WHERE ex.user_id = " + mysql.escape(id) + " ORDER BY la.name DESC";
 
 			con.query(sqlString1, function(err, result1, fields){
 				if(err) throw err
@@ -382,7 +388,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 					}
 
 					var sqlString2 = "SELECT na.id, la.symbol, la.name as laname FROM nativelg na INNER JOIN " +
-									  "language la ON la.id = na.language_id WHERE na.user_id = " + id +
+									  "language la ON la.id = na.language_id WHERE na.user_id = " + mysql.escape(id) +
 									  " ORDER BY la.name DESC"	
 
 					con.query(sqlString2, function(err, result2, fields){
@@ -423,7 +429,7 @@ var selectUserCommunityNative = function(id, cb){
 		if(err)	throw err;
 		else if(resu.length > 0)
 		{
-			console.log(resu)
+		//	console.log(resu)
 			var ind = 0, orcondi = "";
 
 			if(resu.length > 1) orcondi +="("
@@ -466,7 +472,7 @@ var selectUserCommunityEx = function(id, cb){
 		if(err)	throw err;
 		else if(resu.length > 0)
 		{
-			console.log(resu)
+			//console.log(resu)
 			var ind = 0, orcondi = "";
 
 			if(resu.length > 1) orcondi +="("
@@ -488,7 +494,7 @@ var selectUserCommunityEx = function(id, cb){
 				"u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
 				" ORDER BY u.state DESC, le.level ASC";
 
-			console.log(sqlString)
+		//	console.log(sqlString)
 
 			con.query(sqlString, function(error, res, fields){
 				if(error)	cb(null, error)
@@ -589,5 +595,6 @@ module.exports = {
 	selectUserCommunityEx: selectUserCommunityEx,
 	selectTableJoin: selectTableJoin,
 	selectMessage: selectMessage,
-	selectListUserMessenger: selectListUserMessenger
+	selectListUserMessenger: selectListUserMessenger,
+	loadMessageSetting: loadMessageSetting
 }

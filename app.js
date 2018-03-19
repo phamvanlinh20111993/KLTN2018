@@ -21,12 +21,21 @@ app.use(morgan('dev'))
 app.use(bodyParser.urlencoded({extended: true, limit: '50mb'}))//limit data transfer from client
 app.use(bodyParser.json())
 
-app.use(session({
-	secret:'secret',
-	saveUninitialized: true,
-	resave: false,
-	cookie: { secure: false, maxAge: 48*3600*1000}//neu de secure:true thi session khong duoc khoi tao???
-}))
+var session = require("express-session")({
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 48*3600*1000 }
+});//neu de secure:true thi session khong duoc khoi tao???
+
+var sharedsession = require("express-socket.io-session");
+
+// Use express-session middleware for express
+app.use(session);
+
+// Use shared session middleware for socket.io
+// setting autoSave:true cccc
+io.use(sharedsession(session, {autoSave:true})); 
 
 app.use(flash())
 app.use(cookieParser())//su dung cookie
@@ -80,7 +89,7 @@ var publicrq = require('./controller/login_signup/publicrequest');
 var registerinfo = require('./controller/login_signup/registerinfo');
 var authenticateuser = require('./controller/login_signup/authenticateuser');
 var homerq = require('./controller/home/homerequest');
-var home = require('./controller/home/home')
+var posts = require('./controller/home/posts')
 var community = require('./controller/home/community')
 var messenger = require('./controller/home/messenger')
 var filter = require('./controller/filter')
@@ -92,52 +101,172 @@ app.use('/languageex', signup)
 app.use('/languageex', registerinfo)
 app.use('/languageex', authenticateuser)
 app.use('/languageex', homerq)
-app.use('/languageex', home)
+app.use('/languageex', posts)
 app.use('/languageex', filter)
 app.use('/languageex', community)
 app.use('/languageex', messenger)
 
 
+const translate = require('google-translate-api');
+
 var userOnorOffline_id = [];//dia chi email
-var ind = 0, Length, flag = false;
+var index = 0, flag = false;
+var TIME_OFFLINE = 8000;
+var anotherQuery = require('./model/Anotherquery')
 
 
-io.on('connection', function(client){
+io.on('connection', function(client)
+{
 	console.log('Client connected ' + client.id);
 
-	client.on('notifyOnline', function(id)//tham so data la email cua nguoi dung
-    {
-    	client.user_id = id;
-    	for(index = 0; index < Length; index ++){
-        	if(Useronoroffline_id[index] == id){
-	     		client.emit('numofuseronline', yiduser)
-          		flag = true;
-          		break;
+	client.on('notifyOnline', function(id){//tham so data la email cua nguoi dung
+
+    	client.handshake.session.uid = id;
+      client.handshake.session.save();
+
+      flag = false;
+
+    	for(index = 0; index < userOnorOffline_id.length; index ++){
+        	if(userOnorOffline_id[index] == id){
+	     		io.to(client.handshake.session.community).emit('numofuseronline',  client.handshake.session.numOn)
+          	flag = true;
+          	break;
         	}
-      	}
-    })
+      }
 
-    client.on('joinchat', function(){
+      if(!flag){
 
-    })
+         client.handshake.session.numOn = 0;
+         client.handshake.session.community = client.handshake.session.uid;
+         //add to array
+         userOnorOffline_id[userOnorOffline_id.length] = client.handshake.session.id;
+         client.handshake.session.save();
 
-    client.on('typing', function(){
-    	
-    })
+         var sqlString = "UPDATE User SET state = 1 WHERE id = " + mysql.escape(client.handshake.session.uid)
+         con.query(sqlString, function(err, result, fields){
+            if(err) throw err;
+            else{
+               console.log(result.affectedRows + " record(s) updated online.");
+               anotherQuery.selectListUsermyCommunityEx(client.handshake.session.uid, function(data){
+                  var index = 0
+                  for(index = 0; index < data.length; index++){
+                     if(data[index].state == 1)
+                        client.handshake.session.numOn++;
+                     client.handshake.session.community += data[index].id
+                  }
+                  client.handshake.session.save();
+
+                  console.log("my community room " + client.handshake.session.community)
+                  client.join(client.handshake.session.community)
+                  io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+               })
+            }
+         })
+      }
+
+   })
+
 
 	client.on('disconnect', function(){
-		console.log("User id = " + client.user_id + " offline.")
+		console.log("User code id = " + client.handshake.session.uid + " offline.")
+   
+      for(index = 0; index < userOnorOffline_id.length; index++){
+         if(client.handshake.session.uid == userOnorOffline_id[index]){
+            userOnorOffline_id.splice(index, 1)
+            break;
+         }
+      }
 
-		var sqlString = "UPDATE User SET state = 0 WHERE id = " + client.user_id
-		con.query(sqlString, function(err, result, fields){
-			if(err) throw err;
-			else console.log(result.affectedRows + " record(s) updated.");
-		})
+      if(client.handshake.session.uid){
+         var sqlString = "UPDATE User SET state = 0 WHERE id = " + mysql.escape(client.handshake.session.uid)
+         con.query(sqlString, function(err, result, fields){
+            if(err) throw err;
+            else{
+               client.handshake.session.numOn--;
+               io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+               console.log(result.affectedRows + " record(s) updated offline.");
 
-		client.leave(client.room);
-	})
+               client.leave(client.handshake.session.community);
+               client.leave(client.room);
+
+               delete client.handshake.session.community;
+               delete client.handshake.session.numOn;
+               delete client.handshake.session.uid;
+               client.handshake.session.save();
+            }
+       })
+	  }
+
+   })
+
+
+   client.on('createroomchat', function(data){
+      var myid = data.myid;
+      var pid = data.partnerid;
+
+      if(myid > pid){
+         client.join(myid + pid)
+         client.room = myid + pid
+      }else{
+         client.join(pid + myid)
+         client.room = pid + myid
+      }
+     
+      console.log("Da tao room " + client.room)
+   })
+
+
+   client.on('leaveroomchat', function(data){
+      client.leave(client.room);
+      console.log("Da out room " + client.room)
+   })
+
+
+   //nguoi dung dang nhap tin nhan, báo cho phía bên đối tác: tao đang nhập tin nhắn cho mày
+   client.on('chatting', function(data){
+      client.broadcast.emit('typing...', data)
+   })
+
+
+   client.on('translate', function(data){
+      translate(data.content, {from: data.myex, to: data.mynative}).then(res => {
+         console.log(res.text);
+         console.log(res.from.language.iso);
+
+      }).catch(err => {
+         console.error(err);
+      });
+   })
+
+
+   client.on('checkmisspellings', function(data){
+      translate('I spea Dutch!', {from: 'en', to: 'nl'}).then(res => {
+            console.log(res);
+            console.log(res.text);
+            //=> Ik spea Nederlands! 
+            console.log(res.from.text.autoCorrected);
+            //=> false 
+            console.log(res.from.text.value);
+            //=> I [speak] Dutch! 
+            console.log(res.from.text.didYouMean);
+            //=> true 
+         }).catch(err => {
+
+            console.error(err);
+         });
+   })
+
+
+   client.on('receivermsg', function(data){//nhan tin nhan sau do gui di
+
+      io.sockets.in(client.room).emit('sendmsg', { //server gui tin nhan den nguoi nhận
+         data: content, 
+         id_send: id_sender,
+         id_receive: id_receiver
+      });
+   })
+
 })
-
 
 
 

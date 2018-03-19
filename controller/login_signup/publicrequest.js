@@ -195,31 +195,34 @@ router.route('/')
  	var userid = null
  	if(typeof req.query.uid != 'undefined')
  		userid = req.query.uid
-   
+   	
  	if(userid && req.session.user_id){
  		//check database, escape sql injection..
  		querysimple.selectTable("User", ["id"], [{op:"", field: "id", value: userid}], null, null, null,
  			function(result, fields, err){
- 				if(err) throw err
- 			if(result.length > 0){
- 				querysimple.selectProfile(userid, function(result, fields, err){
- 					if(err) throw err
- 					else{
- 						var User = result
- 						if(userid == req.session.user_id)
- 							User.state = "me"
- 						else
- 							User.state = "something"
- 						res.render('ejs/Profile', {User: User})
- 					}
- 				})
- 			}else{
- 				var err = {}
- 				err.redirect = "/languageex/home"
- 				err.title = "Sorry, this content isn't available right now"
- 				err.code = "#1232"
- 				err.content = "The link you followed may have expired, or the page may only be visible to an audience you're not in."
- 				res.render('ejs/Profile', {err: err})
+ 				if(err) throw err;
+ 			else{
+
+ 				if(result.length > 0){
+ 					querysimple.selectProfile(result[0].id, function(result1, fields1, err1){
+ 						if(err1) throw err1
+ 						else{
+ 							var User = result1
+ 							if(userid == req.session.user_id)
+ 								User.state = "me"
+ 							else
+ 								User.state = "something"
+ 							res.render('ejs/Profile', {User: User})
+ 						}
+ 					})
+ 				}else{
+ 					var err = {}
+ 					err.redirect = "/languageex/home"
+ 					err.title = "Sorry, this content isn't available right now"
+ 					err.code = "#1232"
+ 					err.content = "The link you followed may have expired, or the page may only be visible to an audience you're not in."
+ 					res.render('ejs/Profile', {err: err})
+ 				}
  			}
  		})
  	}else{
