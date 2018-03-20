@@ -5,20 +5,15 @@
                 return array.push.apply(array, rest);
             };
 			
-			
-			var me = {};
-			me.avatar = "https://lh6.googleusercontent.com/-lr2nyjhhjXw/AAAAAAAAAAI/AAAAAAAARmE/MdtfUmC0M4s/photo.jpg?sz=48";
-
-			var you = {};
-			you.avatar = "https://a11.t26.net/taringa/avatares/9/1/2/F/7/8/Demon_King1/48x48_5C5.jpg";
-        
+		
             //this variable represents the total number of popups can be displayed according to the viewport width
             var total_popups = 0;
             
             //arrays of popups ids
             var popups = [];
 			
-			function formatAMPM(date) {
+			function formatAMPM(date)
+			{
 				var hours = date.getHours();
 				var minutes = date.getMinutes();
 				var ampm = hours >= 12 ? 'PM' : 'AM';
@@ -26,6 +21,7 @@
 				hours = hours ? hours : 12; // the hour '0' should be '12'
 				minutes = minutes < 10 ? '0'+minutes : minutes;
 				var strTime = hours + ':' + minutes + ' ' + ampm;
+
 				return strTime;
 			}            
         
@@ -33,7 +29,7 @@
             function close_popup(id)
             {
             	console.log("gui tin hieu out room")
-                socket.emit('leaveroomchat', {myid: myid, pid: id}) 
+                socket.emit('leaveroomchat', {myid: MYID, pid: id}) 
                 
                 for(var iii = 0; iii < popups.length; iii++)
                 {
@@ -99,58 +95,121 @@
 
             
             //creates markup for a new popup. Adds the id to popups array.
-            function register_popup(id, name)
+            function register_popup(id, name, photo)
             {
-       
-           //     takecontentMessage(id, function(data){
-           //     	console.log(data)
-           //     })
-
-                takeSettingMessage(id, function(data){
-                	console.log(data)
-                })
-
-                socket.emit('createroomchat', {myid: myid, partnerid: id})
+          
+                socket.emit('createroomchat', {myid: MYID, partnerid: id})
 
                 for(var iii = 0; iii < popups.length; iii++)
                 {   
                     //already registered. Bring it to front.
-                    if(id == popups[iii])
-                    {
+                    if(id == popups[iii]){
                         Array.remove(popups, iii);
-                    
                         popups.unshift(id);
-                        
-                        calculate_popups();
-                        
+                        calculate_popups(); 
                         return;
                     }
                 }               
                 
-                //tao roomchat
+                //load message setting and content message
+                takeSettingMessage(id, function(content){
+                	takecontentMessage(id, function(setting){
+               			document.getElementsByTagName("nav")[0].innerHTML += 
+               				Show_pop_up_message(id, name, photo, setting);  
+						document.getElementById(id+"_scrollmsg").scrollTop = 
+							document.getElementById(id+"_scrollmsg").scrollHeight
 
+						popups.unshift(id);
+                        calculate_popups();
+						//show data to user
 
-                document.getElementsByTagName("nav")[0].innerHTML += Show_pop_up_message(id, name);  
-				$('#content_message').scrollTop($('#content_message')[0].scrollHeight);
-                popups.unshift(id);
-                calculate_popups();
-				
+                	})
+                })
+
             }
 			
-			var count = 0;
-			function Click(e, id)
+			function Click(e, id, photo)
 			{	  
-	          if(e.keyCode == 13){
-				  count++;
-				  val = document.getElementById(id+"ee").value;
-				  if(count%2==0)
-					Message_send(id, val)
-				  else
-					Message_receiver(id, val)  
-				  document.getElementById(id+"ee").value = "";
-			  }
+	          	if(e.keyCode == 13){
+	          		var time = formatAMPM(new Date());
+					var val = document.getElementById(id + "_mymsg").value;
+
+					if(val.length > 0){
+						Message_send(id, time, MYPHOTO, val)
+						socket.emit('sendmsg', {
+							content: val,
+							time: new Date(),
+                        	myid: MYID,
+                        	photo: MYPHOTO,
+                        	pid: id
+						}) 
+						document.getElementById(id + "_mymsg").value = "";
+
+						socket.emit('checkmisspellings', {
+							content: val,
+            				nat: MYPRIONAT,
+            				ex: MYPRIOEX,
+            				id: MYID
+						})
+
+					}
+			  	}else{//nguoi dung dang nhap ban phim
+			  		socket.emit('chatting', {
+                     	myid: MYID,
+                     	pid: id
+                  	})  
+			  	}
             }
+
+            //nhan tin nhan cua nguoi gui
+            socket.on('receivermsg', function(data)
+            {
+            	var time = formatAMPM(new Date(data.time));
+            	if(MYID == parseInt(data.id_receive)){
+
+            		var seenmsg = document.getElementsByClassName(data.id_send+"_seen")
+            		if(seenmsg.length > 0)
+						seenmsg[seenmsg.length-1].style.display = "none"
+
+            	 	Message_receiver(data.id_send, time, data.myphoto, data.content)
+            	    document.getElementById(data.id_send+"_typing").style.display = "none"
+            		
+          			$('#'+data.id_send+'_mymsg').on("focus", function(){
+          				if($(this).is(':focus'))
+          					socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
+          			})
+
+            		socket.emit('checkmisspellings', {
+            			content: data.content,
+            			nat: MYPRIONAT,
+            			ex: MYPRIOEX,
+            			id: MYID
+					})
+            	}
+            })
+
+            socket.on('seen', function(data){
+				var seenmsg = document.getElementsByClassName(data.myid+"_seen")
+				if(seenmsg.length > 0)
+					seenmsg[seenmsg.length-1].style.display = "block"
+		    })	
             
+            var TIME_TYPING = 4500;
+            //nguoi dung dang nhap tin nhan
+            socket.on('typing...', function(data){
+            	var seenmsg = document.getElementsByClassName(data.myid+"_seen")
+            	if(seenmsg.length > 0)
+					seenmsg[seenmsg.length-1].style.display = "none"
+
+            	if(parseInt(data.pid) == parseInt(MYID)){
+            		document.getElementById(data.myid+"_typing").style.display = "block"
+            		setTimeout(function(){
+            			document.getElementById(data.myid+"_typing").style.display = "none"
+            		}, TIME_TYPING)
+            		
+            	}
+            })
+
             //calculate the total number of popups suitable and then populate the toatal_popups variable.
             function calculate_popups()
             {
@@ -171,9 +230,11 @@
             window.addEventListener("load", calculate_popups);
 			
 			
-			
-			function Show_pop_up_message(id, name)
+			function Show_pop_up_message(id, name, photo, setting)
 			{
+				var misspellings = ""
+				var blockmsg = ""
+
 				var element = '<div class="popup-box-chat" id="'+ id +'">' + 
 									'<div style="background-color:  #5b5bef;height: 10%;">' + 
                                         '<div style="height:100%;display:table;float:left;width:70%;">' + 
@@ -189,12 +250,14 @@
 													   '</a>' + 
 				                                       '<ul class="dropdown-menu" style="z-index:999;">' + 
 													       '<li> <div class="checkbox" style="margin-left:10%;">' +
-      																	'<label><input type="checkbox" value="" checked> Auto misspellings</label>'+
+      																'<label><input type="checkbox" value="" checked> Auto misspellings</label>'+
    															   '</div></li>' + 
    															'<li><a href="/languageex/messenger?uid='+id+'">Open in messenger</a></li>' + 
 														   '<li><div class="checkbox" style="margin-left:10%;">' +
       																'<label><input type="checkbox" value="" > Block messages</label>'+
    															   '</div></li>' +
+   															'<li><a href="#">Translations priority</a></li>' + 
+   															'<li><a href="#">Misspellings priority</a></li>' + 
 														   '<li><a href="#">Delete Conversation</a></li>' + 
 														   '<li><a href="#">Report <span style="color:orange;">'+name+'</span></a></li>' +
 														'</ul>' + 
@@ -208,11 +271,12 @@
                                         '</div>' + 
 								    '</div>' + 
 				
-                                    '<div style="height:80%;width:100%;background-color:#CCCCCC;overflow:auto;" id="content_message">' + //#bcd1c6
-                                       '<div><ul id="'+name+'" class="ulclass"></ul></div>' + //content message
+                                    '<div style="height:80%;width:100%;background-color:#CCCCCC;overflow:auto;" id="'+id+'_scrollmsg">' + //#bcd1c6
+                                       '<div style="text-align: center; margin-top:3%;">Welcome to talk with <span style="color: red;">'+ name +'</span></div>'+
+                                       '<div><ul id="'+id+'_content" class="ulclass"></ul></div>' + //content message
 									   
-										'<div style="background-color:#CCCCCC;z-index:1;">' +
-									      '<img src="'+me.avatar+'" class="img-rounded" alt="Anh dai dien" width="40" height="40" style="margin-top:-1%;">' + 
+										'<div style="background-color:#CCCCCC;z-index:1;display:none;bottom: 0;" id="'+id+'_typing">' +
+									      '<img src="'+photo+'" class="img-rounded" alt="Anh dai dien" width="40" height="40" style="margin-top:-1%;">' + 
 										  '<span>.....</span>' + 
 										  '<i class="fa fa-spinner fa-spin" style="font-size:24px"></i>' + 
 										  '<span>.....</span>' + 
@@ -221,7 +285,7 @@
                                     '</div>' +
 							
                                     '<div style="margin-top:5px;box-shadow: 1px 2px 5px #ccccff;height: 10%;">' + 
-                                          '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+name+'ee" style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="Click(event,\''+name+'\')">' + 
+                                          '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg" style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="Click(event,\''+id+'\')">' + 
 				                          '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px"></i></a>' + 
 				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px"></i></a>' + 
                                           '<div style="clear: both;"></div>'
@@ -233,44 +297,52 @@
 				
 			}
 			
-			function Message_send(id, content)
+
+			function makerandomid(){
+    			var text = "";
+    			var possible = "0123456789";
+
+    			for( var i = 0; i < 17; i++ )//ma xac thuc co ngau nhien 45 ki tu
+        			text += possible.charAt(Math.floor(Math.random() * possible.length));
+    			return text;
+			}
+
+
+			function Message_send(id, date, photo, content)
 			{
-				var date = formatAMPM(new Date());
+				var rid = parseInt(makerandomid())
 
 				var control = '<li style="width:100%;margin-top:2%;">' +
                         '<div class="msj macro">' +
-                        '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+ me.avatar +'" /></div>' +
+                        '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+photo+'" /></div>' +
                             '<div class="text text-l">' +
                                 '<p>'+ content +'</p>' +
 								'<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;display:none;">' +
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
-									'<span class="glyphicon glyphicon-edit" ></span>' + 
-									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;"></span>' + 
-									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;"></span>' + 
+									'<span class="glyphicon glyphicon-edit" onclick="Editmessage(\''+content+'\')"></span>' + 
+									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling('+rid+',\''+content+'\')"></span>' + 
+									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' + 
 								'</a>' +
                             '</div>' +
                         '</div>' +
 						
-						'<div class="translate">translate</div>' +
-						'<div class="translate misspellings">misspellings</div>' +
-                    '</li>'; 
+						'<div class="translate" style="display:none;" id="'+rid+'">translate</div>' +
+						'<div class="translate misspellings" style="display:none;" id="'+rid+'_missp">misspelling</div>' +
+                    '</li>'+
+                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">seen at '+formatAMPM(new Date())+'</div>';
+                    
 
-                socket.emit('chatting', {
-                     id_send: yid,
-                     id_receive: Partner_id
-                  })  
-				
-				document.getElementById(id).innerHTML +=  control;	
-				
-				$('#content_message').scrollTop($('#content_message')[0].scrollHeight);
+				document.getElementById(id+"_content").innerHTML +=  control;
+
+				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
-			
 
-			function Message_receiver(id, content)
+
+			function Message_receiver(id, date, photo, content)
 			{
-				var date = formatAMPM(new Date());
-				
+				var rid = parseInt(makerandomid())
+
 				var control = '<li style="width:100%;margin-top:2%;">' +
                         '<div class="msj-rta macro">' +
                             '<div class="text text-r">' +
@@ -278,32 +350,56 @@
 								'<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;display:none;">'+
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
-									'<span class="glyphicon glyphicon-edit" ></span>' + 
-									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;"></span>' + 
-									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(\''+content+'\');"></span>' +
+									'<span class="glyphicon glyphicon-edit" onclick="Editmessage(\''+content+'\')"></span>' + 
+									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling('+rid+',\''+content+'\')"></span>' + 
+									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' +
 								'</a>' +
                             '</div>' +
-                        '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+you.avatar+'" /></div>' +
+                        '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+photo+'"/></div>' +
                   '</li>' +
-				  '<li style="width:100%;"><div class="translate" style="float:right;">translate</div>' +
-				  '<div class="translate misspellings" style="float:right;">misspellings</div></li>';
+				  '<li style="width:100%;"><div class="translate" style="float:right;display:none;" id="'+rid+'">translate</div>' +
+				  '<div class="translate misspellings" style="float:right;display:none;" id="'+rid+'_missp">misspellings</div></li>';
+
 				
-				document.getElementById(id).innerHTML += control;
-				
-				$('#content_message').scrollTop($('#content_message')[0].scrollHeight);
+				document.getElementById(id+"_content").innerHTML += control;
+				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
 
-			
-			function Translate(content){
-				alert(content)
+			var count_num_translate = 0;
+			function Translate(e, id, content){
+				e.preventDefault()
+				var showtranslatep = document.getElementById(id)
+				if(count_num_translate%2 == 0){
+
+					showtranslatep.style.display = "block"
+
+					socket.emit('translate', {
+						id: MYID,
+						ex: MYPRIOEX, 
+						nat: MYPRIONAT,
+						content:content
+					})
+
+					socket.on('translateddone', function(data){
+						if(data.error == null)
+							showtranslatep.innerHTML = "trans: <span style='color:blue'>" + data.translated+"</span>"
+						else
+							showtranslatep.innerHTML = "trans: " + data.error
+					})
+
+				}else
+					showtranslatep.style.display = "none"
+
+				count_num_translate++;
 			}
 			
 
-			function Misspelling(content){
+			function Misspelling(id, content){
 				alert(content)
 			}
 			
 
 			function Editmessage(content){
+				this.style.color = "red"
 				alert(content)
 			}

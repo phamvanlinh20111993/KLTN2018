@@ -21,12 +21,12 @@ var selectMyposts_cmts = function(myid, cb){
 
 
 var selectNotMyposts_cmts = function(myid, cb){
-
+	var sqlString = ""
 }
 
 
 var selectposts_cmts_myfollow = function(myid, cb){
-
+	var sqlString = ""
 }
 
 

@@ -87,8 +87,11 @@
   </style>
   <link rel="stylesheet" href="/css/processboxchat.css">
   <script type="text/javascript">
-     var myid = parseInt("<%= session.user_id  %>")
-     var myemail = "<%= session.email %>"
+     var MYID = parseInt("<%= session.user_id  %>")
+     var MYEMAIL = "<%= session.email %>"
+     var MYPHOTO = "<%= session.photo %>"
+     var MYPRIONAT = "<%= session.mynative %>"
+    var MYPRIOEX = "<%= session.myexchange %>"
 
   </script>
 </head>
@@ -101,6 +104,95 @@
       để phát triển, vui lòng bật lại script. Thân ái.
   </div>
 </noscript>
+
+
+<!-- Modal -->
+  <div class="modal fade" id="ReportuserHome" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Why report this user</h4>
+        </div>
+        <div class="modal-body">
+
+          <div class="checkbox">
+            <label><input type="checkbox" value="">Option 1</label>
+         </div>
+         <div class="checkbox">
+            <label><input type="checkbox" value="">Option 2</label>
+         </div>
+         <div class="checkbox">
+            <label><input type="checkbox" value="">Option 3</label>
+         </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Modal -->
+  <div class="modal fade" id="TranslationpriorityHome" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Language translation priority</h4>
+        </div>
+        <div class="modal-body">
+          <p>My Exchange Language</p>
+
+          <div class="checkbox">
+            <label><input type="checkbox" value="">Option 1</label>
+         </div>
+         <div class="checkbox">
+            <label><input type="checkbox" value="">Option 2</label>
+         </div>
+         <div class="checkbox">
+            <label><input type="checkbox" value="">Option 3</label>
+         </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <div class="modal fade" id="MisspellingpriorityHome" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Language Misspelling priority</h4>
+        </div>
+        <div class="modal-body">
+          <p>My Native Language</p>
+          
+          <div class="checkbox">
+            <label><input type="checkbox" value="">Option 1</label>
+         </div>
+         <div class="checkbox">
+            <label><input type="checkbox" value="">Option 2</label>
+         </div>
+         <div class="checkbox">
+            <label><input type="checkbox" value="">Option 3</label>
+         </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
@@ -257,7 +349,7 @@
            
       socket.on('connect', function(data) {
          //ban dau la khi nguoi dung ket noi         
-         socket.emit('notifyOnline', myid);//client bao voi server la t online roi
+         socket.emit('notifyOnline', MYID);//client bao voi server la t online roi
       });
 
       socket.on('numofuseronline', function(signal){

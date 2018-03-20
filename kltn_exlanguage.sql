@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 14, 2018 at 09:49 PM
+-- Generation Time: Mar 20, 2018 at 01:25 PM
 -- Server version: 10.1.25-MariaDB
 -- PHP Version: 7.0.21
 
@@ -64,6 +64,13 @@ CREATE TABLE `blocklist_user` (
   `timeblock` datetime NOT NULL,
   `time` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `blocklist_user`
+--
+
+INSERT INTO `blocklist_user` (`id`, `whoblock`, `blockwho`, `timeblock`, `time`) VALUES
+(1, 1090168801152655, 402629716513658300, '2018-03-28 17:32:34', '2018-03-16 11:43:41');
 
 -- --------------------------------------------------------
 
@@ -155,6 +162,13 @@ CREATE TABLE `editmessage` (
   `time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `editmessage`
+--
+
+INSERT INTO `editmessage` (`id`, `message_id`, `whoedit`, `newcontent`, `time`) VALUES
+(1, 1, 1090168801152655, 'con cac', '2018-03-20 04:06:04');
+
 -- --------------------------------------------------------
 
 --
@@ -177,9 +191,11 @@ INSERT INTO `exchangelg` (`id`, `user_id`, `degree_id`, `language_id`, `time`) V
 (4, 1090168801152655, 1, 7, '2018-03-14 02:44:26'),
 (5, 660454276020380500, 1, 7, '2018-03-14 03:20:22'),
 (6, 804260829616815200, 2, 7, '2018-03-14 03:23:36'),
-(7, 18446744073709551615, 3, 7, '2018-03-14 19:33:44'),
+(7, 184467440737095520, 3, 7, '2018-03-14 19:33:44'),
 (9, 402629716513658300, 1, 7, '2018-03-15 01:52:11'),
-(10, 879091109123433100, 1, 1, '2018-03-15 02:24:08');
+(10, 879091109123433100, 1, 1, '2018-03-15 02:24:08'),
+(11, 879091109123433100, 4, 3, '2018-03-14 02:44:01'),
+(12, 1090168801152655, 5, 2, '2018-03-14 08:13:09');
 
 -- --------------------------------------------------------
 
@@ -286,6 +302,18 @@ CREATE TABLE `message` (
   `time` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `message`
+--
+
+INSERT INTO `message` (`id`, `userA`, `userB`, `data`, `content`, `check`, `time`) VALUES
+(1, 804260829616815200, 1090168801152655, NULL, 'chung ta se la gi nhi', 1, '2018-03-17 16:26:34'),
+(2, 1090168801152655, 804260829616815200, NULL, 'khong biet ke di', 1, '2018-03-17 20:18:43'),
+(3, 804260829616815200, 1090168801152655, NULL, 'sao lai ns nte', 1, '2018-03-19 13:43:18'),
+(4, 804260829616815200, 1090168801152655, NULL, 'anh cam nghe chua', 1, '2018-04-19 13:43:18'),
+(5, 660454276020380500, 804260829616815200, NULL, 'dang lam gi', 1, '2018-03-19 06:21:00'),
+(6, 804260829616815200, 660454276020380500, NULL, 'ke t', 1, '2018-03-19 11:46:10');
+
 -- --------------------------------------------------------
 
 --
@@ -296,20 +324,21 @@ CREATE TABLE `nativelg` (
   `id` int(4) UNSIGNED NOT NULL,
   `user_id` bigint(30) UNSIGNED NOT NULL,
   `language_id` int(4) UNSIGNED NOT NULL,
-  `time` datetime NOT NULL
+  `time` datetime NOT NULL,
+  `prio` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nativelg`
 --
 
-INSERT INTO `nativelg` (`id`, `user_id`, `language_id`, `time`) VALUES
-(3, 1090168801152655, 7, '2018-03-14 02:44:27'),
-(4, 660454276020380500, 7, '2018-03-14 03:20:22'),
-(5, 804260829616815200, 7, '2018-03-14 03:23:37'),
-(6, 18446744073709551615, 7, '2018-03-14 19:33:44'),
-(8, 402629716513658300, 7, '2018-03-15 01:52:11'),
-(9, 879091109123433100, 1, '2018-03-15 02:24:08');
+INSERT INTO `nativelg` (`id`, `user_id`, `language_id`, `time`, `prio`) VALUES
+(3, 1090168801152655, 7, '2018-03-14 02:44:27', 1),
+(4, 660454276020380500, 7, '2018-03-14 03:20:22', 1),
+(5, 804260829616815200, 7, '2018-03-14 03:23:37', 1),
+(6, 184467440737095520, 7, '2018-03-14 19:33:44', 1),
+(8, 402629716513658300, 7, '2018-03-15 01:52:11', 1),
+(9, 879091109123433100, 1, '2018-03-15 02:24:08', 1);
 
 -- --------------------------------------------------------
 
@@ -469,12 +498,13 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `email`, `password`, `name`, `des`, `score`, `level_id`, `photo`, `gender`, `provider`, `dateofbirth`, `state`, `stay`, `admin`, `creatime`, `time`) VALUES
-(1090168801152655, 'ngannt1710@gmail.com', NULL, 'Lạc Lạc', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv', 0, 1, 'https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/23754830_1014103178759218_3255625551533095662_n.jpg?oh=9dabdadea73cff04c604f128b6e1faad&oe=5B453E55', 'female', 'facebook', '1948-08-14 00:00:00', b'0', b'0', b'0', '2018-03-14 02:44:26', '0000-00-00 00:00:00'),
-(402629716513658300, '14020822@vnu.edu.vn', 'U2FsdGVkX1/DkPnKrZLX3SBw0theOsxg7rUulw11ToJcu1twzY6emnBFWOVnO4iV', 'Tran dai nhan', 'rat thich giao tiep voi moi nguoi, to rat yeu giao tiep yeu duong lang nhang chan that neu khong kiem che duoc cam xuc thi se la no le cua cam xuc', 0, 1, '/data/img/402629716513658286/kApIh0hA7EoS0KxVIpEes6yDG7A8m9Zg5hEmZYVD1LUHJ.png', 'male', 'custom', '1997-07-06 00:00:00', b'1', b'1', b'0', '2018-03-15 01:52:11', '2018-03-14 20:42:47'),
-(660454276020380500, 'phamvanlinh08061995@gmail.com', 'U2FsdGVkX1+PKgMkTztfI7HqoRrs6zN/ZJS9iluko3PILhwkQlPRpK6aea8O0VBK', 'Nguyễn Ngàn ngu ngớ', 'ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', 0, 1, '/data/img/660454276020380604/ac92SsG9hcxp8sGUWpbhSh58BCUlj4eLwJsvFwEbl7KYf.png', 'male', 'custom', '1951-06-10 00:00:00', b'0', b'0', b'0', '2018-03-14 03:20:22', '0000-00-00 00:00:00'),
-(804260829616815200, 'phamvanlinh20111993@gmail.com', 'U2FsdGVkX1/Adt8pRN6k9yH9rcVHf7V4Wvo8WnlIFubOktcf/EkKfgtOau6m3e8Y', 'NamiCambell', 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd', 0, 1, '/data/img/804260829616815190/22wjwu5NQ2qBbLCYfiDxFXTYfMh3DClarc2x6DF38vyFm.png', 'male', 'custom', '1949-10-09 00:00:00', b'0', b'0', b'1', '2018-03-14 03:23:36', '2018-03-14 20:45:42'),
-(879091109123433100, '14020323@vnu.edu.vn', 'U2FsdGVkX1+lPiPslnLoDR2R2b/RNevO0p4kZKw6MmsoDSrY5Ic7xvs0FySJQ75W', 'Nguyễn Ngàn', 'ewffffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 0, 1, '/data/img/879091109123433092/TGtTxqfaqXjZ9ATrshKyqspXaJ6KsbWx5XK43IjM8F4N3.png', 'male', 'custom', '2011-06-05 00:00:00', b'1', b'1', b'0', '2018-03-15 02:24:08', '2018-03-14 19:24:08'),
-(18446744073709551615, 'duanwebptudweb@gmail.com', NULL, 'Web DuAn', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 0, 1, 'https://lh6.googleusercontent.com/-UDk_IK-gSek/AAAAAAAAAAI/AAAAAAAAAAs/0uoreIUR760/photo.jpg?sz=50', 'male', 'google', '1947-09-12 00:00:00', b'0', b'0', b'0', '2018-03-14 19:33:44', '0000-00-00 00:00:00');
+(184467440737, 'vithinhan@gmail.com', 'NULL', 'Nhan Nguyen', 'yeu moi truong', 0, 2, 'sdasdasdas', 'male', 'google', '2009-11-01 00:00:00', 0, 0, 0, '2018-03-19 14:56:18', '0000-00-00 00:00:00'),
+(1090168801152655, 'ngannt1710@gmail.com', NULL, 'Lạc Lạc', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv', 0, 1, 'https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/23754830_1014103178759218_3255625551533095662_n.jpg?oh=9dabdadea73cff04c604f128b6e1faad&oe=5B453E55', 'female', 'facebook', '1948-08-14 00:00:00', 1, 1, 0, '2018-03-14 02:44:26', '2018-03-20 12:15:37'),
+(184467440737095520, 'duanwebptudweb@gmail.com', NULL, 'Web DuAn', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 0, 1, 'https://lh6.googleusercontent.com/-UDk_IK-gSek/AAAAAAAAAAI/AAAAAAAAAAs/0uoreIUR760/photo.jpg?sz=50', 'male', 'google', '1947-09-12 00:00:00', 0, 0, 0, '2018-03-14 19:33:44', '2018-03-19 17:05:55'),
+(402629716513658300, '14020822@vnu.edu.vn', 'U2FsdGVkX1/DkPnKrZLX3SBw0theOsxg7rUulw11ToJcu1twzY6emnBFWOVnO4iV', 'Tran dai nhan', 'rat thich giao tiep voi moi nguoi, to rat yeu giao tiep yeu duong lang nhang chan that neu khong kiem che duoc cam xuc thi se la no le cua cam xuc', 0, 1, '/data/img/402629716513658286/kApIh0hA7EoS0KxVIpEes6yDG7A8m9Zg5hEmZYVD1LUHJ.png', 'male', 'custom', '1997-07-06 00:00:00', 0, 1, 0, '2018-03-15 01:52:11', '2018-03-19 18:53:56'),
+(660454276020380500, 'phamvanlinh08061995@gmail.com', 'U2FsdGVkX1+PKgMkTztfI7HqoRrs6zN/ZJS9iluko3PILhwkQlPRpK6aea8O0VBK', 'Nguyễn Ngàn ngu ngớ', 'ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', 0, 1, '/data/img/660454276020380604/ac92SsG9hcxp8sGUWpbhSh58BCUlj4eLwJsvFwEbl7KYf.png', 'male', 'custom', '1951-06-10 00:00:00', 0, 0, 0, '2018-03-14 03:20:22', '2018-03-14 20:51:59'),
+(804260829616815200, 'phamvanlinh20111993@gmail.com', 'U2FsdGVkX1/Adt8pRN6k9yH9rcVHf7V4Wvo8WnlIFubOktcf/EkKfgtOau6m3e8Y', 'NamiCambell', 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd', 0, 1, '/data/img/804260829616815190/22wjwu5NQ2qBbLCYfiDxFXTYfMh3DClarc2x6DF38vyFm.png', 'male', 'custom', '1949-10-09 00:00:00', 1, 1, 1, '2018-03-14 03:23:36', '2018-03-20 12:14:25'),
+(879091109123433100, '14020323@vnu.edu.vn', 'U2FsdGVkX1+lPiPslnLoDR2R2b/RNevO0p4kZKw6MmsoDSrY5Ic7xvs0FySJQ75W', 'Nguyễn Ngàn', 'ewffffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 0, 1, '/data/img/879091109123433100/gHHXLgbaGiIqwo1x2Y8NxLmS2vmBUrmcG2SNMg6dgOw7i.png', 'male', 'custom', '2011-06-05 00:00:00', 0, 1, 0, '2018-03-15 02:24:08', '2018-03-19 12:50:51');
 
 --
 -- Indexes for dumped tables
@@ -668,7 +698,7 @@ ALTER TABLE `blocklist_admin_content`
 -- AUTO_INCREMENT for table `blocklist_user`
 --
 ALTER TABLE `blocklist_user`
-  MODIFY `id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `blockmessages`
 --
@@ -698,12 +728,12 @@ ALTER TABLE `delconversation`
 -- AUTO_INCREMENT for table `editmessage`
 --
 ALTER TABLE `editmessage`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `exchangelg`
 --
 ALTER TABLE `exchangelg`
-  MODIFY `id` int(4) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(4) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `follow`
 --
@@ -723,7 +753,7 @@ ALTER TABLE `level`
 -- AUTO_INCREMENT for table `message`
 --
 ALTER TABLE `message`
-  MODIFY `id` bigint(40) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(40) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT for table `nativelg`
 --

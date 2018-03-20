@@ -4,6 +4,7 @@ var router = express.Router()
 var CryptoJS = require("crypto-js")
 var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
+var anotherquery = require('../../model/Anotherquery')
 
 
 router.route('/home')
@@ -33,8 +34,13 @@ router.route('/home')
 							req.session.user_id = result[0].id
 							req.session.email = result[0].email
 							req.session.password = result[0].password
+							req.session.photo = result[0].photo
 
-							res.render('ejs/homepage', {user: result})
+							anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+								req.session.mynative = data[0].natsy
+								req.session.myexchange = data[0].exsy
+								res.render('ejs/homepage', {user: result})
+							})
 						})
 					}else
 						res.redirect('/languageex/user/login')
@@ -55,7 +61,14 @@ router.route('/home')
 				req.session.user_id = result[0].id
 				req.session.email = result[0].email
 				req.session.password = result[0].password	
-				res.render('ejs/homepage', {user: result})
+				req.session.photo = result[0].photo
+				
+				anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+					req.session.mynative = data[0].natsy
+					req.session.myexchange = data[0].exsy
+					res.render('ejs/homepage', {user: result})
+				})
+				
 			})
 		}else
 			res.redirect('/languageex/user/filter')
@@ -71,11 +84,21 @@ router.route('/home')
     	querysimple.updateTable("User", [{field: "state", value: 1}, {field: "stay", value: 1}], 
 			[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
 			if(err) throw err;
+			anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+				req.session.mynative = data[0].natsy
+				req.session.myexchange = data[0].exsy
+				res.render('ejs/homepage', {user: result})
+			})
 			console.log(result.affectedRows + " record(s) updated")
 		})
 
 		querysimple.selectUser(req.session.email, function(result, fields, err){
 			if(err) throw err
+			anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+				req.session.mynative = data[0].natsy
+				req.session.myexchange = data[0].exsy
+				res.render('ejs/homepage', {user: result})
+			})
 			res.render('ejs/homepage', {user: result})
 		})
 		

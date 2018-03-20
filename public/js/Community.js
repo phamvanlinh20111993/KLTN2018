@@ -16,7 +16,8 @@ var getListUserCommnunity = function(id, callback) {
 var showUserCommunity = function(User)
 {
 	var isOnline = '<h4> <i class="fa fa-circle" style="color:red;"></i> '+User.infor.name+' </h4>'
-	var isFollow = '<a href="#"  data-toggle="tooltip" title="Follow '+User.infor.name+'"  class="icon"><i class="fa fa-eye" style="font-size:36px;color:#3399FF;"></i></a>'
+	var isFollow = '<a href="#"  data-toggle="tooltip" title="Follow '+User.infor.name+
+                  '"class="icon"><i class="fa fa-eye" style="font-size:36px;color:#3399FF;"></i></a>'
 
 	if(User.infor.state == 1){
 		isOnline = '<h4> <i class="fa fa-circle" style="color:green;"></i> '+User.infor.name+' </h4>'
@@ -30,9 +31,8 @@ var showUserCommunity = function(User)
 	var Interface = '<div class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">'+
              			'<div class="card inf-content">' +
                				'<div style="width: 100%;height: 50%;" data-toggle="tooltip" title="View profile ">' +
-                  				'<a href="/languageex/user/profile?uid='+encodeURIComponent(User.infor.id)+'"><img src="'+User.infor.photo+'"'+
-            					'alt="'+User.infor.name+'" style="width:100%;max-height: 100%;border-radius:8px;border:1px solid #696969; ">'+
-            					'</a>'+
+                  				'<img src="'+User.infor.photo+'"alt="'+User.infor.name+'" style="width:100%;max-height:100%;cursor:pointer; '+
+            					     'border-radius:8px;border:1px solid #696969; " onclick = "viewProfileByImage(\''+User.infor.id+'\')">'+
               				'</div>'+
          					'<div style="line-height: 90%;">'+
        							isOnline +
@@ -42,7 +42,7 @@ var showUserCommunity = function(User)
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
-                  				'<a href="#" onclick="register_popup('+User.infor.id+',\''+User.infor.name+'\');"  data-toggle="tooltip" title="Send message" class="icon">'+
+                  				'<a href="#" onclick="register_popup('+User.infor.id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');"  data-toggle="tooltip" title="Send message" class="icon">'+
                   				'<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>' +
                   				isFollow +
                				'</div>'+
@@ -61,11 +61,16 @@ Object.size = function(obj) {
     return size;
 };
 
-getListUserCommnunity(myid, function(data)
+getListUserCommnunity(MYID, function(data)
 {
     var size = data.community.length;
     var ind = 0;
-    console.log(data)
+  //  console.log(data)
     for(ind = 0; ind < size; ind++)
     	showUserCommunity(data.community[ind])
 })
+
+
+function viewProfileByImage(uid){
+  location.href = "/languageex/user/profile?uid="+encodeURIComponent(uid)
+}

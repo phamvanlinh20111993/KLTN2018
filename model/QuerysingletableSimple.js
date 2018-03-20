@@ -181,8 +181,10 @@ var selectTableJoin = function(tbname, data, cb){
 
 //tra ve thong tin nguoi dung email(params) hien thi trong trang home
 var selectUser = function(email, cb){//hien thi nguoi dung
-	var sqlString = "select user.id, user.name, user.email, user.photo,user.score, level.level from user inner join level "+
-				"on level.id = user.level_id where user.email = " + mysql.escape(email);
+	var sqlString = "select user.id, user.name, user.email, user.photo, user.score,"+
+	            " level.level from user INNER JOIN level "+
+				" ON level.id = user.level_id"+
+			    " WHERE user.email = " + mysql.escape(email);
 
 	con.query(sqlString, function(err, result, fields){
 		if(err)
@@ -442,7 +444,7 @@ var selectUserCommunityNative = function(id, cb){
 			if(resu.length > 1) orcondi +=")"
 
 			//all user online and have max lever sorted, max level
-			var sqlString = "SELECT u.id, u.name AS uname, u.des, u.state, "+
+			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, "+
 				"u.photo, u.gender, u.score, la.name AS lname, le.level FROM user u " +
 				"JOIN level le ON u.level_id = le.id JOIN nativelg nat ON u.id = nat.user_id "+
 				"JOIN language la ON la.id = nat.language_id " +
@@ -485,7 +487,7 @@ var selectUserCommunityEx = function(id, cb){
 			if(resu.length > 1) orcondi +=")"
 
 			//all user online and have max lever sorted, max level
-			var sqlString = "SELECT u.id, u.name AS uname, u.des, u.state, "+
+			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, "+
 				"u.photo, u.gender, u.score, u.dateofbirth, de.name AS dename, " +
 				" la.name AS lname, le.level FROM user u " +
 				"JOIN level le ON u.level_id = le.id JOIN exchangelg ex ON u.id = ex.user_id "+

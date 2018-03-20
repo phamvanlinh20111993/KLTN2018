@@ -184,6 +184,7 @@ io.on('connection', function(client)
             else{
                client.handshake.session.numOn--;
                io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+               //io.sockets.in(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
                console.log(result.affectedRows + " record(s) updated offline.");
 
                client.leave(client.handshake.session.community);
@@ -224,48 +225,69 @@ io.on('connection', function(client)
 
    //nguoi dung dang nhap tin nhan, báo cho phía bên đối tác: tao đang nhập tin nhắn cho mày
    client.on('chatting', function(data){
-      client.broadcast.emit('typing...', data)
+      client.in(client.room).emit('typing...', data)//ca 
+
    })
 
 
    client.on('translate', function(data){
-      translate(data.content, {from: data.myex, to: data.mynative}).then(res => {
-         console.log(res.text);
-         console.log(res.from.language.iso);
-
+      translate(data.content, {from: data.ex, to: data.nat}).then(res => {
+         io.sockets.in(client.room).emit('translateddone', {
+            uid: data.id,
+            translated: res.text,
+            error: null
+         })
       }).catch(err => {
          console.error(err);
+         io.sockets.in(client.room).emit('translateddone', {
+            error: err
+         })
       });
    })
 
 
-   client.on('checkmisspellings', function(data){
-      translate('I spea Dutch!', {from: 'en', to: 'nl'}).then(res => {
+   client.on('checkmisspellings', function(data)
+   {
+    //  console.log("from "+data.ex + " to " +  data.nat)
+      translate(data.content, {to: data.nat}).then(res => {
             console.log(res);
             console.log(res.text);
-            //=> Ik spea Nederlands! 
             console.log(res.from.text.autoCorrected);
-            //=> false 
             console.log(res.from.text.value);
-            //=> I [speak] Dutch! 
             console.log(res.from.text.didYouMean);
-            //=> true 
+           
+            io.sockets.in(client.room).emit('checkeddone', {
+               checktrue: res.from.text.autoCorrected,
+               error: null
+            })
          }).catch(err => {
-
-            console.error(err);
+             console.error(err);
+             io.sockets.in(client.room).emit('checkeddone',{
+               error: err
+             })
          });
    })
 
 
-   client.on('receivermsg', function(data){//nhan tin nhan sau do gui di
+   client.on('sendmsg', function(data){//nhan tin nhan sau do gui di
+      //save in database
 
-      io.sockets.in(client.room).emit('sendmsg', { //server gui tin nhan den nguoi nhận
-         data: content, 
-         id_send: id_sender,
-         id_receive: id_receiver
+
+
+      client.in(client.room).emit('receivermsg', { //server gui tin nhan den nguoi nhận
+         content: data.content, 
+         myphoto: data.photo,
+         id_send: data.myid,
+         id_receive: data.pid,
+         time: data.time
       });
    })
 
+
+   client.on('isseemsg', function(data){
+      client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
+      //io.sockets.in(client.room)//ca 2 ben deu thay tin nhan
+   })
 })
 
 

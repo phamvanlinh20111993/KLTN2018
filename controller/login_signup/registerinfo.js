@@ -77,13 +77,13 @@ router.route('/user/signup/register')
          if(err)
             throw err;
          else{
-            querysimple.insertTable("ExchangeLG", ["user_id", "degree_id", "language_id", "time"], 
-               [parseInt(req.session.user_id), parseInt(degree), parseInt(languageEx), new Date()], function(result, err){
+            querysimple.insertTable("ExchangeLG", ["user_id", "degree_id", "language_id", "time", "prio"], 
+               [parseInt(req.session.user_id), parseInt(degree), parseInt(languageEx), new Date(), 1], function(result, err){
                if(err)
                   throw err;
                else{
-                  querysimple.insertTable("nativelg", ["user_id", "language_id", "time"], 
-                     [parseInt(req.session.user_id), parseInt(languageEx), new Date()], function(result, err){
+                  querysimple.insertTable("nativelg", ["user_id", "language_id", "time", "prio"], 
+                     [parseInt(req.session.user_id), parseInt(native), new Date(), 1], function(result, err){
                      if(err)
                         throw err;
                      else {

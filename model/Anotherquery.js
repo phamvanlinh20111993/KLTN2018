@@ -159,9 +159,53 @@ var selectListUsermyCommunityEx = function(id, cb){
 	})
 }
 
+//tra ve ngon ngu tu nhien va ngon ngu trao doi co do uu tien cao nhat
+var select_max_prio_Ex_and_Navtive = function(id, cb){
+	var sqlstr = "SELECT la.symbol AS exsy, la.name AS natname, la1.symbol AS natsy,"+
+	        " la1.name AS exname FROM exchangelg JOIN language la "+
+	        " ON la.id = exchangelg.language_id JOIN nativelg "+
+	        " ON exchangelg.user_id = nativelg.user_id JOIN language la1 "+
+	        " ON la1.id = nativelg.language_id WHERE exchangelg.user_id = "+ mysql.escape(id)+
+	        " AND exchangelg.prio = 1 AND nativelg.prio = 1"+
+	        " LIMIT 1"
+
+	con.query(sqlstr, function(err, result, fields){
+		if(err) throw err;
+		else  cb(result)
+	})
+}
+
+var selectAllExchangelg = function(id, cb){
+	var sqlstr = "SELECT u.id as id, la.symbol AS exsy, la.name AS exname, exchangelg.prio"+
+	        " FROM exchangelg JOIN language la "+
+	        " ON la.id = exchangelg.language_id JOIN user u ON " +
+	        " u.id = exchangelg.user_id WHERE u.id = "+ mysql.escape(id)+
+	        " ORDER BY exchangelg.prio DESC"
+
+	con.query(sqlstr, function(err, result, fields){
+		if(err) throw err;
+		else  cb(result)
+	})
+}
+
+var selectAllNativelg = function(id, cb){
+	var sqlstr = "SELECT u.id as id, la.symbol AS natsy, la.name AS natname, nativelg.prio"+
+	        " FROM nativelg nat JOIN language la "+
+	        " ON la.id = nativelg.language_id JOIN user u ON " +
+	        " u.id = nativelg.user_id WHERE u.id = "+ mysql.escape(id)+
+	        " ORDER BY nativelg.prio DESC"
+
+	con.query(sqlString, function(err, result, fields){
+		if(err) throw err;
+		else  cb(result)
+	})
+}
 
 module.exports = {
 	editMessage: editMessage,
 	delConversation: delConversation,
-	selectListUsermyCommunityEx: selectListUsermyCommunityEx
+	selectListUsermyCommunityEx: selectListUsermyCommunityEx,
+	select_max_prio_Ex_and_Navtive:select_max_prio_Ex_and_Navtive,
+	selectAllNativelg: selectAllNativelg,
+	selectAllExchangelg: selectAllExchangelg
 }

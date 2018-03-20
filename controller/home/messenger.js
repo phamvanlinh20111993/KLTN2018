@@ -9,11 +9,16 @@ var anotherquery = require('../../model/Anotherquery')
 
 router.route('/user/messages')
 .get(function(req, res){
+	//khoi tao session
+	var uid = req.body.uid
+
+
 
 })
 .post(function(req, res)
 {
-	if(req.session.user_id){
+	if(req.session.filter)
+	{
 		var idanother = req.body.anotherid    	                   	
 		if(typeof idanother != 'undefined'){
 			querysimple.selectMessage(req.session.user_id, idanother, function(err, data){
@@ -53,14 +58,34 @@ router.route('/user/loadmsgsetting')
 
 
 router.route('/user/editmgs')
-.get(function(req, res){
-
-})
 .post(function(req, res)
 {
 	if(req.session.user_id){
 		
 	}
 })
+
+
+router.route('/user/allnat')
+.post(function(req, res)
+{
+	if(req.session.user_id){
+		anotherquery.selectAllNativelg(req.session.user_id, function(data){
+			console.log(data)
+		})
+	}
+})
+
+
+router.route('/user/allex')
+.post(function(req, res)
+{
+	if(req.session.user_id){
+		anotherquery.selectAllExchangelg(req.session.user_id, function(data){
+			console.log(data)
+		})
+	}
+})
+
 
 module.exports = router;
