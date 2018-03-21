@@ -149,7 +149,8 @@
 							content: val,
             				nat: MYPRIONAT,
             				ex: MYPRIOEX,
-            				id: MYID
+            				id: MYID,
+            				senderid: id
 						})
 
 					}
@@ -175,15 +176,17 @@
             	    document.getElementById(data.id_send+"_typing").style.display = "none"
             		
           			$('#'+data.id_send+'_mymsg').on("focus", function(){
-          				if($(this).is(':focus'))
+          				if($(this).is(':focus')){
           					socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
+          				}
           			})
 
             		socket.emit('checkmisspellings', {
             			content: data.content,
             			nat: MYPRIONAT,
             			ex: MYPRIOEX,
-            			id: MYID
+            			id: MYID,
+            			senderid: data.id_send
 					})
             	}
             })
@@ -285,7 +288,8 @@
                                     '</div>' +
 							
                                     '<div style="margin-top:5px;box-shadow: 1px 2px 5px #ccccff;height: 10%;">' + 
-                                          '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg" style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="Click(event,\''+id+'\')">' + 
+                                          '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
+                                            ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="Click(event,\''+id+'\')">'+ 
 				                          '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px"></i></a>' + 
 				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px"></i></a>' + 
                                           '<div style="clear: both;"></div>'
@@ -302,7 +306,7 @@
     			var text = "";
     			var possible = "0123456789";
 
-    			for( var i = 0; i < 17; i++ )//ma xac thuc co ngau nhien 45 ki tu
+    			for( var i = 0; i < 20; i++ )//ma xac thuc co ngau nhien 45 ki tu
         			text += possible.charAt(Math.floor(Math.random() * possible.length));
     			return text;
 			}
@@ -311,28 +315,26 @@
 			function Message_send(id, date, photo, content)
 			{
 				var rid = parseInt(makerandomid())
-
-				var control = '<li style="width:100%;margin-top:2%;">' +
+	
+				var control = '<li style="width:100%;margin-top:2%;" class="'+id+'_msgserc">' +
                         '<div class="msj macro">' +
-                        '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+photo+'" /></div>' +
+                            '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+photo+'" /></div>' +
                             '<div class="text text-l">' +
                                 '<p>'+ content +'</p>' +
 								'<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;display:none;">' +
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
 									'<span class="glyphicon glyphicon-edit" onclick="Editmessage(\''+content+'\')"></span>' + 
-									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling('+rid+',\''+content+'\')"></span>' + 
+									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling(event,'+id+')"></span>' + 
 									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' + 
 								'</a>' +
                             '</div>' +
                         '</div>' +
 						
 						'<div class="translate" style="display:none;" id="'+rid+'">translate</div>' +
-						'<div class="translate misspellings" style="display:none;" id="'+rid+'_missp">misspelling</div>' +
+						'<div class="translate misspellings" style="display:none;">misspelling</div>' +
                     '</li>'+
-                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">seen at '+formatAMPM(new Date())+'</div>';
-                    
-
+                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">seen at '+formatAMPM(new Date())+'</div>';    
 				document.getElementById(id+"_content").innerHTML +=  control;
 
 				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
@@ -351,55 +353,77 @@
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
 									'<span class="glyphicon glyphicon-edit" onclick="Editmessage(\''+content+'\')"></span>' + 
-									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling('+rid+',\''+content+'\')"></span>' + 
+									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling(event,'+id+')"></span>' + 
 									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' +
 								'</a>' +
                             '</div>' +
                         '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+photo+'"/></div>' +
                   '</li>' +
-				  '<li style="width:100%;"><div class="translate" style="float:right;display:none;" id="'+rid+'">translate</div>' +
-				  '<div class="translate misspellings" style="float:right;display:none;" id="'+rid+'_missp">misspellings</div></li>';
+				  '<li style="width:100%;" class="'+id+'_msgserc"><div class="translate" style="float:right;display:none;" id="'+rid+'">translate</div>' +
+				  '<div class="translate misspellings" style="float:right;display:none;">misspellings</div></li>';
 
 				
 				document.getElementById(id+"_content").innerHTML += control;
 				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
 
-			var count_num_translate = 0;
+
+			socket.on('checkeddone', function(data){
+				var showcheckedmis = document.getElementsByClassName(data.sid + "_msgserc")
+				if(showcheckedmis.length > 0){
+					var showcontent = showcheckedmis[showcheckedmis.length-1].getElementsByClassName("misspellings")
+					showcontent[0].innerHTML = data.value
+					console.log(data)
+				}
+			})
+
+
+			var TIME_TRANSLATE = 5000, TIME_MISSPE = 7000
 			function Translate(e, id, content){
 				e.preventDefault()
 				var showtranslatep = document.getElementById(id)
-				if(count_num_translate%2 == 0){
+				showtranslatep.style.display = "block"
 
-					showtranslatep.style.display = "block"
+				socket.emit('translate', {
+					id: MYID,
+					ex: MYPRIOEX, 
+					nat: MYPRIONAT,
+					content:content,
+					eid: id//id (ben giao dien)cua message da gui len
+				})
 
-					socket.emit('translate', {
-						id: MYID,
-						ex: MYPRIOEX, 
-						nat: MYPRIONAT,
-						content:content
-					})
-
-					socket.on('translateddone', function(data){
-						if(data.error == null)
-							showtranslatep.innerHTML = "trans: <span style='color:blue'>" + data.translated+"</span>"
-						else
-							showtranslatep.innerHTML = "trans: " + data.error
-					})
-
-				}else
+				setTimeout(function(){
 					showtranslatep.style.display = "none"
-
-				count_num_translate++;
+				}, TIME_TRANSLATE)
 			}
 			
 
-			function Misspelling(id, content){
-				alert(content)
+			socket.on('translateddone', function(data){
+				var showtranslatep = document.getElementById(data.eid)
+				if(data.error == null)
+					showtranslatep.innerHTML = "trans: <span style='color:blue'>" + data.translated+"</span>"
+				else
+					showtranslatep.innerHTML = "trans: " + data.error
+			})
+
+
+			function Misspelling(e, id){
+				e.preventDefault()
+				var showcheckedmis = document.getElementsByClassName(id + "_msgserc")
+				console.log("toi da chay " + showcheckedmis.length + "  " + id)
+				if(showcheckedmis.length > 0){
+					var showcontent = showcheckedmis[showcheckedmis.length-1].getElementsByClassName("misspellings")
+					console.log("toi da chay id " + id)
+					showcontent[0].style.display = "block"
+
+					setTimeout(function(){
+						showcontent[0].style.display = "none"
+					}, TIME_MISSPE)
+				}
 			}
 			
 
 			function Editmessage(content){
-				this.style.color = "red"
+				//this.style.color = "red"
 				alert(content)
 			}

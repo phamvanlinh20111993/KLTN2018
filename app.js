@@ -235,12 +235,14 @@ io.on('connection', function(client)
          io.sockets.in(client.room).emit('translateddone', {
             uid: data.id,
             translated: res.text,
-            error: null
+            error: null,
+            eid: data.eid
          })
       }).catch(err => {
          console.error(err);
          io.sockets.in(client.room).emit('translateddone', {
-            error: err
+            error: err,
+            eid: data.eid
          })
       });
    })
@@ -249,7 +251,7 @@ io.on('connection', function(client)
    client.on('checkmisspellings', function(data)
    {
     //  console.log("from "+data.ex + " to " +  data.nat)
-      translate(data.content, {to: data.nat}).then(res => {
+      translate(data.content, {to: data.ex}).then(res => {
             console.log(res);
             console.log(res.text);
             console.log(res.from.text.autoCorrected);
@@ -258,12 +260,18 @@ io.on('connection', function(client)
            
             io.sockets.in(client.room).emit('checkeddone', {
                checktrue: res.from.text.autoCorrected,
+               corrected: res.from.text.didYouMean,
+               id: data.id,
+               sid: data.senderid,
+               value: res.from.text.value,
                error: null
             })
          }).catch(err => {
              console.error(err);
              io.sockets.in(client.room).emit('checkeddone',{
-               error: err
+               error: err,
+               id: data.id,
+               sid: data.senderid
              })
          });
    })
