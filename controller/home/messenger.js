@@ -5,6 +5,7 @@ var CryptoJS = require("crypto-js")
 var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
 var anotherquery = require('../../model/Anotherquery')
+const translate = require('google-translate-api');
 
 
 router.route('/user/messages')
@@ -61,6 +62,9 @@ router.route('/user/editmgs')
 .post(function(req, res)
 {
 	if(req.session.user_id){
+		var content = req.body.content
+		var messid = req.body.id
+		var whoedit = req.session.user_id
 		
 	}
 })
@@ -84,6 +88,70 @@ router.route('/user/allex')
 		anotherquery.selectAllExchangelg(req.session.user_id, function(data){
 			console.log(data)
 		})
+	}
+})
+
+
+router.route('/user/translate')
+.post(function(req, res){
+
+	if(req.session.user_id){
+		var myex = req.body.ex
+		var mynat = req.body.nat
+		var content = req.body.content
+		var Trlcontent = {}
+
+		translate(content, {from: myex, to: mynat}).then(resp => {
+            Trlcontent.translated = resp.text
+            Trlcontent.error = null
+
+            console.log(resp);
+            console.log(resp.text);
+
+            res.send(JSON.stringify({content:Trlcontent}))
+        }).catch(err => {
+         	console.error(err);
+         
+         	Trlcontent.translated = null
+         	Trlcontent.error = err
+
+         	res.send(JSON.stringify({content:Trlcontent}))
+      });
+	}
+	
+})
+
+
+router.route('/user/checkmisspelling')
+.post(function(req, res){
+
+	if(req.session.user_id){
+
+		var myex = req.body.ex
+		var content = req.body.content
+		var Misscontent = {}
+
+		translate(content, {to: myex}).then(resp => {
+
+			console.log(resp);
+            console.log(resp.text);
+            console.log(resp.from.text.autoCorrected);
+            console.log(resp.from.text.value);
+            console.log(resp.from.text.didYouMean);
+
+            Misscontent.checktrue = resp.from.text.autoCorrected
+            Misscontent.corrected = resp.from.text.didYouMean,
+            Misscontent.value = resp.from.text.value
+            Misscontent.error = null
+
+            res.send(JSON.stringify({content:Misscontent}))
+        }).catch(err => {
+         	console.error(err);
+            Misscontent.error =  err
+            Misscontent.value = null
+         	
+         	res.send(JSON.stringify({content:Misscontent}))
+      });
 	}
 })
 

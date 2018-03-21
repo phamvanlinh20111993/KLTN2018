@@ -229,53 +229,7 @@ io.on('connection', function(client)
 
    })
 
-
-   client.on('translate', function(data){
-      translate(data.content, {from: data.ex, to: data.nat}).then(res => {
-         io.sockets.in(client.room).emit('translateddone', {
-            uid: data.id,
-            translated: res.text,
-            error: null,
-            eid: data.eid
-         })
-      }).catch(err => {
-         console.error(err);
-         io.sockets.in(client.room).emit('translateddone', {
-            error: err,
-            eid: data.eid
-         })
-      });
-   })
-
-
-   client.on('checkmisspellings', function(data)
-   {
-    //  console.log("from "+data.ex + " to " +  data.nat)
-      translate(data.content, {to: data.ex}).then(res => {
-            console.log(res);
-            console.log(res.text);
-            console.log(res.from.text.autoCorrected);
-            console.log(res.from.text.value);
-            console.log(res.from.text.didYouMean);
-           
-            io.sockets.in(client.room).emit('checkeddone', {
-               checktrue: res.from.text.autoCorrected,
-               corrected: res.from.text.didYouMean,
-               id: data.id,
-               sid: data.senderid,
-               value: res.from.text.value,
-               error: null
-            })
-         }).catch(err => {
-             console.error(err);
-             io.sockets.in(client.room).emit('checkeddone',{
-               error: err,
-               id: data.id,
-               sid: data.senderid
-             })
-         });
-   })
-
+   
 
    client.on('sendmsg', function(data){//nhan tin nhan sau do gui di
       //save in database

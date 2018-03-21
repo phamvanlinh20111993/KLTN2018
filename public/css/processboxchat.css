@@ -150,7 +150,14 @@
 			font-style: italic;
 		}
 		
-		.translate.misspellings{
+		.misspellings{
+			margin-top:0px;
+			width:85%;
+			border-radius:5px;
+			padding:5px;
+			display:inline-block;
+			font-size:13px;
+			font-style: italic;
 			background-color: #3399FF;
 		}
 		

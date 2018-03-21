@@ -145,14 +145,6 @@
 						}) 
 						document.getElementById(id + "_mymsg").value = "";
 
-						socket.emit('checkmisspellings', {
-							content: val,
-            				nat: MYPRIONAT,
-            				ex: MYPRIOEX,
-            				id: MYID,
-            				senderid: id
-						})
-
 					}
 			  	}else{//nguoi dung dang nhap ban phim
 			  		socket.emit('chatting', {
@@ -180,14 +172,6 @@
           					socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
           				}
           			})
-
-            		socket.emit('checkmisspellings', {
-            			content: data.content,
-            			nat: MYPRIONAT,
-            			ex: MYPRIOEX,
-            			id: MYID,
-            			senderid: data.id_send
-					})
             	}
             })
 
@@ -316,27 +300,30 @@
 			{
 				var rid = parseInt(makerandomid())
 	
-				var control = '<li style="width:100%;margin-top:2%;" class="'+id+'_msgserc">' +
+				var control = '<li style="width:100%;margin-top:2%;">' +
                         '<div class="msj macro">' +
                             '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+photo+'" /></div>' +
                             '<div class="text text-l">' +
-                                '<p>'+ content +'</p>' +
-								'<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;display:none;">' +
+                                '<p id="'+rid+'_contentmsg">'+content+'</p>' +
+								'<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;background:orange;display:none;" id="'+rid+'_fixcontmsg">' +
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
-									'<span class="glyphicon glyphicon-edit" onclick="Editmessage(\''+content+'\')"></span>' + 
-									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling(event,'+id+')"></span>' + 
+									'<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
+									'<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="showMisspelling(event,'+rid+')"></span>' + 
 									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' + 
 								'</a>' +
                             '</div>' +
                         '</div>' +
 						
-						'<div class="translate" style="display:none;" id="'+rid+'">translate</div>' +
-						'<div class="translate misspellings" style="display:none;">misspelling</div>' +
+						'<div class="translate" id="'+rid+'_trans" style="display:none;margin-top:2%;"></div>' +
+						'<div class="misspellings" style="display:none;margin-top:2%;" id="'+rid+'_missp"></div>' +
+
                     '</li>'+
-                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">seen at '+formatAMPM(new Date())+'</div>';    
+                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">seen at '+formatAMPM(new Date())+'</div>';  
+
 				document.getElementById(id+"_content").innerHTML +=  control;
 
+				Misspelling(rid, content);
 				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
 
@@ -348,82 +335,147 @@
 				var control = '<li style="width:100%;margin-top:2%;">' +
                         '<div class="msj-rta macro">' +
                             '<div class="text text-r">' +
-                                '<p>'+content+'</p>' +
-								'<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;display:none;">'+
+                                '<p id="'+rid+'_contentmsg">'+content+'</p>' +
+								'<input id="'+rid+'_fixcontmsg" type="text" value="'+content+'" autofocus style="border:0px;background:orange;outline-width:0;display:none;">'+
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
-									'<span class="glyphicon glyphicon-edit" onclick="Editmessage(\''+content+'\')"></span>' + 
-									'<span class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="Misspelling(event,'+id+')"></span>' + 
+									'<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
+									'<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;" onclick="showMisspelling(event,'+rid+')"></span>' + 
 									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' +
 								'</a>' +
                             '</div>' +
                         '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+photo+'"/></div>' +
                   '</li>' +
-				  '<li style="width:100%;" class="'+id+'_msgserc"><div class="translate" style="float:right;display:none;" id="'+rid+'">translate</div>' +
-				  '<div class="translate misspellings" style="float:right;display:none;">misspellings</div></li>';
+				  '<li style="width:100%;"><div class="translate" style="float:right;display:none;" id="'+rid+'_trans"></div>' +
+				  '<div class="misspellings" style="float:right;display:none;" id="'+rid+'_missp"></div></li>';
 
-				
 				document.getElementById(id+"_content").innerHTML += control;
+				//add setting condition
+				Misspelling(rid, content);
+
 				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
 
 
-			socket.on('checkeddone', function(data){
-				var showcheckedmis = document.getElementsByClassName(data.sid + "_msgserc")
-				if(showcheckedmis.length > 0){
-					var showcontent = showcheckedmis[showcheckedmis.length-1].getElementsByClassName("misspellings")
-					showcontent[0].innerHTML = data.value
-					console.log(data)
-				}
-			})
-
-
-			var TIME_TRANSLATE = 5000, TIME_MISSPE = 7000
-			function Translate(e, id, content){
+			var TIME_TRANSLATE = 5000, TIME_MISSPE = 5000
+			function Translate(e, id, content)
+			{
 				e.preventDefault()
-				var showtranslatep = document.getElementById(id)
-				showtranslatep.style.display = "block"
+				var showtranslatep = document.getElementById(id+"_trans")
 
-				socket.emit('translate', {
-					id: MYID,
-					ex: MYPRIOEX, 
-					nat: MYPRIONAT,
-					content:content,
-					eid: id//id (ben giao dien)cua message da gui len
+				if(showtranslatep.innerHTML == ""){
+					Translate_or_Misspelling("/languageex/user/translate", 
+				  		MYPRIOEX, MYPRIONAT, content, function(data){
+				  	
+				  		if(data.content.error == null){
+				  			showtranslatep.innerHTML = "trans:  <span style='color:blue;'>"+data.content.translated+"</span>"
+				  		}else
+				  			showtranslatep.innerHTML = "somes error with your msg."
+				  		
+				  		showtranslatep.style.display = "block"
+						setTimeout(function(){
+							showtranslatep.style.display = "none"
+						}, TIME_TRANSLATE)
+					})
+
+				}else{
+					showtranslatep.style.display = "block"
+					setTimeout(function(){
+						showtranslatep.style.display = "none"
+					}, TIME_TRANSLATE)
+				}
+			}
+			
+
+			function Misspelling(id, content)
+			{
+				var showcheckedmis = document.getElementById(id+"_missp")
+
+				if(showcheckedmis.innerHTML == "")
+				{
+					Translate_or_Misspelling("/languageex/user/checkmisspelling", 
+						MYPRIOEX , null, content, function(data){
+	
+						if(data.content.error == null){
+							if(data.content.value==""){
+								showcheckedmis.innerHTML = "your message ok."
+							}else{
+								document.getElementById(id+"_check").style.color = "red"
+								showcheckedmis.innerHTML = "mean: " + data.content.value
+							}
+						}else
+							showcheckedmis.innerHTML = "not match with your language."
+					})
+				}
+			}
+
+			function showMisspelling(e, id){
+				e.preventDefault()
+				var showcheckedmis = document.getElementById(id+"_missp")
+
+				showcheckedmis.style.display = "block"
+				setTimeout(function(){
+					showcheckedmis.style.display = "none"
+				}, TIME_MISSPE)
+			}
+			
+			//ham sua tin nhan
+			function Editmessage(e, id, content){
+				e.preventDefault()
+				var span_edit = document.getElementById(id+"_speditmsg")
+				var p_content = document.getElementById(id+"_contentmsg")
+				var input_fix_content = document.getElementById(id+"_fixcontmsg")
+
+				p_content.style.display = "none"
+				input_fix_content.style.display = "block"
+				
+				//dat con tro o cuoi the input
+				setCaretPosition(input_fix_content, input_fix_content.value.length);
+
+				input_fix_content.addEventListener("keypress", function(e){
+
+					if(e.keyCode == 13){
+						var content = input_fix_content.value
+						if(content.length < 1)
+							alert("You can not blank this fields")
+						else{
+							p_content.style.display = "block"
+							p_content.innerHTML = content
+							input_fix_content.style.display = "none"
+							//ajax with else condition
+						}
+					}
 				})
 
-				setTimeout(function(){
-					showtranslatep.style.display = "none"
-				}, TIME_TRANSLATE)
 			}
-			
 
-			socket.on('translateddone', function(data){
-				var showtranslatep = document.getElementById(data.eid)
-				if(data.error == null)
-					showtranslatep.innerHTML = "trans: <span style='color:blue'>" + data.translated+"</span>"
-				else
-					showtranslatep.innerHTML = "trans: " + data.error
-			})
+			//gui du lieu len server
+			var Translate_or_Misspelling = function(url, myex, mynat, content, cb){
+            	$.ajax({
+                    type: "POST",
+                    url: url,
+                    data:{nat: mynat, ex: myex, content: content},
+                    success: function(data)//hien thi message
+                    {
+                        if(typeof cb == "function")
+                       		cb(JSON.parse(data));//tra ve du lieu
+                    }
+                  })
+            }
 
-
-			function Misspelling(e, id){
-				e.preventDefault()
-				var showcheckedmis = document.getElementsByClassName(id + "_msgserc")
-				console.log("toi da chay " + showcheckedmis.length + "  " + id)
-				if(showcheckedmis.length > 0){
-					var showcontent = showcheckedmis[showcheckedmis.length-1].getElementsByClassName("misspellings")
-					console.log("toi da chay id " + id)
-					showcontent[0].style.display = "block"
-
-					setTimeout(function(){
-						showcontent[0].style.display = "none"
-					}, TIME_MISSPE)
-				}
-			}
-			
-
-			function Editmessage(content){
-				//this.style.color = "red"
-				alert(content)
+            //ham set vi tri cua con tro khi thay doi gia tri trong input
+            function setCaretPosition(ctrl, pos) {
+  				// Modern browsers
+  				if (ctrl.setSelectionRange) {
+   				 	ctrl.focus();
+    			 	ctrl.setSelectionRange(pos, pos);
+  
+  				// IE8 and below
+  				} else if (ctrl.createTextRange) {
+    				var range = ctrl.createTextRange();
+    				range.collapse(true);
+    				range.moveEnd('character', pos);
+    				range.moveStart('character', pos);
+    				range.select();
+  				}		
 			}
