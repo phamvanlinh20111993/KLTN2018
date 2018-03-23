@@ -98,7 +98,7 @@
             function register_popup(id, name, photo)
             {
           
-                socket.emit('createroomchat', {myid: MYID, partnerid: id})
+                socket.emit('createroomchat', {myid: MYID, pid: id})
 
                 for(var iii = 0; iii < popups.length; iii++)
                 {   
@@ -128,8 +128,14 @@
 
             }
 			
-			function Click(e, id, photo)
-			{	  
+			//su kien nhap tin nhan cua nguoi dung
+			function writeMessage(e, id, photo)
+			{	
+				//xóa dòng đã xem tin nhắn
+				var seenmsg = document.getElementsByClassName(id+"_seen")
+				if(seenmsg.length > 0)
+					seenmsg[seenmsg.length-1].style.display = "none"
+
 	          	if(e.keyCode == 13){
 	          		var time = formatAMPM(new Date());
 					var val = document.getElementById(id + "_mymsg").value;
@@ -143,6 +149,7 @@
                         	photo: MYPHOTO,
                         	pid: id
 						}) 
+						//reset input box
 						document.getElementById(id + "_mymsg").value = "";
 
 					}
@@ -166,11 +173,12 @@
 
             	 	Message_receiver(data.id_send, time, data.myphoto, data.content)
             	    document.getElementById(data.id_send+"_typing").style.display = "none"
-            		
+
           			$('#'+data.id_send+'_mymsg').on("focus", function(){
-          				if($(this).is(':focus')){
-          					socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
-          				}
+          				//console.log("check event focus")
+          				//if($(this).is(':focus')){}//if focus
+          				socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
+          				
           			})
             	}
             })
@@ -184,6 +192,7 @@
             var TIME_TYPING = 4500;
             //nguoi dung dang nhap tin nhan
             socket.on('typing...', function(data){
+            	//xóa dòng đã xem tin nhắn
             	var seenmsg = document.getElementsByClassName(data.myid+"_seen")
             	if(seenmsg.length > 0)
 					seenmsg[seenmsg.length-1].style.display = "none"
@@ -237,16 +246,16 @@
 													   '</a>' + 
 				                                       '<ul class="dropdown-menu" style="z-index:999;">' + 
 													       '<li> <div class="checkbox" style="margin-left:10%;">' +
-      																'<label><input type="checkbox" value="" checked> Auto misspellings</label>'+
+      																'<label><input type="checkbox" value="" checked onclick="Auto_check_miss(this,'+id+')"> Auto misspellings</label>'+
    															   '</div></li>' + 
    															'<li><a href="/languageex/messenger?uid='+id+'">Open in messenger</a></li>' + 
 														   '<li><div class="checkbox" style="margin-left:10%;">' +
-      																'<label><input type="checkbox" value="" > Block messages</label>'+
+      																'<label><input type="checkbox" value="" onclick="Blockmessages(this,'+id+',\''+name+'\')"> Block messages</label>'+
    															   '</div></li>' +
-   															'<li><a href="#">Translations priority</a></li>' + 
-   															'<li><a href="#">Misspellings priority</a></li>' + 
-														   '<li><a href="#">Delete Conversation</a></li>' + 
-														   '<li><a href="#">Report <span style="color:orange;">'+name+'</span></a></li>' +
+   															'<li><a href="#" onclick="translatePrio()">Translations priority</a></li>' + 
+   															'<li><a href="#" onclick="misspellingPrio()">Misspellings priority</a></li>' + 
+														   '<li><a href="#" onclick="delConversation('+id+',\''+name+'\')">Delete Conversation</a></li>' + 
+														   '<li><a href="#" onclick="reportUser('+id+',\''+name+'\' )">Report <span style="color:orange;">'+name+'</span></a></li>' +
 														'</ul>' + 
 				                                   '</div>' + 
 											 '</div>' + 
@@ -273,7 +282,7 @@
 							
                                     '<div style="margin-top:5px;box-shadow: 1px 2px 5px #ccccff;height: 10%;">' + 
                                           '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
-                                            ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="Click(event,\''+id+'\')">'+ 
+                                            ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
 				                          '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px"></i></a>' + 
 				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px"></i></a>' + 
                                           '<div style="clear: both;"></div>'
@@ -309,8 +318,8 @@
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
 									'<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
-									'<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="showMisspelling(event,'+rid+')"></span>' + 
-									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' + 
+									'<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="showMisspelling(event,'+rid+', '+id+')"></span>' + 
+									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\','+id+')"></span>' + 
 								'</a>' +
                             '</div>' +
                         '</div>' +
@@ -340,8 +349,8 @@
                                 '<p><small>'+date+'</small></p>' +
 								'<a href="#">' +
 									'<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
-									'<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;" onclick="showMisspelling(event,'+rid+')"></span>' + 
-									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\')"></span>' +
+									'<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;" onclick="showMisspelling(event,'+rid+','+id+')"></span>' + 
+									'<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\','+id+')"></span>' +
 								'</a>' +
                             '</div>' +
                         '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+photo+'"/></div>' +
@@ -358,7 +367,7 @@
 
 
 			var TIME_TRANSLATE = 5000, TIME_MISSPE = 5000
-			function Translate(e, id, content)
+			function Translate(e, id, content, boxid)
 			{
 				e.preventDefault()
 				var showtranslatep = document.getElementById(id+"_trans")
@@ -384,6 +393,8 @@
 						showtranslatep.style.display = "none"
 					}, TIME_TRANSLATE)
 				}
+
+				document.getElementById(boxid+"_scrollmsg").scrollTop = document.getElementById(boxid+"_scrollmsg").scrollHeight
 			}
 			
 
@@ -400,8 +411,14 @@
 							if(data.content.value==""){
 								showcheckedmis.innerHTML = "your message ok."
 							}else{
-								document.getElementById(id+"_check").style.color = "red"
-								showcheckedmis.innerHTML = "mean: " + data.content.value
+								if(data.content.language == MYPRIOEX){
+									showcheckedmis.innerHTML = "Did you mean: " + data.content.value
+									document.getElementById(id+"_check").style.color = "red"
+								}
+								else {
+									showcheckedmis.innerHTML = "Not valid this: " + data.content.value
+									document.getElementById(id+"_check").style.color = "yellow"
+								}
 							}
 						}else
 							showcheckedmis.innerHTML = "not match with your language."
@@ -409,7 +426,7 @@
 				}
 			}
 
-			function showMisspelling(e, id){
+			function showMisspelling(e, id, boxid){
 				e.preventDefault()
 				var showcheckedmis = document.getElementById(id+"_missp")
 
@@ -417,6 +434,8 @@
 				setTimeout(function(){
 					showcheckedmis.style.display = "none"
 				}, TIME_MISSPE)
+
+				document.getElementById(boxid+"_scrollmsg").scrollTop = document.getElementById(boxid+"_scrollmsg").scrollHeight
 			}
 			
 			//ham sua tin nhan
@@ -425,6 +444,7 @@
 				var span_edit = document.getElementById(id+"_speditmsg")
 				var p_content = document.getElementById(id+"_contentmsg")
 				var input_fix_content = document.getElementById(id+"_fixcontmsg")
+				var input_fix_old_content = input_fix_content.value
 
 				p_content.style.display = "none"
 				input_fix_content.style.display = "block"
@@ -438,11 +458,17 @@
 						var content = input_fix_content.value
 						if(content.length < 1)
 							alert("You can not blank this fields")
-						else{
-							p_content.style.display = "block"
-							p_content.innerHTML = content
-							input_fix_content.style.display = "none"
+						else if(input_fix_old_content != content)
+						{
+							msgid = "2133213123" //get message id
 							//ajax with else condition
+							editMessage(msgid, content, function(data){
+								p_content.style.display = "block"
+								span_edit.style.color = "green"
+								p_content.innerHTML = content
+								input_fix_content.style.display = "none"
+								console.log(data)
+							})
 						}
 					}
 				})
@@ -455,6 +481,20 @@
                     type: "POST",
                     url: url,
                     data:{nat: mynat, ex: myex, content: content},
+                    success: function(data)//hien thi message
+                    {
+                        if(typeof cb == "function")
+                       		cb(JSON.parse(data));//tra ve du lieu
+                    }
+                  })
+            }
+
+            //gui du lieu len server sua tin nhan
+			var editMessage = function(msgid, content, cb){
+            	$.ajax({
+                    type: "POST",
+                    url: "/languageex/editmsg",
+                    data:{id: msgid, whoedit: MYID, content: content},
                     success: function(data)//hien thi message
                     {
                         if(typeof cb == "function")

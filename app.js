@@ -69,6 +69,12 @@ var con = mysql.createConnection({
   charset: "utf8_general_ci"
 });
 
+//Server: sql12.freemysqlhosting.net
+//Name: sql12227778
+//Username: sql12227778
+//Password: iuwLpRpXNe
+//Port number: 3306
+
 con.connect(function(err) {
   if (err) throw err;
   console.log("Mysql Connected Successful in Control App file!");
@@ -93,6 +99,8 @@ var posts = require('./controller/home/posts')
 var community = require('./controller/home/community')
 var messenger = require('./controller/home/messenger')
 var filter = require('./controller/filter')
+var msgsetting = require('./controller/home/msgsetting')
+var profile = require('./controller/home/profile')
 //var admin = require('./controller/admin')
 
 app.use('/languageex', publicrq)
@@ -105,6 +113,8 @@ app.use('/languageex', posts)
 app.use('/languageex', filter)
 app.use('/languageex', community)
 app.use('/languageex', messenger)
+app.use('/languageex', msgsetting)
+app.use('/languageex', profile)
 
 
 const translate = require('google-translate-api');
@@ -113,7 +123,7 @@ var userOnorOffline_id = [];//dia chi email
 var index = 0, flag = false;
 var TIME_OFFLINE = 8000;
 var anotherQuery = require('./model/Anotherquery')
-
+var roomchats = [];
 
 io.on('connection', function(client)
 {
@@ -190,6 +200,22 @@ io.on('connection', function(client)
                client.leave(client.handshake.session.community);
                client.leave(client.room);
 
+               var roomchatsLength = roomchats.length
+               for(var index = 0; index < roomchatsLength; index++){
+                  if(roomchats[index].room == client.room)
+                  {
+                     if(roomchats[index].idM1 == client.handshake.session.uid)
+                        roomchats[index].idM1 = null
+                     if(roomchats[index].idM2 == client.handshake.session.uid)
+                        roomchats[index].idM2 = null
+
+                     if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
+                        roomchats[index].splice(index, 1)
+                        roomchatsLength--;
+                     }
+                  }
+               }
+
                delete client.handshake.session.community;
                delete client.handshake.session.numOn;
                delete client.handshake.session.uid;
@@ -202,8 +228,9 @@ io.on('connection', function(client)
 
 
    client.on('createroomchat', function(data){
-      var myid = data.myid;
-      var pid = data.partnerid;
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      var isexistroom = false;
 
       if(myid > pid){
          client.join(myid + pid)
@@ -212,29 +239,80 @@ io.on('connection', function(client)
          client.join(pid + myid)
          client.room = pid + myid
       }
+
+      for(var room in roomchats){
+         if(room.room == client.room){
+            isexistroom = true;
+            break;
+         }
+      }
+
+      //create a new room
+      if(!isexistroom){
+         roomchats[roomchats.length] = {}
+         roomchats[roomchats.length-1].room = client.room
+         roomchats[roomchats.length-1].idM1 = data.myid//id of users in room
+         roomchats[roomchats.length-1].idM2 = data.pid//id of users in room
+      }
      
       console.log("Da tao room " + client.room)
    })
 
 
    client.on('leaveroomchat', function(data){
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
       client.leave(client.room);
       console.log("Da out room " + client.room)
+
+      var index = 0, roomchatsLength = roomchats.length
+      for(index = 0; index < roomchatsLength; index++){
+         if(roomchats[index].room == client.room)
+         {
+            if(roomchats[index].idM1 == client.handshake.session.uid)
+               roomchats[index].idM1 = null
+            if(roomchats[index].idM2 == client.handshake.session.uid)
+               roomchats[index].idM2 = null
+
+            if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
+               roomchats[index].splice(index, 1)
+               roomchats.length--;
+            }
+         }
+      }
+
    })
 
 
    //nguoi dung dang nhap tin nhan, báo cho phía bên đối tác: tao đang nhập tin nhắn cho mày
    client.on('chatting', function(data){
-      client.in(client.room).emit('typing...', data)//ca 
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
 
+      client.in(client.room).emit('typing...', data)//ca 
    })
 
    
-
    client.on('sendmsg', function(data){//nhan tin nhan sau do gui di
       //save in database
+      var myid = data.myid.toString();//nguoi gui
+      var pid = data.pid.toString();//nguoi nhan
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
 
-
+      console.log("nhan tin vao room " + client.room)
 
       client.in(client.room).emit('receivermsg', { //server gui tin nhan den nguoi nhận
          content: data.content, 
@@ -247,11 +325,53 @@ io.on('connection', function(client)
 
 
    client.on('isseemsg', function(data){
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
       client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
       //io.sockets.in(client.room)//ca 2 ben deu thay tin nhan
    })
-})
 
+   //su kien sua tin nhan cua nguoi dung
+   client.on('editmsg', function(data){
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      client.in(client.room).emit('editdone', data)
+   })
+
+   //su kien block tin nhan cua nguoi dung
+   client.on('blockmsg', function(data){
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      //ca 2 ben deu nhan duoc tin hieu block msg
+      io.sockets.in(client.room).emit('blockmsgdone', data)
+   })
+
+
+   client.on('manageroom', function(data){//send to admin
+
+   })
+
+   client.on('alluseronline', function(data){//send to admin
+
+   })
+
+
+})
 
 
 server.listen(port, function(){

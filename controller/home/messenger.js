@@ -58,35 +58,17 @@ router.route('/user/loadmsgsetting')
 
 
 
-router.route('/user/editmgs')
+router.route('/user/editmsg')
 .post(function(req, res)
 {
 	if(req.session.user_id){
 		var content = req.body.content
 		var messid = req.body.id
 		var whoedit = req.session.user_id
-		
-	}
-})
 
-
-router.route('/user/allnat')
-.post(function(req, res)
-{
-	if(req.session.user_id){
-		anotherquery.selectAllNativelg(req.session.user_id, function(data){
-			console.log(data)
-		})
-	}
-})
-
-
-router.route('/user/allex')
-.post(function(req, res)
-{
-	if(req.session.user_id){
-		anotherquery.selectAllExchangelg(req.session.user_id, function(data){
-			console.log(data)
+		anotherquery.editMessage(messid, whoedit, content, function(data, err){
+			if(err) throw err
+			else console.log(data)
 		})
 	}
 })
@@ -141,6 +123,7 @@ router.route('/user/checkmisspelling')
 
             Misscontent.checktrue = resp.from.text.autoCorrected
             Misscontent.corrected = resp.from.text.didYouMean,
+            Misscontent.language = resp.from.language.iso,
             Misscontent.value = resp.from.text.value
             Misscontent.error = null
 

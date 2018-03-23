@@ -49,6 +49,7 @@ var editMessage = function(idmsg, whoeditid, content, cb){
 	})
 }
 
+//xoa cac tin nhan trong thoi gian time khi 2 nguoi muon xoa tin nhan
 function delMessages(idme, iduser, time)
 {
 	var sql = "DELETE FROM delconversation WHERE ((whodel = "+ mysql.escape(idme) + 
@@ -63,6 +64,7 @@ function delMessages(idme, iduser, time)
   	});
 }
 
+//xoa hoi thoai cua idme voi iduser
 var delConversation = function(idme, iduser, cb){
 	var sqlString = "SELECT id, time FROM delconversation WHERE "+
 				    "whodel = "+ mysql.escape(idme) + " AND delwho = "+ mysql.escape(iduser)
@@ -176,11 +178,11 @@ var select_max_prio_Ex_and_Navtive = function(id, cb){
 }
 
 var selectAllExchangelg = function(id, cb){
-	var sqlstr = "SELECT u.id as id, la.symbol AS exsy, la.name AS exname, exchangelg.prio"+
-	        " FROM exchangelg JOIN language la "+
-	        " ON la.id = exchangelg.language_id JOIN user u ON " +
-	        " u.id = exchangelg.user_id WHERE u.id = "+ mysql.escape(id)+
-	        " ORDER BY exchangelg.prio DESC"
+	var sqlstr = "SELECT la.id as id, la.symbol AS exsy, la.name AS exname, ex.prio"+
+	        " FROM exchangelg ex JOIN language la "+
+	        " ON la.id = ex.language_id JOIN user u ON " +
+	        " u.id = ex.user_id WHERE u.id = "+ mysql.escape(id)+
+	        " ORDER BY ex.prio DESC"
 
 	con.query(sqlstr, function(err, result, fields){
 		if(err) throw err;
@@ -189,13 +191,13 @@ var selectAllExchangelg = function(id, cb){
 }
 
 var selectAllNativelg = function(id, cb){
-	var sqlstr = "SELECT u.id as id, la.symbol AS natsy, la.name AS natname, nativelg.prio"+
+	var sqlstr = "SELECT la.id as id, la.symbol AS natsy, la.name AS natname, nat.prio"+
 	        " FROM nativelg nat JOIN language la "+
-	        " ON la.id = nativelg.language_id JOIN user u ON " +
-	        " u.id = nativelg.user_id WHERE u.id = "+ mysql.escape(id)+
-	        " ORDER BY nativelg.prio DESC"
+	        " ON la.id = nat.language_id JOIN user u ON " +
+	        " u.id = nat.user_id WHERE u.id = "+ mysql.escape(id)+
+	        " ORDER BY nat.prio DESC"
 
-	con.query(sqlString, function(err, result, fields){
+	con.query(sqlstr, function(err, result, fields){
 		if(err) throw err;
 		else  cb(result)
 	})
