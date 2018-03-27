@@ -11,9 +11,18 @@ const translate = require('google-translate-api');
 router.route('/user/messages')
 .get(function(req, res){
 	//khoi tao session
-	var uid = req.body.uid
-
-
+	if(req.session.user_id){
+		var uid = req.query.uid
+		if(typeof uid != 'undefined'){
+			querysimple.selectMessage(req.session.user_id, uid, function(err, data){
+				if(err) throw err;
+				else {
+					console.log("Start send messages....")
+					res.send(JSON.stringify({listmessage: data}))
+				}
+			})
+		}
+	}
 
 })
 .post(function(req, res)
@@ -30,6 +39,30 @@ router.route('/user/messages')
 				}
 			})
 		}
+		
+	}else
+		res.redirect('/languageex/user/login', {state: 1})
+})
+
+
+router.route('/user/loasdusermsg')
+.get(function(req, res){
+	//khoi tao session
+	var uid = req.body.uid
+
+
+
+})
+.post(function(req, res)
+{
+	if(req.session.filter)
+	{
+		querysimple.selectListUserMessenger(req.session.user_id, function(data, err){
+			if(err) throw err;
+			else
+				console.log(data)
+			res.send(JSON.stringify({listuser: data}))
+		})
 		
 	}else
 		res.redirect('/languageex/user/login', {state: 1})
@@ -66,9 +99,16 @@ router.route('/user/editmsg')
 		var messid = req.body.id
 		var whoedit = req.session.user_id
 
+		console.log(content)
+
 		anotherquery.editMessage(messid, whoedit, content, function(data, err){
 			if(err) throw err
-			else console.log(data)
+			else{
+				if(data.length > 0){
+					console.log(data)
+				}
+				res.send(JSON.stringify({content:content}))
+			} 
 		})
 	}
 })

@@ -77,7 +77,7 @@ var delConversation = function(idme, iduser, cb){
     	else{
     		if(result.length > 0){
     			var sqlString1 = "UPDATE delconversation SET time = " + new Date() 
-    							 " WHERE id = " + result[0].id
+    							 " WHERE id = " + mysql.escape(result[0].id)
 
     			con.query(sqlString1, function(err1, result1, field1){
     				if (err1) throw err1;
@@ -148,7 +148,7 @@ var selectListUsermyCommunityEx = function(id, cb){
 
 			var sqlString = "SELECT ex.user_id as id, u.state, ex.language_id FROM exchangelg ex "+
 							" JOIN user u ON ex.user_id = u.id "+
-							" WHERE ex.user_id != "+id +" AND "+
+							" WHERE ex.user_id != "+mysql.escape(id) +" AND "+
 							orcondi
             
          //   console.log(sqlString)

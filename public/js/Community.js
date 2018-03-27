@@ -42,7 +42,7 @@ var showUserCommunity = function(User)
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
-                  				'<a href="#" onclick="register_popup('+User.infor.id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');"  data-toggle="tooltip" title="Send message" class="icon">'+
+                  				'<a href="#" onclick="register_popup(event,'+User.infor.id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');"  data-toggle="tooltip" title="Send message" class="icon">'+
                   				'<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>' +
                   				isFollow +
                				'</div>'+

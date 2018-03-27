@@ -50,6 +50,7 @@ app.set('view engine', 'html');
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'view'))
 app.set('public', path.join(__dirname, 'public'))
+//app.set('node_modules', path.join(__dirname, 'node_modules'))
 //app.set('private', path.join(__dirname, 'private'))
 
 app.use(express.static(__dirname + '/view'));//su dung cac file tĩnh trong views
@@ -201,7 +202,7 @@ io.on('connection', function(client)
                client.leave(client.room);
 
                var roomchatsLength = roomchats.length
-               for(var index = 0; index < roomchatsLength; index++){
+               while(index < roomchatsLength){
                   if(roomchats[index].room == client.room)
                   {
                      if(roomchats[index].idM1 == client.handshake.session.uid)
@@ -214,6 +215,8 @@ io.on('connection', function(client)
                         roomchatsLength--;
                      }
                   }
+
+                  index++
                }
 
                delete client.handshake.session.community;
@@ -272,7 +275,7 @@ io.on('connection', function(client)
       console.log("Da out room " + client.room)
 
       var index = 0, roomchatsLength = roomchats.length
-      for(index = 0; index < roomchatsLength; index++){
+      while(index < roomchatsLength){
          if(roomchats[index].room == client.room)
          {
             if(roomchats[index].idM1 == client.handshake.session.uid)
@@ -281,10 +284,12 @@ io.on('connection', function(client)
                roomchats[index].idM2 = null
 
             if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
-               roomchats[index].splice(index, 1)
-               roomchats.length--;
+               roomchats[index].splice(index, 1);
+               roomchatsLength--
             }
          }
+
+         index++
       }
 
    })
@@ -305,6 +310,7 @@ io.on('connection', function(client)
    
    client.on('sendmsg', function(data){//nhan tin nhan sau do gui di
       //save in database
+      
       var myid = data.myid.toString();//nguoi gui
       var pid = data.pid.toString();//nguoi nhan
       if(myid > pid)
@@ -362,14 +368,43 @@ io.on('connection', function(client)
    })
 
 
+
    client.on('manageroom', function(data){//send to admin
 
    })
+
 
    client.on('alluseronline', function(data){//send to admin
 
    })
 
+
+   //su kien gui du lieu am thanh cua nguoi dung
+   client.on('sendrecording', function(data){//send to admin
+      //insert to database
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      client.in(client.room).emit('receiverecording', data)
+   })
+
+
+   //gui ma ket noi goi video
+   client.on('sendcallvideocode', function(data){//send to admin
+      //insert to database
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      client.in(client.room).emit('receivecallvideocode', data)
+   })
 
 })
 

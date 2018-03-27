@@ -174,6 +174,62 @@
   </div>
 
 
+  <div class="modal fade" id="recordingAudio" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" >
+        <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+           <h4 class="modal-title">Recording your voice</h4>
+        </div>
+
+         <div class="modal-body">
+            <div id="startrecordingAudio" style="height:auto;width: auto;">
+               <h4>recording....<span class="glyphicon glyphicon-volume-up" style="color: blue;"></span></h4>
+               <video style="height: 60%;width:40%;margin-left:20%;" id="recordingAudiovideo" controls>
+               </video>
+
+               <button type="button" class="btn btn-info" id="stoprecordingAudio">Stop</button>
+            </div>
+
+            <div id="restartrecordingAudio" style="display:none;">
+               <h4>review</span></h4>
+               <audio id="video1"  controls>
+               </audio>
+               <button type="button" class="btn btn-success" id="donerecordingAudio" style="margin-top:3%;">Done</button>
+            </div>
+
+         </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="callvideoStream" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" >
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Call video</h4>
+        </div>
+
+        <div class="modal-body">
+          <h4>Content</h4>
+
+        </div>
+
+        <div class="modal-footer">
+           <button type="button" class="btn btn-info">Done</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -312,6 +368,7 @@
    });
 
    function Logout(){
+      sessionStorage.clear();
       location.href = '/languageex/user/logout'
    }
 
@@ -343,5 +400,10 @@
 <!--<script type="text/javascript" src="../../public/js/ProcessBoxChat.js"></script> -->
 <script type="text/javascript" src="/js/ProcessBoxChat.js"></script>
 <script type="text/javascript" src="/js/Settingmsg.js"></script>
+
+<script src="/lib/recordrtc/RecordRTC.js"></script>
+
+<script type="text/javascript" src="/js/audioAndvideo.js"></script>
+
 </body>
 </html>

@@ -507,10 +507,9 @@ var selectUserCommunityEx = function(id, cb){
 	})
 }
 
-//tra ve danh sach nguoi dung trong messenger voi nhiue nhan tin giua 2 nguoi giam dan
+//tra ve danh sach nguoi dung trong messenger voi nhieu nhan tin giua 2 nguoi giam dan
 var selectListUserMessengerMaxContent = function(id, cb)
 {
-
 	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, count(u.id) as num"+
 	                " FROM user u JOIN message me ON "+
 	                " (me.userA = u.id AND me.userB = "+ id +")"+
@@ -531,7 +530,7 @@ var selectListUserMessengerMaxContent = function(id, cb)
 var selectListUserMessenger = function(id, cb)
 {
 
-	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, MAX(me.time) as max"+
+	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, u.state, MAX(me.time) as max"+
 	        " FROM user u JOIN message me ON (me.userA = u.id AND me.userB = "+id+") "+
 	        " OR (me.userA = "+id+" AND me.userB = u.id) "+
 	        " WHERE u.id != "+id+" GROUP BY u.id"

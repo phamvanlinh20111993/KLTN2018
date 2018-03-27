@@ -242,14 +242,18 @@ router.route('/messenger')
  		userid = req.query.uid
 
 	if(req.session.user_id){
-		//check database, escape sql injection..
- 		var User = {}
-
-		if(userid){
-			//search contact
-			res.render('ejs/messenger.ejs', {User: User})
-		}else
- 			res.render('ejs/messenger.ejs', {User: User})
+ 		querysimple.selectUser(req.session.email, function(result, fields, err){
+			if(err) throw err
+			else{
+			
+				if(userid){
+					//search contact
+					res.render('ejs/messenger.ejs', {User: result})
+				}else{
+ 					res.render('ejs/messenger.ejs', {User: result})
+ 				}
+ 			}
+ 		})
  	}else
  		res.render('html/Notfound.html')
 })

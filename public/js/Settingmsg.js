@@ -297,6 +297,7 @@ var Blockmessages = function(el, pid, name){
 			socket.emit('blockmsg', {
             	myid: MYID,
             	pid: pid,
+            	name: name,
             	signal: true
 	    	}) 
 
@@ -308,6 +309,7 @@ var Blockmessages = function(el, pid, name){
 		socket.emit('blockmsg', {
             	myid: MYID,
             	pid: pid,
+            	name: name,
             	signal: false
 	    	}) 
 
@@ -320,15 +322,24 @@ var Blockmessages = function(el, pid, name){
 socket.on('blockmsgdone', function(data){//tin hieu gui den cho 2 phia
 	
 	if(data.signal){
-		if(MYID == data.myid)
+		if(MYID == data.myid){
 			document.getElementById(data.pid + "_mymsg").disabled = true;
-		else
+			sessionStorage.setItem("_block_"+data.pid, true);
+		}
+		else{
 			document.getElementById(data.myid + "_mymsg").disabled = true;
+			sessionStorage.setItem("_block_"+data.myid, true);
+			alert("You was blocked messages by " + data.name)
+		}
 	}else{
-		if(MYID == data.myid)
+		if(MYID == data.myid){
 			document.getElementById(data.pid + "_mymsg").disabled = false;
-		else
+			sessionStorage.setItem("_block_"+data.pid, false);
+		}
+		else{
 			document.getElementById(data.myid + "_mymsg").disabled = false;
+			sessionStorage.setItem("_block_"+data.myid, false);
+		}
 	}
 
 })
