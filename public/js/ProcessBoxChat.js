@@ -191,6 +191,7 @@
             }
 			
 			//su kien nhap tin nhan cua nguoi dung
+            //takeidmsg la bien de 
 			function writeMessage(e, id, photo)
 			{	
 				//xóa dòng đã xem tin nhắn
@@ -358,7 +359,7 @@
                                           '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
                                             ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
 				                          '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px" onclick="msgRecord('+id+')"></i></a>' + 
-				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideo('+id+')"></i></a>' + 
+				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\')"></i></a>' + 
                                           '<div style="clear: both;"></div>'
 									'</div>';
 				
@@ -395,6 +396,7 @@
                     messageType = '<p id="'+rid+'_contentmsg">'+content+'</p>' +
                                 '<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;background:orange;display:none;" id="'+rid+'_fixcontmsg">' +
                                 '<p><small>'+Time+'</small></p>' +
+                                '<input type="hidden" id="'+rid+'_saveidms" value="">'+
                                 '<a href="#">' +
                                     '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
                                     '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>' + 
@@ -447,6 +449,7 @@
                     messageType = '<p id="'+rid+'_contentmsg">'+content+'</p>' +
                                 '<input id="'+rid+'_fixcontmsg" type="text" value="'+content+'" autofocus style="border:0px;background:orange;outline-width:0;display:none;">'+
                                 '<p><small>'+Time+'</small></p>' +
+                                '<input type="hidden" id="'+rid+'_saveidms" value="">'+//luu id message de sau nay edit no
                                 '<a href="#">' +
                                     '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
                                     '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;" onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>' + 

@@ -1,21 +1,5 @@
 
 
-
-var callVideo = function(id){
-	$('#callvideoStream').modal('show')
-	$('#callvideoStream').modal({backdrop: 'static', keyboard: false})  
-}
-
-
-
-$('#callvideoStream').on('hidden.bs.modal', function() {
-	video.pause();
-	video.src = ""
-    localstream.stop();//tat camera
-})
-
-
-
 var video  = document.querySelector('#recordingAudiovideo');
 var localstream, Interval, TINTERVAL = 1000;
 var msgRecord = function(id){
