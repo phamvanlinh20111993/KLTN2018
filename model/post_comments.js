@@ -30,6 +30,11 @@ var selectposts_cmts_myfollow = function(myid, cb){
 }
 
 
+var insertPosts = function(myid, Infor, cb){
+
+}
+
+
 module.exports = {
 	selectposts_cmts_myfollow: selectposts_cmts_myfollow,
 	selectMyposts_cmts: selectMyposts_cmts,

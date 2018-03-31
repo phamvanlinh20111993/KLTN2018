@@ -4,7 +4,7 @@ var video  = document.querySelector('#recordingAudiovideo');
 var localstream, Interval, TINTERVAL = 1000;
 var msgRecord = function(id){
 
-	$('#recordingAudio').modal('show')
+	//$('#recordingAudio').modal('show')
 	$('#recordingAudio').modal({backdrop: 'static', keyboard: false})  
 
 	//nguoi dung muon tiep tuc ghi am

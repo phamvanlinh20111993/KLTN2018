@@ -15,32 +15,48 @@ con.connect(function(err) {
 });
 
 
+//return sql string date format
+var getDateTime = function(date){
+	return date.getFullYear() +
+                '-' + (date.getMonth() + 1) +
+                '-' + (date.getDate()) +
+                ' ' + (date.getHours()) +
+                ':' + (date.getMinutes()) +
+                ':' + (date.getSeconds());
+}
+
+
 var editMessage = function(idmsg, whoeditid, content, cb){
 
-	var sql = "SELECT message_id, whoedit FROM editmessage LIMIT 1"
+	var sql = "SELECT message_id, whoedit FROM editmessage WHERE message_id="+mysql.escape(idmsg)+
+			   " AND whoedit = " + mysql.escape(whoeditid)
 	var sqlString = ""
 
 	con.query(sql, function(err, result, fields){
 		if (err) throw err;
 		else{
+			console.log(result)
 			if(result.length > 0){
 
 				sqlString = "UPDATE editmessage SET newcontent = "+ mysql.escape(content) +
-					", time = "+ new Date() +
-					" WHERE message_id = "+mysql.escape(idmsg) +
+					", ctime = '"+ getDateTime(new Date()) +
+					"' WHERE message_id = "+mysql.escape(idmsg) +
 					" AND whoedit = " + mysql.escape(whoeditid)
 
+				console.log("sql "+sqlString)
 				con.query(sqlString, function(err1, result1, fields1){
 					if(err) cb(null, err1)
 					else cb(result1.affectedRows, null)
 				})
 
 			}else{//chua co du lieu
-				sqlString = "INSERT INTO editmessage (message_id, whoedit, content, time) "+
-					"VALUES(" + mysql.escape(idmsg) + "," + mysql.escape(whoeditid) +
-					", " + mysql.escape(content)+", "+new Date()+")"
+				sqlString = "INSERT INTO editmessage(message_id, whoedit, newcontent, ctime) "+
+					"VALUES("+ mysql.escape(idmsg) + ", " + mysql.escape(whoeditid) + 
+					", " + mysql.escape(content)+", '"+getDateTime(new Date())+"')";
 
+				console.log("sql1 "+sqlString)
 				con.query(sqlString, function(err1, result1, fields1){
+					console.log("ket qua la " + result1)
 					if(err) cb(null, err1)
 					else cb(result1.affectedRows, null)
 				})
@@ -76,7 +92,7 @@ var delConversation = function(idme, iduser, cb){
     	if(err) throw err;
     	else{
     		if(result.length > 0){
-    			var sqlString1 = "UPDATE delconversation SET time = " + new Date() 
+    			var sqlString1 = "UPDATE delconversation SET time = " + new Date()+ 
     							 " WHERE id = " + mysql.escape(result[0].id)
 
     			con.query(sqlString1, function(err1, result1, field1){
@@ -203,11 +219,31 @@ var selectAllNativelg = function(id, cb){
 	})
 }
 
+//tra ve truong co gia tri lon nhat trong bang
+var selectMaxfield = function(tbname, field, cb){
+	var sqlstr = "SELECT MAX("+field+") AS max FROM "+tbname
+	con.query(sqlstr, function(err, result, fields){
+		if(err) throw err;
+		else  cb(result)
+	})
+}
+
+var selectMinfield = function(tbname, field, cb){
+	var sqlstr = "SELECT MIN("+field+") AS min FROM "+tbname
+	con.query(sqlstr, function(err, result, fields){
+		if(err) throw err;
+		else  cb(result)
+	})
+}
+
+
 module.exports = {
 	editMessage: editMessage,
 	delConversation: delConversation,
 	selectListUsermyCommunityEx: selectListUsermyCommunityEx,
 	select_max_prio_Ex_and_Navtive:select_max_prio_Ex_and_Navtive,
 	selectAllNativelg: selectAllNativelg,
-	selectAllExchangelg: selectAllExchangelg
+	selectAllExchangelg: selectAllExchangelg,
+	selectMaxfield: selectMaxfield,
+	selectMinfield: selectMinfield
 }

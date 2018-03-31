@@ -41,7 +41,7 @@ var insertString = function(tbname, field, value, cb)
 
 	sqlString += " )";
 	
-	//console.log("Query: " + sqlString)
+	console.log("Query: " + sqlString)
 
 	//query
 	con.query(sqlString, function(err, result){
@@ -233,8 +233,9 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	            			deltime = " me.time <= " + new Date(result1[0].time)
 
 	            		//select all message between idme and idB 
-						var sqlString2 = "SELECT me.id, me.userA, me.userB, me.data, me.content, "+
-						 " me.check, me.time, ed.whoedit as idedit, ed.newcontent as ncontent, ed.time as ntime "+
+						var sqlString2 = "SELECT me.id, me.userA, me.userB, CAST(me.data AS CHAR(100000) CHARACTER SET utf8) AS data, "+
+						" me.content, me.misspelling, " +
+						 " me.ischeck, me.time, ed.whoedit as idedit, ed.newcontent as ncontent, ed.ctime as ntime "+
 						 " FROM message me LEFT JOIN editmessage ed ON ed.message_id = me.id "+
 	 		    		 " WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
 	 					 " OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
@@ -256,40 +257,43 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 
 	 							for(ind = 0; ind < result2.length; ind++)
 	 							{
-	 								Listmessages.messages[ind] = {}
-	 								Listmessages.messages[ind].messageid = result2[ind].id
-									Listmessages.messages[ind].idA = result2[ind].userA
-									Listmessages.messages[ind].idB = result2[ind].userB
-									Listmessages.messages[ind].data = result2[ind].data
-									Listmessages.messages[ind].content = result2[ind].content
-									Listmessages.messages[ind].time = result2[ind].time
-									Listmessages.messages[ind].ischeck = result2[ind].check
+	 								if(mark[ind] == 0){
+	 									Listmessages.messages[ind] = {}
+	 									Listmessages.messages[ind].messageid = result2[ind].id
+										Listmessages.messages[ind].idA = result2[ind].userA
+										Listmessages.messages[ind].idB = result2[ind].userB
 
-									var pos = 0;
-									Listmessages.messages[ind].edit = []
+										Listmessages.messages[ind].data = result2[ind].data
+										//console.log(result2[ind].data)
 
-									if(result2[ind].idedit){
-										Listmessages.messages[ind].edit[pos] = {}
-										Listmessages.messages[ind].edit[pos].whoedit = result2[ind].idedit 
-										Listmessages.messages[ind].edit[pos].newcontent = result2[ind].ncontent
-										Listmessages.messages[ind].edit[pos].time = result2[ind].ntime
-										pos++;
-									}else{
-									  	pos = 0;
-									 	continue;
-									}
+										Listmessages.messages[ind].content = result2[ind].content
+										Listmessages.messages[ind].time = result2[ind].time
+										Listmessages.messages[ind].ischeck = result2[ind].ischeck
+										Listmessages.messages[ind].misspelling = result2[ind].misspelling
 
-	 								for(ind1 = ind + 1; ind1 < result2.length; ind1++){
-	 									if(result2[ind].id == result2[ind1].id && mark[ind1]== 0){
-	 										mark[ind1] = 1;
-	 										Listmessages.messages[ind].edit[pos] = {}
-	 										Listmessages.messages[ind].edit[pos].whoedit = result2[ind1].idedit 
-											Listmessages.messages[ind].edit[pos].newcontent = result2[ind1].ncontent
-											Listmessages.messages[ind].edit[pos].time = result2[ind1].ntime
-	 										pos++;
+										var pos = 0;
+										Listmessages.messages[ind].edit = []
+
+										if(result2[ind].idedit){
+											Listmessages.messages[ind].edit[pos] = {}
+											Listmessages.messages[ind].edit[pos].whoedit = result2[ind].idedit 
+											Listmessages.messages[ind].edit[pos].newcontent = result2[ind].ncontent
+											Listmessages.messages[ind].edit[pos].time = result2[ind].ntime
+											pos++;
+										}else	continue;
+							
+
+	 									for(ind1 = ind + 1; ind1 < result2.length; ind1++){
+	 										if(result2[ind].id == result2[ind1].id && mark[ind1]== 0){
+	 											mark[ind1] = 1;
+	 											Listmessages.messages[ind].edit[pos] = {}
+	 											Listmessages.messages[ind].edit[pos].whoedit = result2[ind1].idedit 
+												Listmessages.messages[ind].edit[pos].newcontent = result2[ind1].ncontent
+												Listmessages.messages[ind].edit[pos].time = result2[ind1].ntime
+	 											pos++;
+	 										}
 	 									}
 	 								}
-	 								pos = 0;
 	 							}
 	 					
 	 							cb(null, Listmessages)

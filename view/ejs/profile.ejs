@@ -240,8 +240,9 @@
                   
                <div>
                  <%if(User.state == 'something'){%>
-                   <button class="btn btn-primary">Follow</button>
-                   <button class="btn btn-danger">Report</button>
+                   <button class="btn btn-primary" onclick="Follow('<%=User.infor.id%>')">Follow</button>
+                   <button class="btn btn-danger" data-toggle="tooltip" data-original-title="report this user" onclick="Report('<%=User.infor.id%>')">Report</button>
+                   <button class="btn btn-warning" data-toggle="tooltip" data-original-title="block this user" onclick="Block('<%=User.infor.id%>')">Block</button>
                   <%}%>
                </div>
                 </div>
@@ -333,10 +334,13 @@
          $('[data-toggle="tooltip"]').tooltip();
 
          $('button').click(function(e) {
-            e.preventDefault();
-             console.log("This is a demo.\n :-)");
+           // e.preventDefault();
+          //  console.log("This is a demo.\n :-)");
          });
       });
+
    </script>
+   <script type="text/javascript" src="/js/profile_js.js">  </script>
+
   </body>
 </html>

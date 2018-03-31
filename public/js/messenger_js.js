@@ -1,3 +1,20 @@
+
+function formatAMPM(date)
+{
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+
+  return strTime;
+}       
+
+
+
+
 function Logout(){
     location.href = '/languageex/user/logout'
 }
@@ -87,8 +104,8 @@ function showMessageuserSend(user, messages, setting){//user la object cua nguoi
 
 	var element = '<li class="sent">'+
             '<img src="'+user.photo+'" alt="" />'+
-            '<p>'+messages.content+'</br><span style="font-style:italic;font-size:90%;">'+
-                  messages.time+'</span></p>'+
+            '<p>'+messages.content+'     (<span style="font-style:italic;font-size:90%;">'+
+                  formatAMPM(new Date(messages.time))+')</span></p>'+
 
 		       '<a href="#" style="font-size: 18px;">'+
 			       '<span class="glyphicon glyphicon-edit" ></span>'+
@@ -137,8 +154,8 @@ function showMessageuserReceive(user, messages, setting){
 
             '<td>'+
                '<img src="'+user.photo+'" alt="" />'+
-               '<p>'+messages.content+'</br><span style="font-style:italic;font-size:90%;">'+
-                  messages.time+'</span></p>'+
+               '<p>'+messages.content+'   <span style="font-style:italic;font-size:90%;">('+
+                  formatAMPM(new Date(messages.time))+')</span></p>'+
             '</td>'+
            '</tr>'+
             '</table>'+

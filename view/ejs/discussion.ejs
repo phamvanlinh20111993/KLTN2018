@@ -8,15 +8,88 @@
   <link rel="icon bar" type="text/css" href="https://www.waseda.jp/inst/icc/assets/uploads/2015/10/web_image1.jpg">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link href="/css/lib/fileinput.css" media="all" rel="stylesheet" type="text/css" />
+  <link href="/css/post_comment.css" media="all" rel="stylesheet" type="text/css" />
   <style>
   
-	html,body { 
-        height: 100%; 
-        margin: 0px; padding: 0px; 
+	  /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
     }
+    
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 450px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height:auto;} 
+    }
+  
+  html,body { height: 100%; margin: 0px; padding: 0px; }
+
+    .active{
+      border-left: 0px;
+      border-right: 0px;
+      border-radius: 0px;
+    }
+
+     .modal.modal-wide .modal-dialog {
+              width: 90%;
+          }
+
+          .modal-wide .modal-body {
+              overflow-y: auto;
+          }
+
+          .modal-content textarea.form-control {
+               min-width: 100%;
+          }
+
+          .popup-box-chat{
+            display:none;
+            position: fixed;
+            bottom: 2px;
+            right: 220px;
+            height:392px;
+            margin-right: 10%;
+            background-color: white;
+            box-shadow: 1px 2px 5px #ccccff;
+            width: 300px;
+            border: 1px solid rgba(29, 49, 91, .3);
+          }
+
+
+
   </style>
-    <link rel="stylesheet" href="cssfile.css">
+  <script type="text/javascript">
+     var MYID = parseInt("<%= session.user_id  %>")
+     var MYEMAIL = "<%= session.email %>"
+     var MYPHOTO = "<%= session.photo %>"
+     var MYPRIONAT = "<%= session.mynative %>"
+     var MYPRIOEX = "<%= session.myexchange %>"
+
+  </script>
+
 </head>
 
 <body>
@@ -35,46 +108,165 @@
 
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul id="nav_ul" class="nav navbar-nav">
-       <li class="active"><a href="#">Home</a></li>
-        <li ><a href="#">Profile</a></li>
+       <li class="active"><a href="#" onclick="Home()">Home</a></li>
+        <li ><a href="#" onclick="Profile()">Profile</a></li>
         <li><a href="#">Group</a></li>
         <li><a href="#">Courses</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        <li><a href="/languageex/user/logout" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       </ul>
     </div>
   </div>
 </nav>
   
-<div class="container-fluid text-center" style="margin-top:50px;">    
+<div class="container-fluid text-center" style="margin-top:50px;">  
+
   <div class="row content">
-    <div class="col-lg-2 sidenav" style="height:100%;width: 23%;border-right: 1px solid #BBBBBB;position:fixed;">
+      <div class="col-lg-2 sidenav" style="height:100%;width: 23%;border-right: 1px solid #BBBBBB;position:fixed;" >
+      <div class="col-lg-9 sidenav" style="margin-left: 20%;width: 80%;">
+        <div class="well" style="background: #f6f9fc;">
+          <h4><i></i></h4>
+          <p>Level: <span style="color: orange;"></span></p>
+          <p>Score: <span style="color: orange;"></span></p>
+          <p>My community: <span style="color: orange;"></span></p>
+        </div>
 
-      <div class="well">
-      </div>
+        <div>
+          <!-- http://taimienphi.vn/tmp/cf/aut/hinh-anh-dep-2.jpg -->
+          <img src=""  class="img-circle" alt="Avatar" height="120" width="120">
+        </div>
 
-      <div>
-        <img src="http://taimienphi.vn/tmp/cf/aut/hinh-anh-dep-2.jpg"  class="img-circle" alt="Avatar" height="120" width="120">
-      </div>
+        <div style="margin-top: 18%;">
+            <ul class="nav nav-pills nav-stacked" style="width: 114%;margin-left: -7%;">
+               <li class="active" style="text-align: left;"><a href="#"><span style="font-size: 130%;">
+                  <span class="glyphicon glyphicon-folder-open"></span> <span style="margin-left: 10%;">My post</span>
+               </span></a></li>
 
-      <div style="margin-top: 18%;">
-      
+               <li style="text-align: left;margin-top:4%;"><a href="#"><span style="font-size: 130%;">
+                  <span class="glyphicon glyphicon-globe"></span><span style="margin-left: 10%;"> Recent </span>
+               </span></a></li>
+
+               <li style="text-align: left;margin-top:4%;"><a href="#""><span style="font-size: 130%;">
+                   <span class="glyphicon glyphicon-inbox"></span> <span style="margin-left: 10%;">Comunity</span>
+               </span></a></li>
+
+                <li style="text-align: left;margin-top:4%;"><a href="/languageex/messenger" onclick="Messenger()"><span style="font-size: 130%;">
+                   <span class="glyphicon glyphicon-comment"></span> <span style="margin-left: 10%;">Messenger</span>
+               </span></a></li>
+
+            </ul>
        </div>
-
+      </div>
    </div>
 
-   <div class="col-sm-9 text-left" style="width: 65%;overflow: auto;margin-left:23%;border: 1px solid blue;"> 
 
 
-            
-    </div>
+   <div class="col-sm-9 text-left" style="width: 65%;overflow: auto;margin-left:23%;">   
+      <div style="margin-left: 3%;">
+        <form enctype="multipart/form-data" id="" method = "post" action ="">
+          <div class="form-group" style="margin-top: 4%;">
+            <textarea class="form-control" rows="4" id="comment" name = '' placeholder="Write something in here...." style="width: 95%;"></textarea>
+          </div>
+            <!--   <label for="comment" style="margin-left: 7%; font-size: 130%;">Choose file:</label> -->
+          <a href="#">
+            <input id="file-0a" class="file" name = "tep" type="file" multiple data-min-file-count="1"> 
+          </a>
+          <input type="hidden" value="" id="chudenan" name="chude">
+            <br>
+           <button type="button" class="btn btn-primary" name ="submitform" onclick="">Đăng bài</button>
+          <button type="reset" class="btn btn-default" style="margin-left: 15px;">Reset content</button>
+        </form>    
 
-     <div class="col-lg-2 sidenav" style="height:100%;width: 13%;border: 1px solid #BBBBBB;position:fixed;margin-left:87%;">
 
-      <div class="well">
+         <div id="showpostusers">
+
+           <div class="popup-box4">
+
+            <div class="dropdown">
+              <a class="dropbtn"><h5 class="glyphicon glyphicon-chevron-down"></h5></a>
+              <div class="dropdown-content">
+                <a style="cursor:pointer;" onclick="">Phản hồi bài đăng</a>
+                <a style="cursor:pointer;" onclick="">xóa bài đăng</a>
+                 <a style="cursor:pointer;" onclick="">sửa bài đăng</a>
+              </div>
+            </div>
+
+              <table style="margin-left: 5px;height:80px;">
+                <tr style="margin-top:5px;">
+                  <td><img src="" style="height:47px;width:47px;"></td>
+                  <td><div style="margin-left:8px;padding:0px;">
+                          <p style="color:blue;margin-top:4px;">
+                              <a style="font-size:110%;cursor:pointer;" class="text-justify"><b>Linh Van</b></a> đã cập nhật chủ đề <b style="color:black;font-size:160%;"></b>
+                          </p>
+                    <div style="margin-top:-9px;"><label style="font-size:90%;">27/11/1994</label>
+                    </div></div>
+                    </td>
+                </tr>
+              </table>
+
+                <div style="min-height: 140px;margin-top:10px;" class="form-group">
+                  <textarea readonly class="form-control" style="min-height:20px;resize:none;outline:none;font-size:15px;color:orange;background-color:white;border:none;">
+                dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+                  </textarea>
+                  <div style="float:right;margin-right:10px;"></div>
+                </div>
+
+              <div class="divcmt">
+                  <img src="/img/dalike.jpg" onclick = "" style="margin-left:5px;width:36;height:29px;">
+                  <p style="margin-top:-20px;margin-left: 50px;color:blue;">Đã thích</p>
+
+                <div style="margin-top:-22px;margin-left:26%;"><a style="cursor:pointer;" data-toggle="modal" data-target="#showInfoLikePost" onclick=""><span>40</span> người đã thích</a></div>
+              </div>
+
+                <div class="divcmt1">
+                  <div style="border:1px solid #d5e8e8;height:auto;">
+                      <div style="margin-top:12px;">
+                        <a class="a4" onclick = "">Xem bình thêm luận(<span id="changecmt">8</span>)</a>
+                        <input type="hidden" id="changecmt" value = 9><input type="hidden" id="changecmt" value = 1>
+                      </div>
+                      <div style="height:auto;" id=0></div>
+                  </div>
+
+                  <form style="margin-top:18px;margin-left:10px;">
+                    <table>
+                      <tr>
+                        <td><img src="" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;"></td>
+                        <td>
+                            <div>
+                              <textarea style="resize:none;" rows="1" placeholder="Viết bình luận" class="divcmt2">
+                              </textarea>
+                        </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </form>
+
+                <div style="height:30px; margin-top:0px;"></div>
+
+                  <div style="min-height:40px;margin-top:5px;">
+                    <img src="" width="41" height="42" style="float:left;margin-left:10px;margin-top:-2px;">
+                    <p style="width:85%;word-wrap:break-word;margin-left:65px;"><span style="color:blue;  font-size:108%;"></span>woa realy ok
+                    </p>
+                    <div style="height:10px;margin-left:65px;font-size:90%;color:#474343;margin-top:-7px;">
+                    <a class="a11" onclick=""> xóa </a> <a class="a11" onclick="">report</a><span style="margin-left:10px;font-size: 90%;">25/7/2018</span></div>
+        
+                </div>
+
+                <div style="height:20px; margin-top:0px;"></div>
+                </div>
+
+            </div>
+
+         </div>
       </div>
 
+    </div>
+
+
+
+
+     <div class="col-lg-2 sidenav" style="height:100%;width: 13%;border: 1px solid #BBBBBB;position:fixed;margin-left:87%;">
    </div>
 
   </div>
@@ -85,6 +277,49 @@
   <p>Footer Text</p>
 </footer>  -->
 <script type="text/javascript">
+
+    $('li > a').click(function(e) {
+      $('li').removeClass();
+      $(this).parent().addClass('active');
+      e.preventDefault();
+   });
+
+   //ham nay cho phep tu dong tang chieu dai cua textarea khi nguoi dung comment vuot qua chieu dai co dinh
+   function Height(e) {
+      $(e).css({'height':'auto','overflow-y':'hidden'}).height(e.scrollHeight);
+   }
+      
+   $('textarea').each(function () {
+      Height(this);
+   }).on('input', function () {
+      Height(this);
+   });
+   
+   //dung tooltip
+   $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();   
+   });
+  
 </script>
+
+<script type="text/javascript">
+  function Logout(){
+      sessionStorage.clear();
+      location.href = '/languageex/user/logout'
+   }
+
+   function Profile(){
+      location.href = '/languageex/user/profile?uid='+encodeURIComponent(MYID)
+   }
+
+   function Messenger(){
+      location.href = '/languageex/messenger'
+   }
+
+   function Home(){
+      location.href = '/languageex/home'
+   }
+
+</script>>
 </body>
 </html>

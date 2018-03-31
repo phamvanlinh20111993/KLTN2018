@@ -215,6 +215,13 @@ CREATE TABLE IF NOT EXISTS `Report_user_content`(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+CREATE TABLE IF NOT EXISTS `likes_post`(
+	`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`id_user` bigint(30) UNSIGNED NOT NULL,
+	`id_post`  bigint(20) UNSIGNED NOT NULL,
+	`ctime` DATETIME
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 /*################################################################################################## */
 
 ALTER TABLE `User`
@@ -281,6 +288,9 @@ ALTER TABLE `Report_user`
 	ADD CONSTRAINT `who was report1` FOREIGN KEY (`reportwho`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `code report1 user` FOREIGN KEY (`code`) REFERENCES `Report_user_content` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE `likes_post`
+	ADD CONSTRAINT `who like post` FOREIGN KEY (`id_user`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `which post` FOREIGN KEY (`id_post`) REFERENCES `post` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /* ############################################################################################### */
 

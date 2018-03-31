@@ -109,6 +109,26 @@
 </noscript>
 
 
+<div class="modal fade" id="InformationEditMessage" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"><span class="glyphicon glyphicon-pencil" style="color:blue;"></span> Information</h4>
+        </div>
+
+        <div class="modal-body" >
+          
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 <!-- Modal -->
   <div class="modal fade" id="ReportuserHome" role="dialog">
     <div class="modal-dialog modal-sm">
@@ -239,18 +259,37 @@
         </div>
 
         <div class="modal-body">
-          <div>
+          <div id="showcalling">
             <h4>Calling.... <span class="glyphicon glyphicon-earphone" style="color:blue;"></span></h4>
           </div>
-          <div>
-               <video style="height: 80%;width:60%;margin-left:20%;" id="callingvideoStream" controls>
+          <div style="display: none;" id="videochatcalling">
+               <video style="height:80%;width:60%;margin-left:20%;" id="callingvideoStream" controls>
                </video>
                 <button type="button" class="btn btn-warning" id="endcallingvideoStream" style="margin-top:3%;">End call</button>
           </div>
         </div>
 
         <div class="modal-footer">
-           <button type="button" class="btn btn-info">Done</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="acceptCallvideoFromuser" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Video call</h4>
+        </div>
+        <div class="modal-body">
+            <img src="" class="img-circle" alt="Cinque Terre">
+            <p>want to connect with you...</p>
+            <button type="button" class="btn btn-warning">Accept</button>
+            <button type="button" class="btn btn-success">Refuse</button>
+        </div>
+        <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
@@ -273,7 +312,8 @@
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul id="nav_ul" class="nav navbar-nav">
         <li class="active"><a href="/languageex/user/profile" onclick="Profile()">Profile</a></li>
-        <li><a href="#cádasd">Discussion</a></li>
+        <li><a href="/languageex/user/post" onclick="Post()">Discussion</a></li>
+
         <li><a href="#">Group</a></li>
         <li><a href="#">Courses</a></li>
       </ul>
@@ -404,6 +444,10 @@
       location.href = '/languageex/user/profile?uid=' + encodeURIComponent("<%= user[0].id  %>")
    }
 
+   function Post(){
+      location.href = '/languageex/user/post?uid=' + encodeURIComponent("<%= user[0].id  %>")
+   }
+
    function Messenger(){
       location.href = '/languageex/messenger'
    }
@@ -416,6 +460,12 @@
          //ban dau la khi nguoi dung ket noi         
          socket.emit('notifyOnline', MYID);//client bao voi server la t online roi
       });
+
+       //loi ket noi
+      socket.on('connect_error', function(err){
+        alert(err)
+      })
+
 
       socket.on('numofuseronline', function(signal){
          if(signal < 0) signal = 0
@@ -433,14 +483,8 @@
 <script src="/lib/recordrtc/RecordRTC.js"></script>
 
 <script type="text/javascript" src="/js/Audio.js"></script>
+<script type="text/javascript" src="/lib/peer.js"></script>
 <script type="text/javascript" src="/js/CallVideo.js"></script>
-<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
-<!--<script type="text/javascript">
-   var peer = new Peer('pick-an-id', {key: 'myapikey'}); 
-   var conn = peer.connect('another-peers-id');
-   conn.on('open', function(){
-      conn.send('hi!');
-   });
-</script> -->
+
 </body>
 </html>

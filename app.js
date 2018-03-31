@@ -124,6 +124,7 @@ var userOnorOffline_id = [];//dia chi email
 var index = 0, flag = false;
 var TIME_OFFLINE = 8000;
 var anotherQuery = require('./model/Anotherquery')
+var querysimple = require('./model/QuerysingletableSimple')
 var roomchats = [];
 
 io.on('connection', function(client)
@@ -228,7 +229,7 @@ io.on('connection', function(client)
 	  }
 
    })
-
+   
 
    client.on('createroomchat', function(data){
       var myid = data.myid.toString();
@@ -309,8 +310,7 @@ io.on('connection', function(client)
 
    
    client.on('sendmsg', function(data){//nhan tin nhan sau do gui di
-      //save in database
-      
+
       var myid = data.myid.toString();//nguoi gui
       var pid = data.pid.toString();//nguoi nhan
       if(myid > pid)
@@ -318,15 +318,36 @@ io.on('connection', function(client)
       else
          client.room = pid + myid
 
-      console.log("nhan tin vao room " + client.room)
+      //save in database
+      anotherQuery.selectMaxfield("message", "id", function(res)
+      {
+         var idmessg = res[0].max
+         //chen du lieu vao bang
+       //  querysimple.insertTable("message", 
+     //       ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
+        //    [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
+       //     function(result, err){
+          //     if(err)  throw err;
+           //    else{
+                  console.log("1 record inserted messages.");
+                  console.log("nhan tin vao room " + client.room)
 
-      client.in(client.room).emit('receivermsg', { //server gui tin nhan den nguoi nhận
-         content: data.content, 
-         myphoto: data.photo,
-         id_send: data.myid,
-         id_receive: data.pid,
-         time: data.time
-      });
+                  data.content.messageid = idmessg + 1;//id cua tin nhan
+
+                  //gui lai cho nguoi gui tin nhan ma cua tin nhan vua gui di
+                  io.sockets.in(client.room).emit('sendmsgid', {myid: data.myid, msgid: idmessg+1})
+
+                  client.in(client.room).emit('receivermsg', { //server gui tin nhan den nguoi nhận
+                     content: data.content, 
+                     myphoto: data.photo,
+                     id_send: data.myid,
+                     id_receive: data.pid,
+                     time: data.time
+                  })
+        //       }
+      //   })
+
+      })
    })
 
 
@@ -338,9 +359,20 @@ io.on('connection', function(client)
       else
          client.room = pid + myid
 
-      client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
-      //io.sockets.in(client.room)//ca 2 ben deu thay tin nhan
+    //  querysimple.updateTable("message", [{field: "ischeck", value: 2}], 
+     //    [{op: "", field: "userA", value: parseInt(pid)}, {op:"AND", field: "userB", value: parseInt(myid)}],
+     //  function(result, err){
+    //        if(err)   throw err
+     //       else{
+              console.log(result.affectedRows + " record(s) updated seen message");
+               client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
+               //io.sockets.in(client.room)//ca 2 ben deu thay tin nhan-io.sockets se gui tin nhan cho het cac ben
+     //       }
+
+     //    })
+
    })
+
 
    //su kien sua tin nhan cua nguoi dung
    client.on('editmsg', function(data){
@@ -362,6 +394,7 @@ io.on('connection', function(client)
          client.room = myid + pid
       else
          client.room = pid + myid
+      //insert to database
 
       //ca 2 ben deu nhan duoc tin hieu block msg
       io.sockets.in(client.room).emit('blockmsgdone', data)
@@ -380,7 +413,7 @@ io.on('connection', function(client)
 
 
    //su kien gui du lieu am thanh cua nguoi dung
-   client.on('sendrecording', function(data){//send to admin
+   client.on('sendrecording', function(data){
       //insert to database
       var myid = data.myid.toString();
       var pid = data.pid.toString();
@@ -389,13 +422,22 @@ io.on('connection', function(client)
       else
          client.room = pid + myid
 
-      client.in(client.room).emit('receiverecording', data)
+      querysimple.insertTable("message", 
+            ["userA", "userB", "data", "content", "ischeck", "time"], //field
+            [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time], 
+            function(result, err){
+               if(err)  throw err;
+               else{
+                  console.log("1 record inserted messages audio.");
+                  console.log("nhan tin vao room " + client.room)
+                  client.in(client.room).emit('receiverecording', data)
+               }
+         })
    })
 
 
    //gui ma ket noi goi video
-   client.on('sendcallvideocode', function(data){//send to admin
-      //insert to database
+   client.on('sendcallvideocode', function(data){
       var myid = data.myid.toString();
       var pid = data.pid.toString();
       if(myid > pid)
@@ -403,7 +445,43 @@ io.on('connection', function(client)
       else
          client.room = pid + myid
 
-      client.in(client.room).emit('receivecallvideocode', data)
+      client.broadcast.emit('receivecallvideocode', data)
+   })
+
+
+   client.on('acceptcall', function(data){
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      client.in(client.room).emit('calling', data)
+   })
+
+
+   client.on('endcall', function(data){
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      client.in(client.room).emit('doneendcall', data)
+   })
+
+
+   client.on('refusecall', function(data){//nguoi dung tu choi cuoc goi
+      var myid = data.myid.toString();
+      var pid = data.pid.toString();
+      if(myid > pid)
+         client.room = myid + pid
+      else
+         client.room = pid + myid
+
+      client.broadcast.emit('donerefusecall', data)
    })
 
 })

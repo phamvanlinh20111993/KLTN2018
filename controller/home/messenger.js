@@ -99,7 +99,7 @@ router.route('/user/editmsg')
 		var messid = req.body.id
 		var whoedit = req.session.user_id
 
-		console.log(content)
+		console.log(req.body.id)
 
 		anotherquery.editMessage(messid, whoedit, content, function(data, err){
 			if(err) throw err

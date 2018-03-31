@@ -1,0 +1,190 @@
+            .chusang{
+               color: blue;
+               font-size: 110%;
+               word-break: break-all;
+           }
+
+           .chusang:hover {
+             /* -webkit-filter: brightness(150%); */
+               filter: alpha(opacity=80);
+               opacity: .8;
+           }
+
+           .dropbtn {
+               color: blue;
+               border: none;
+               cursor: pointer;
+               margin-top:5px;
+            }
+
+            .dropdown {
+               position: relative;
+               display: inline-block;
+               float: right;
+               margin-right: 1%;
+               margin-top: 1%;
+            }
+
+            .dropdown-content {
+               display: none;
+               position: absolute;
+               background-color: #f9f9f9;
+               min-width: 160px;
+               box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+               z-index: 1;
+               margin-left: -1000%;
+               margin-top: -90%;
+            }
+
+            .dropdown-content a {
+               color: black;
+               padding: 12px 16px;
+               text-decoration: none;
+               display: block;
+            }
+
+            .dropdown-content a:hover {background-color: #f1f1f1}
+
+            .dropdown:hover .dropdown-content {
+               display: block;
+            }
+
+            .dropdown:hover .dropbtn {
+               -webkit-filter: brightness(150%);
+            }
+
+            .navbar {
+                margin-bottom: 0;
+                border-radius: 0;
+            }
+
+             body {
+                position: relative;
+             }
+
+             .affix {
+                top:0;
+                width: 100%;
+                z-index: 9999 !important;
+              }
+              
+
+             .affix ~ .container-fluid {
+                position: relative;
+                top: 50px;
+              }
+    
+            .row.content {height: 660px}
+    
+            .sidenav {
+                padding-top: 20px;
+                background-color: #f1f1f1;
+                height: 100%;
+            }
+    
+            footer {
+                background-color: #555;
+                color: white;
+                padding: 15px;
+            }
+    
+            @media screen and (max-width: 767px) {
+               .sidenav {
+                  height: auto;
+                  padding: 15px;
+                }
+
+               .row.content {height:auto;} 
+            }
+
+            .popup-box4
+            { 
+                border-width: 1px;
+                margin-top: 30px;
+                border-radius: 10px; 
+                box-shadow: 1px 1px 1px 1px grey;
+                background-color: white;
+                min-height:302px;
+                margin-left:3px;
+                width: 94%;
+            }
+
+            .divcmt{
+                height: 36px;
+                margin-top:2px; 
+                box-shadow: 1px 2px 1px #ccccff;
+                border:1px solid #b0f2b0; 
+                border-width: 1px 0px 2px 0px;
+            }
+
+            .divcmt1{
+                right: 0px;
+                min-height: 65px;
+                border-radius: 5px; 
+                box-shadow: 1px 2px 1px #ccccff;
+                background-color: #d5e8e8;
+            }
+
+            .divcmt2{
+                margin-top:8px;
+                font-size:110%;
+                outline:none;
+                padding:3px;
+                border-width:1px solid #c2cec8;
+                min-height: 30px;
+                margin-left: 10px;
+                width: 320%;
+            }
+
+            .a4{
+                color:#ef5b5b;
+                font-size:105%;
+                text-decoration:underline;
+                margin-left:70%;
+            }
+
+           .a4:hover{
+                color:orange;
+                cursor:pointer;
+            }
+
+            .a4:active{
+                color:violet;
+            }
+
+            .a8{
+               color:blue;
+               text-decoration:none;
+               font-size:145%;
+               cursor:pointer;
+               margin-left: 15px;
+               margin-top:10px;
+            }
+
+            .a8:hover{
+                text-decoration:underline;
+               color:purple;
+            }
+
+            .a8:active{
+               color:blue;
+            }
+
+            .a11{
+               cursor:pointer;
+               font-size: 80%;
+            }
+
+            .a11:hover{
+               text-decoration:underline;
+               color:red;
+            }
+
+            .a11:active{
+                color:blue;
+                text-decoration:none;
+            }
+
+            .navbar-fixed-top{
+              top:0%;
+            }

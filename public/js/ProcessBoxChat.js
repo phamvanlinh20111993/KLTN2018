@@ -1,4 +1,9 @@
-//this function can remove a array element.
+
+
+           var INPUT_HIDDEN_SAVE_MSSID = "";//su dung bien nay de luu tru input hidden-luu msg id=>edit msg
+           var CONSTANTSTRING = 38492124245347//random number
+
+           //this function can remove a array element.
             Array.remove = function(array, from, to) {
                 var rest = array.slice((to || from) + 1 || array.length);
                 array.length = from < 0 ? array.length + from : from;
@@ -27,11 +32,11 @@
             
             function formatTime(date)
             {
-                var hours = date.getHours();
+                var hours = date.getHours() + 7;
                 var minutes = date.getMinutes();
 
-                var days = date.getDay();
-                var months = date.getMonth();
+                var days = date.getDate();
+                var months = date.getMonth() + 1;//getMonth() return 0-11
                 var years = date.getFullYear();
 
                 minutes = minutes < 10 ? '0'+ minutes : minutes;
@@ -41,7 +46,17 @@
                     strTime = days + '/' + months + '/' +years
 
                 return strTime;
-            }          
+            }     
+
+            //return sql string date format
+            function getDateTime(date){
+                return date.getFullYear() +
+                 '-' + (date.getMonth() + 1) +
+                 '-' + (date.getDate()) +
+                 ' ' + (date.getHours()) +
+                 ':' + (date.getMinutes()) +
+                 ':' + (date.getSeconds());
+}     
         
             //this is used to close a popup
             function close_popup(id)
@@ -178,11 +193,11 @@
                             }
                         }
 
-						document.getElementById(id+"_scrollmsg").scrollTop = 
-							document.getElementById(id+"_scrollmsg").scrollHeight
-
 						popups.unshift(id);
                         calculate_popups();
+                        document.getElementById(id+"_scrollmsg").scrollTop = 
+                            document.getElementById(id+"_scrollmsg").scrollHeight
+
 						//show data to user
 
                 	})
@@ -212,13 +227,33 @@
                         message.edit = []//khoi tao rong
 
 						Message_send(id, time, MYPHOTO, message, 0)
-						socket.emit('sendmsg', {
-							content: message,
-							time: new Date(),
-                        	myid: MYID,
-                        	photo: MYPHOTO,
-                        	pid: id
-						}) 
+
+                        console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
+                        var ismisspelling = 0;//khong co loi dich, tin nhan ok
+                        Translate_or_Misspelling("/languageex/user/translate", 
+                        MYPRIOEX, MYPRIONAT, val, function(data){
+
+                           if(data.content.error == null){
+                                if(data.content.value==""){
+                                    ismisspelling = 0;//tin nhan ok
+                                }else{
+                                    if(data.content.language == MYPRIOEX)
+                                        ismisspelling = 1;//co loi chinh ta
+                                    else
+                                        ismisspelling = 2//khong phai ngon ngu dang trao doi
+                                }
+                           }else
+                                ismisspelling = 3;//loi dich tin nhan
+
+                            message.misspelling = ismisspelling
+						    socket.emit('sendmsg', {
+							   content: message,
+							   time: new Date(),
+                        	   myid: MYID,
+                        	   photo: MYPHOTO,
+                        	   pid: id
+						    }) 
+                        })
 						//reset input box
 						document.getElementById(id + "_mymsg").value = "";
 
@@ -230,6 +265,15 @@
                   	})  
 			  	}
             }
+
+            //luu ma tin nhan vua gui di trong input hidden
+            socket.on('sendmsgid', function(data){
+                if(data.myid == MYID){
+                    var savemsgid = document.getElementById(INPUT_HIDDEN_SAVE_MSSID+"_saveidms")
+                    savemsgid.value = data.msgid
+                    console.log("messageid " + savemsgid.value)
+                }
+            })
 
             //nhan tin nhan cua nguoi gui
             socket.on('receivermsg', function(data)
@@ -359,7 +403,7 @@
                                           '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
                                             ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
 				                          '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px" onclick="msgRecord('+id+')"></i></a>' + 
-				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\')"></i></a>' + 
+				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\', \''+name+'\', \''+photo+'\')"></i></a>' + 
                                           '<div style="clear: both;"></div>'
 									'</div>';
 				
@@ -379,16 +423,58 @@
     			return text;
 			}
 
+            //thay the tat ca string 'search' trong 'string' bang string 'replacement'
+            var replaceAll = function(string, search, replacement) {
+                return string.replace(new RegExp(search, 'g'), replacement);
+            }
+
+         //   var replaceAll1 = function(string, search, replacement) {
+        //        return target.split(search).join(replacement);
+        //    };
+
             //bien state de check la day la load tin nhan tu server hay nguoi dung dang nhan tin
 			function Message_send(id, date, photo, message, state)
 			{
 				var rid = parseInt(makerandomid())
 	            var content  = message.content
-                var Time;
+                var Time, msgid = "";
+
+                INPUT_HIDDEN_SAVE_MSSID = rid;
+
+                if(message.messageid)
+                    msgid = message.messageid 
+
                 if(state == 1)
                     Time = formatTime(new Date(date))
                 else
                     Time = formatAMPM(new Date())
+
+                var changecolor = ""//doi mau the span edit
+                var showeditmsg = ""//nhung js
+                var oldcontent = ""//noi dung tin nhan moi
+                if(message.edit.length > 0){//nếu tin nhắn được edit thì chạy hàm này
+                    oldcontent = content
+                    if(message.edit.length == 1){
+                        content = message.edit[0].newcontent
+                        Time = formatTime(new Date(message.edit[0].time))
+                    }else{
+                        if(MYID == message.edit[0].whoedit){
+                            content = message.edit[0].newcontent
+                            Time = formatTime(new Date(message.edit[0].time))
+                        }else if(MYID == message.edit[1].whoedit){
+                            content = message.edit[1].newcontent
+                            Time = formatTime(new Date(message.edit[1].time))
+                        }
+                    }  
+
+                    changecolor = "color: green;";
+                    var replacementJSON = replaceAll(JSON.stringify(message), '"', CONSTANTSTRING)
+                    showeditmsg = '<span id="'+rid+'_infoeditmsg" style="margin-left: 3px;"'+
+                        'class="glyphicon glyphicon glyphicon-eye-open" data-toggle="tooltip" title="show infor message"'+
+                        ' onclick="showInfoEditMsg(event,\''+photo+'\',\''+replacementJSON+'\')"></span>'
+
+        
+                }
 
                 //du lieu van ban
                 var messageType = ""
@@ -396,9 +482,10 @@
                     messageType = '<p id="'+rid+'_contentmsg">'+content+'</p>' +
                                 '<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;background:orange;display:none;" id="'+rid+'_fixcontmsg">' +
                                 '<p><small>'+Time+'</small></p>' +
-                                '<input type="hidden" id="'+rid+'_saveidms" value="">'+
+                                '<input type="hidden" id="'+rid+'_saveidms" value="'+msgid+'">'+
                                 '<a href="#">' +
-                                    '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
+                                    '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" style="'+changecolor+'" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
+                                     showeditmsg+
                                     '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>' + 
                                     '<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\','+id+')"></span>' + 
                                 '</a>' +
@@ -410,7 +497,7 @@
                 }else{
                     //du lieu khac
                     messageType =  '<p style="font-size:90%;">Audio</p>' +
-                               '<div style="background-color:blue;"><audio style="width:100%;" controls src='+message.data+'></audio></div>'+
+                               '<div style="background-color:blue;"><audio style="width:100%;" controls id="'+rid+'_audio" src='+message.data+'></audio></div>'+
                                '<p><small>'+Time+'</small></p>'
                 }
 
@@ -436,12 +523,45 @@
 			{
 				var rid = parseInt(makerandomid())
                 var content  = message.content
-                var Time;
-                if(state == 1)
+                var Time, msgid = "";
+
+                if(message.messageid)
+                    msgid = message.messageid 
+
+                if(state == 1)//hien thi thoi gian khi load tin nhan
                     Time = formatTime(new Date(date))
-                else
+                else          //hien thi thoi gian khi dang nhan tin socket
                     Time = formatAMPM(new Date())
-                 
+
+                var changecolor = ""//doi mau the span edit
+                var showeditmsg = ""//nhung js
+                var oldcontent = ""//noi dung tin nhan moi
+                if(message.edit.length > 0){
+                    oldcontent = content
+                    if(message.edit.length == 1){
+                        content = message.edit[0].newcontent
+                        Time = formatTime(new Date(message.edit[0].time))
+                    }else{
+                        if(MYID == message.edit[0].whoedit){
+                            content = message.edit[0].newcontent
+                            Time = formatTime(new Date(message.edit[0].time))
+                        }else if(MYID == message.edit[1].whoedit){
+                            content = message.edit[1].newcontent
+                            Time = formatTime(new Date(message.edit[1].time))
+                        }
+                    }  
+
+                    //vi khong the truyen 1 JSON.stringfify(do co chua dau ngoac kep " trong chuoi) do do
+                    //can thay the chuoi nay bang 1 chuoi moi co CONSTANTSTRING la 1 day so khong bao gio 
+                    //gap noi dau /"/ trong chuoi sau khi truyen thi thay the lai sau do chuyen sang object
+                    var replacementJSON = replaceAll(JSON.stringify(message), '"', CONSTANTSTRING)
+
+                    changecolor = "color: green;";
+                    showeditmsg = '<span id = "'+rid+'_infoeditmsg" style="margin-left: 3px;"'+
+                        'class="glyphicon glyphicon glyphicon-eye-open" data-toggle="tooltip" title="show infor message"'+
+                        ' onclick="showInfoEditMsg(event,\''+photo+'\',\''+replacementJSON+'\')"></span>'
+
+                }
 
                 var messageType = ""
 
@@ -449,16 +569,19 @@
                     messageType = '<p id="'+rid+'_contentmsg">'+content+'</p>' +
                                 '<input id="'+rid+'_fixcontmsg" type="text" value="'+content+'" autofocus style="border:0px;background:orange;outline-width:0;display:none;">'+
                                 '<p><small>'+Time+'</small></p>' +
-                                '<input type="hidden" id="'+rid+'_saveidms" value="">'+//luu id message de sau nay edit no
+                                '<input type="hidden" id="'+rid+'_saveidms" value="'+msgid+'">'+//luu id message de sau nay edit no
                                 '<a href="#">' +
-                                    '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
+                                    '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" style="'+changecolor+'" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
+                                    showeditmsg +
                                     '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;" onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>' + 
                                     '<span class="glyphicon glyphicon-transfer" style="margin-left: 3px;" onclick="Translate(event,'+rid+',\''+content+'\','+id+')"></span>' +
                                 '</a>'
                 }else{
                     messageType =  '<p style="font-size:90%;">Audio</p>' +
-                           '<div style="background-color:blue;height:auto;margin-top:3%;"><audio style="width:100%;" src='+message.data+' controls></audio></div>'+
+                           '<div style="background-color:blue;height:auto;margin-top:3%;">'+
+                           '<audio style="width:100%;" type="audio/webm" id="'+rid+'_audio" controls src='+message.data+'></audio></div>'+
                             '<p><small>'+Time+'</small></p>'
+
                 }
 
 
@@ -524,7 +647,7 @@
 						MYPRIOEX , null, content, function(data){
 
 	                    if(typeof cb == "function")
-                            cb("Done.");//tra ve du lieu
+                            cb(data);//tra ve du lieu
 
 						if(data.content.error == null){
 							if(data.content.value == ""){
@@ -601,14 +724,14 @@
 							alert("You can not blank this fields")
 						else if(input_fix_old_content != content)
 						{
-							msgid = "2133213123" //get message id
+							var msgid =  document.getElementById(id+"_saveidms").value
 							//ajax with else condition
 							editMessage(msgid, content, function(data){
 								p_content.style.display = "block"
 								span_edit.style.color = "green"
 								p_content.innerHTML = content
 								input_fix_content.style.display = "none"
-								console.log(data)
+								//console.log(data)
 							})
 						}
 					}
@@ -660,3 +783,40 @@
     				range.select();
   				}		
 			}
+
+
+
+            function showInfoEditMsg(e, photo, message)//hien thi thong tin tin nhan da edit
+            {
+                e.preventDefault()
+
+                var messagetoOBJ = replaceAll(message, CONSTANTSTRING, '"')
+                message = JSON.parse(messagetoOBJ)
+
+                $('#InformationEditMessage').modal('show')
+                var modalEditMessage = document.getElementById('InformationEditMessage')
+                var modalEditMessage_body = modalEditMessage.getElementsByClassName('modal-body')[0]
+
+                var oldcontent = '<tr><td>Me</td><td>'+message.content +' (old)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+                var anotheredit = ""
+                if(message.edit.length == 1){
+                    if(message.edit[0].whoedit != MYID)
+                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox"></td></tr>' 
+                }else{
+                    if(message.edit[0].whoedit != MYID)
+                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox"></td></tr>' 
+                    else if(message.edit[1].whoedit != MYID)
+                        anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[1].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox"></td></tr>' 
+                }
+
+                var ele = '<table class="table table-hover"><thead><tr>'+
+                          '<th>photo</th><th>content</th><th>time</th><th>Agree</th>'+
+                          '</tr></thead>'+
+                          '<tbody>' +
+                                oldcontent+
+                                anotheredit+
+                          '</tbody>' +
+                          '</table>'
+
+                modalEditMessage_body.innerHTML = ele
+            }
