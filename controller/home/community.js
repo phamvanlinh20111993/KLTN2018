@@ -40,6 +40,7 @@ function APIComunityEx(id, cb)
 
 				ListUser[ind].infor.follow = {}
 				ListUser[ind].infor.follow.id = -1;
+				ListUser[ind].infor.follow.tracked = -1;
 				ListUser[ind].infor.follow.time = -1;
 
 				var index = 1;
@@ -55,7 +56,7 @@ function APIComunityEx(id, cb)
 		    }
 
 		    //check followers of this user
-		    querysimple.selectTable("follow", ["id","tracked", "time"], [{op: "", 
+		    querysimple.selectTable("follow", ["id","tracked", "ctime"], [{op: "", 
 		    	field: "followers", value: id }], 
 		    	null, null, null, function(result, fields, err){
 		    		if(err) throw err
@@ -66,7 +67,8 @@ function APIComunityEx(id, cb)
 		    					for(index = 0; index < ListUser.length; index++){
 		    						if(result[ind].tracked == ListUser[index].infor.id){
 		    							ListUser[ind].infor.follow.id = result[ind].id;
-										ListUser[ind].infor.follow.time = result[ind].time;
+		    							ListUser[ind].infor.follow.tracked =  result[ind].tracked;
+										ListUser[ind].infor.follow.time = result[ind].ctime;
 		    						}
 		    					}
 		    				}
@@ -114,6 +116,7 @@ function APIComunityNative(id, cb)
 
 				ListUser[ind].infor.follow = {}
 				ListUser[ind].infor.follow.id = -1;
+				ListUser[ind].infor.follow.tracked = -1;
 				ListUser[ind].infor.follow.time = -1;
 
 				var index = 1;
@@ -129,7 +132,7 @@ function APIComunityNative(id, cb)
 		    }
 
 		    //check followers of this user
-		    querysimple.selectTable("follow", ["id","tracked", "time"], [{op: "", 
+		    querysimple.selectTable("follow", ["id","tracked", "ctime"], [{op: "", 
 		    	field: "followers", value: id }], 
 		    	null, null, null, function(result, fields, err){
 		    		if(err) throw err
@@ -140,7 +143,8 @@ function APIComunityNative(id, cb)
 		    					for(index = 0; index < ListUser.length; index++){
 		    						if(result[ind].tracked == ListUser[index].infor.id){
 		    							ListUser[ind].infor.follow.id = result[ind].id;
-										ListUser[ind].infor.follow.time = result[ind].time;
+		    							ListUser[ind].infor.follow.tracked = result[ind].tracked;
+										ListUser[ind].infor.follow.time = result[ind].ctime;
 		    						}
 		    					}
 		    				}
@@ -153,7 +157,6 @@ function APIComunityNative(id, cb)
 	 }) 
 
 }
-
 
 
 router.route('/home/community')
@@ -172,5 +175,61 @@ router.route('/home/community')
 	}
 })
 
+
+//theo doi nguoi dung
+router.route('/home/follow')
+.post(function(req, res)
+{
+	if(req.session.user_id){
+		
+		var data = JSON.parse(req.body.data)
+		console.log(data)
+		console.log(req.body)
+		console.log(typeof req.body.data)
+		querysimple.selectTable("follow", ["id"], 
+		 [{op:"", field: "followers", value: req.session.user_id}, 
+			  {op:"AND", field: "tracked", value: data.id}], 
+		null, null, null, function(result, fields, err){
+			if(err) throw err;
+			else{
+				if(result.length == 0){
+					var field = ["followers", "tracked", "ctime"]
+					var value = [req.session.user_id, data.id, data.time]
+					querysimple.insertTable("follow", field, value, function(result, err){
+						if(err) throw err
+						else  res.json({data: result.affectedRows})
+					})
+				}
+			}
+		})
+	}
+})
+
+
+//bo theo doi nguoi dung
+router.route('/home/unfollow')
+.post(function(req, res)
+{
+	if(req.session.user_id){
+		var data = JSON.parse(req.body.data)
+
+		querysimple.selectTable("follow", ["id"], 
+		 [{op:"", field: "followers", value: req.session.user_id}, 
+			  {op:"AND", field: "tracked", value: data.id}], 
+		null, null, null, function(result, fields, err){
+			if(err) throw err;
+			else{
+				if(result.length > 0){
+					var whecdt = [{op: "", field: "followers", value: req.session.user_id}, 
+					{op: "AND", field: "tracked", value: data.id}]
+					querysimple.deleteTable("follow", whecdt, function(result, err){
+						if(err) throw err
+						else res.json({data: result.affectedRows})
+					})
+				}
+			}
+		})
+	}
+})
 
 module.exports = router;

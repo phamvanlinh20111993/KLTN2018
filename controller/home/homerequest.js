@@ -11,7 +11,6 @@ router.route('/home')
 .get(function(req, res)
 {
 	var User  = {}
-
 	if(!req.session.user_id)//khong ton tai phien lam viec
 	{
 		if(req.session.filter && req.cookies.CeE7_z1ws){
@@ -58,17 +57,18 @@ router.route('/home')
 
 			querysimple.selectUser(req.session.email, function(result, fields, err){
 				if(err) throw err
-				req.session.user_id = result[0].id
-				req.session.email = result[0].email
-				req.session.password = result[0].password	
-				req.session.photo = result[0].photo
+				else{
+					req.session.user_id = result[0].id
+					req.session.email = result[0].email
+					req.session.password = result[0].password	
+					req.session.photo = result[0].photo
 				
-				anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
-					req.session.mynative = data[0].natsy
-					req.session.myexchange = data[0].exsy
-					res.render('ejs/homepage', {user: result})
-				})
-				
+					anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+						req.session.mynative = data[0].natsy
+						req.session.myexchange = data[0].exsy
+						res.render('ejs/homepage', {user: result})
+					})
+				}
 			})
 		}else
 			res.redirect('/languageex/user/filter')
@@ -94,12 +94,14 @@ router.route('/home')
 
 		querysimple.selectUser(req.session.email, function(result, fields, err){
 			if(err) throw err
-			anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
-				req.session.mynative = data[0].natsy
-				req.session.myexchange = data[0].exsy
+			else{
+				anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+					req.session.mynative = data[0].natsy
+					req.session.myexchange = data[0].exsy
+					res.render('ejs/homepage', {user: result})
+				})
 				res.render('ejs/homepage', {user: result})
-			})
-			res.render('ejs/homepage', {user: result})
+			}
 		})
 		
 	}else if(!req.session.filter){

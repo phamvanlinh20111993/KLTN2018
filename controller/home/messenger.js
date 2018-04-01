@@ -12,6 +12,7 @@ router.route('/user/messages')
 .get(function(req, res){
 	//khoi tao session
 	if(req.session.user_id){
+
 		var uid = req.query.uid
 		if(typeof uid != 'undefined'){
 			querysimple.selectMessage(req.session.user_id, uid, function(err, data){
@@ -21,9 +22,8 @@ router.route('/user/messages')
 					res.send(JSON.stringify({listmessage: data}))
 				}
 			})
-		}
+		}	
 	}
-
 })
 .post(function(req, res)
 {

@@ -32,8 +32,22 @@ router.route('/user/filter')
 						req.session.destroy()
 					res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(62)))
 				}else{
-					req.session.filter = true;
-					res.redirect('/languageex/home')
+					//check nguoi dung da dang nhap chua
+					querysimple.selectTable("User", ["state"], [{op:"", field: "email", value: emailuser}],
+						null, null, null, function(result, fields, err){
+						if (err) throw err;
+						else{
+							if(result.length > 0){
+							//	if(result[0].state == 0){
+									req.session.filter = true;
+									res.redirect('/languageex/home')
+							//	}else{
+							//		res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(8)))//ve trang dang nhap
+							//	}
+							}
+						}
+
+					})
 				}
 			})
     }else
@@ -42,7 +56,7 @@ router.route('/user/filter')
 .post(function(req, res){
    var email = req.body.username
    var pass = req.body.password
-
+  
     if(libfunc.validateEmail(email) && libfunc.validatePassword(pass))
     {
    		querysimple.selectTable("blocklist_admin", ["blockwho"],
@@ -51,8 +65,20 @@ router.route('/user/filter')
    			if(result.length > 0){
 				res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(62)))
 			}else{
-				req.session.filter = true;
-				res.redirect(307, '/languageex/user/login')
+				//kiem tra tai khoan nay da duoc su dung hay chua
+				querysimple.selectTable("User", ["state"], [{op:"", field: "email", value: email}],
+					null, null, null, function(result, fields, err){
+					if (err) throw err;
+					else{
+						if(result.length > 0){
+						//	if(result[0].state == 0){
+								req.session.filter = true;
+								res.redirect(307, '/languageex/user/login')
+						//	}else
+						//	    res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(8)))//ve trang dang nhap//dang nhap ve trang dang nhap
+						}
+					}
+				})
 			}
    		})
     }else

@@ -134,8 +134,9 @@
     <ul class="nav navbar-nav">
       <li class="active"><a href="/languageex/home">Home</a></li>
        <li><a href="/languageex/messenger">Messenger</a></li>
-       <li><a href="#cádasd">Discussion</a></li>
+       <li><a href="/languageex/user/post">Discussion</a></li>
     </ul>
+
     <ul class="nav navbar-nav navbar-right">
       <li><a href="#" data-toggle="modal" data-target="#BoxUpdatePhoto"><span class="glyphicon glyphicon-globe" ></span> Information</a></li>
       <li><a href="/languageex/user/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
@@ -257,8 +258,15 @@
                <%if(User.state == 'me'){%>
                  <div style="height: 35px;">
                   <span class="pull-right">
-                   <a href="#" data-original-title="Edit info" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+
+                     <a href="#" data-original-title="Add more exchange language" data-toggle="tooltip" type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-font"></i></a>
+
+                     <a href="#" data-original-title="Add more native language" data-toggle="tooltip" type="button" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-bold"></i></a>
+
+                    <a href="#" data-original-title="Edit info" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+
                      <a data-original-title="My blocks list" data-toggle="tooltip" type="button" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-folder-open"></i></a>
+
                      <a data-original-title="My followers list" data-toggle="tooltip" type="button" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-eye-close"></i></a>
                   </span>
                  </div>

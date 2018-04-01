@@ -23,3 +23,9 @@ git remote set-url --add name https://github.com/phamvanlinh20111993/KLTN2018_AF
 
 ##, push to specigfix remote repository
 git push -u https://github.com/phamvanlinh20111993/KLTN2018_AFTER.git master
+
+
+##, Call video choose one in three total
+simple-peer
+peerjs
+socket.io p2p

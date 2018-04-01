@@ -102,6 +102,7 @@ var messenger = require('./controller/home/messenger')
 var filter = require('./controller/filter')
 var msgsetting = require('./controller/home/msgsetting')
 var profile = require('./controller/home/profile')
+var post_setting =  require('./controller/home/posts_setting')
 //var admin = require('./controller/admin')
 
 app.use('/languageex', publicrq)
@@ -116,6 +117,7 @@ app.use('/languageex', community)
 app.use('/languageex', messenger)
 app.use('/languageex', msgsetting)
 app.use('/languageex', profile)
+app.use('/languageex', post_setting)
 
 
 const translate = require('google-translate-api');

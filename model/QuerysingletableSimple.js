@@ -149,22 +149,21 @@ var updateTable = function(tbname, fields, whcondi, cb)
 /* delete table*/
 var deleteTable = function(tbname, whcondi, cb){
 
-	var sqlString = "DELETE " + tbname;
-
+	var sqlString = "DELETE FROM " + tbname;
 	if(whcondi)
 	{
-		sqlString = " WHERE ";
+		sqlString += " WHERE ";
 		var ind = 0;
 		while(ind < whcondi.length)
 		{
 			if(whcondi[ind].op)
-				sqlString += "  " + whcondi[ind].op + " ";
+				sqlString += " " + whcondi[ind].op + " ";
 			sqlString += whcondi[ind].field + " = " + mysql.escape(whcondi[ind].value);
 			ind++;
 		}
 	}
 
-	//console.log("Query: " + sqlString)
+//	console.log("Query: " + sqlString)
 
 	con.query(sqlString, function (err, result) {
     	if (err)
@@ -175,17 +174,18 @@ var deleteTable = function(tbname, whcondi, cb){
 
 //tao cau lenh truy van co ban co join bang
 var selectTableJoin = function(tbname, data, cb){
-
+	
 }
 
 
 //tra ve thong tin nguoi dung email(params) hien thi trong trang home
 var selectUser = function(email, cb){//hien thi nguoi dung
 	var sqlString = "select user.id, user.name, user.email, user.photo, user.score,"+
-	            " level.level from user INNER JOIN level "+
-				" ON level.id = user.level_id"+
+	            " level.level, language.name as exname from user INNER JOIN level "+
+				" ON level.id = user.level_id JOIN exchangelg ON (user.id = exchangelg.user_id "+
+				" AND exchangelg.prio > 0) JOIN language ON exchangelg.language_id = language.id "+
 			    " WHERE user.email = " + mysql.escape(email);
-
+ 
 	con.query(sqlString, function(err, result, fields){
 		if(err)
 			cb(null, null, err)
@@ -449,11 +449,12 @@ var selectUserCommunityNative = function(id, cb){
 
 			//all user online and have max lever sorted, max level
 			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, "+
-				"u.photo, u.gender, u.score, la.name AS lname, le.level FROM user u " +
-				"JOIN level le ON u.level_id = le.id JOIN nativelg nat ON u.id = nat.user_id "+
-				"JOIN language la ON la.id = nat.language_id " +
-				"WHERE u.id != " +id+ " AND "+orcondi+" AND "+
-				"u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
+				" u.photo, u.gender, u.score, la.name AS lname, le.level FROM user u " +
+				" JOIN level le ON u.level_id = le.id"+
+				" JOIN nativelg nat ON u.id = nat.user_id "+
+				" JOIN language la ON la.id = nat.language_id " +
+				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
+				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
 				" ORDER BY u.state DESC, le.level ASC";
 			
 			con.query(sqlString, function(error, res, fields)
@@ -494,9 +495,11 @@ var selectUserCommunityEx = function(id, cb){
 			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, "+
 				"u.photo, u.gender, u.score, u.dateofbirth, de.name AS dename, " +
 				" la.name AS lname, le.level FROM user u " +
-				"JOIN level le ON u.level_id = le.id JOIN exchangelg ex ON u.id = ex.user_id "+
-				"JOIN language la ON la.id = ex.language_id JOIN degree de ON " +
-				"ex.degree_id = de.id WHERE u.id != " +id+ " AND "+orcondi+" AND "+
+				" JOIN level le ON u.level_id = le.id "+
+				" JOIN exchangelg ex ON u.id = ex.user_id "+
+				" JOIN language la ON la.id = ex.language_id "+
+				" JOIN degree de ON ex.degree_id = de.id" +
+				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
 				"u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
 				" ORDER BY u.state DESC, le.level ASC";
 

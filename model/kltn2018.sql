@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `User` (
   `level_id` int(4) UNSIGNED NOT NULL, /* trinh do, tien do*/
   `admin` BIT NOT NULL,
   `creatime` DATETIME NOT NULL,/* thoi gian khoi tao tai khoan nay */
-  `time` TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP
+  `ctime` TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `Follow`(
 	`id` int(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`followers` bigint(30) UNSIGNED NOT NULL,/* ai la nguoi theo doi */
 	`tracked` bigint(30) UNSIGNED NOT NULL,/* nguowi bi theo doi la ai */
-	`time` DATETIME
+	`ctime` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `Message`(
 	`content` varchar(5000) NOT NULL,
 	`check` int(1) NOT NULL,/*giá trị check thông báo đối phương đã xem tin nhắn hay chưa
 				   đặt 0 là nguoi gui đã xem(default), 1 là nguoi nhan da xem*/
-	`time` DATETIME NOT NULL
+	`ctime` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `Editmessage`(
 	`message_id` bigint(40) UNSIGNED NOT NULL,
 	`whoedit` bigint(30) UNSIGNED NOT NULL,
 	`newcontent` varchar(5000) NOT NULL,
-	`time` DATETIME NOT NULL
+	`ctime` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `Delconversation`(
 	`id` int(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`whodel` bigint(30) UNSIGNED NOT NULL,
 	`delwho` bigint(30) UNSIGNED NOT NULL,
-	`time` DATETIME NOT NULL/* xóa các tin nhắn đén thời điểm time*/
+	`ctime` DATETIME NOT NULL/* xóa các tin nhắn đén thời điểm time*/
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `Blockmessages`(
 	`id` int(9) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`whoblock` bigint(30) UNSIGNED NOT NULL,
 	`blockwho` bigint(30) UNSIGNED NOT NULL,
-	`time` DATETIME NOT NULL
+	`ctime` DATETIME NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -133,9 +133,11 @@ CREATE TABLE IF NOT EXISTS `Post`(
 	`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`user_id` bigint(30) UNSIGNED NOT NULL,
 	`content` varchar(5000) NOT NULL,
+	`title_id` int(4) UNSIGNED NOT NULL,
 	`file` varchar(1000), /* dinh kem file luu dia chi url*/
 	`nameoffile` varchar(500),
-	`time` DATETIME NOT NULL
+	`ctime` DATETIME NOT NULL,
+	`turnof_cmt` int(1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -144,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `Comment`(
 	`post_id` bigint(20) UNSIGNED NOT NULL,
 	`user_id` bigint(30) UNSIGNED NOT NULL,
 	`content` varchar(5000) NOT NULL,
-	`time` DATETIME NOT NULL
+	`ctime` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -153,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `Blocklist_user`(
 	`whoblock` bigint(30) UNSIGNED NOT NULL,
 	`blockwho` bigint(30) UNSIGNED NOT NULL,
 	`timeblock` DATETIME NOT NULL,
-	`time` DATETIME
+	`ctime` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -162,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `Blocklist_admin`(
 	`blockwho` bigint(30) UNSIGNED NOT NULL,
 	`timeblock` DATETIME NOT NULL,
 	`content_id` int(8) NOT NULL,
-	`time` DATETIME
+	`ctime` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -180,7 +182,7 @@ CREATE TABLE IF NOT EXISTS `Report_post_comment`( /* Report to admin */
 	`code` int(8) UNSIGNED NOT NULL,
 	`type` int(8) UNSIGNED NOT NULL,/* report comment, post or user */
 	`state` BIT NOT NULL,/* Admin read or not */
- 	`time` DATETIME
+ 	`ctime` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -204,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `Report_user`(
 	`reportwho` bigint(30) UNSIGNED NOT NULL,
 	`code` int(8) UNSIGNED NOT NULL,
 	`state` BIT NOT NULL,/* Admin read or not */
- 	`time` DATETIME
+ 	`ctime` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -220,6 +222,14 @@ CREATE TABLE IF NOT EXISTS `likes_post`(
 	`id_user` bigint(30) UNSIGNED NOT NULL,
 	`id_post`  bigint(20) UNSIGNED NOT NULL,
 	`ctime` DATETIME
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `post_title`(
+	`id` int(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` varchar(200) NOT NULL,
+	`code` varchar(10) NOT NULL,
+	`photo` varchar(1000)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*################################################################################################## */
@@ -264,7 +274,8 @@ ALTER TABLE `Setting`
 	ADD CONSTRAINT `id of user` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `Post`
-	ADD CONSTRAINT `iduserpost` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+	ADD CONSTRAINT `iduserpost` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `title of post` FOREIGN KEY (`title_id`) REFERENCES `post_title` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `Comment`
 	ADD CONSTRAINT `id of post` FOREIGN KEY (`post_id`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -340,4 +351,8 @@ INSERT INTO `Level` (`level`, `score`) VALUES
 
 INSERT INTO `Degree`(`name`) VALUES 
 ('Beginner'),('Elementary'),('Intermediate'), ('Advanced'), ('Expert');
+
+INSERT INTO `post_title`(`name`, `code`) VALUES 
+('Grammar', '#FR4z'),('Vocabulary', 'A#vV2'),('Pronounce','DDH#m'), 
+('Structure', 'H!zKK'), ('General', 'LAD&3');
 

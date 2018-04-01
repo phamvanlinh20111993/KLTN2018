@@ -46,6 +46,10 @@ function Error(id){
 			errstr = "This account does not exist.Please try again."
 			break;
 
+		case md5(8):
+			errstr = "This account is being used. Please try again."
+			break;
+
 		case md5(30):
 			//truy van csdl
 		default:
@@ -54,6 +58,39 @@ function Error(id){
 	}
 	return errstr;
 }
+
+
+
+function createSession(req, res, emailuser, passuser)
+{
+	querysimple.selectTable("User", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
+		null, null, null, function(result, field, err)
+		{
+			if(err) throw err
+
+			var bytes  = CryptoJS.AES.decrypt(result[0].password, md5(passuser));
+			var deemail = bytes.toString(CryptoJS.enc.Utf8);
+
+			if(deemail.toString() == emailuser.toString() && result[0].stay == 1){//chua logout bao gio
+				querysimple.selectUser(emailuser, function(result, fields, err){
+					if(err) throw err
+					req.session.user_id = result[0].id
+					req.session.email = result[0].email
+					req.session.password = result[0].password
+					req.session.photo = result[0].photo
+
+					anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+						req.session.mynative = data[0].natsy
+						req.session.myexchange = data[0].exsy
+						res.render('ejs/messenges', {user: result})
+					})
+				})
+			}else
+				res.redirect('/languageex/user/login')
+	})
+
+}
+
 
 router.route('/user')
  .get(function(req, res)
@@ -254,8 +291,30 @@ router.route('/messenger')
  				}
  			}
  		})
- 	}else
- 		res.render('html/Notfound.html')
+ 	}else{
+		if(req.cookies.CeE7_z1ws){
+			var bytes  = CryptoJS.AES.decrypt(req.cookies.CeE7_z1ws, "20111993");
+			var bytes1 = CryptoJS.AES.decrypt(req.cookies.Coie_ccd4, "20111993");
+			var emailuser = bytes.toString(CryptoJS.enc.Utf8);//chuỗi string
+			var passuser = bytes1.toString(CryptoJS.enc.Utf8);
+
+			if(!req.session.filter){
+				//fitle nguoi dung
+				querysimple.selectTable("blocklist_admin", ["blockwho"],
+   					[{op:"", field: "blockwho", value: emailuser}], null, null, null, function(result, fields, err){
+   					if(err)  throw err;
+   					if(result.length > 0){
+						res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(62)))
+					}else{
+						req.session.filter = true;
+						createSession(req, res, emailuser, passuser)
+					}
+   				})
+			}else
+				createSession(req, res, emailuser, passuser)
+	    }else
+	    	res.render('html/Notfound.html')
+	}
 })
 
 

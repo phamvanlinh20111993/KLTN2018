@@ -89,6 +89,15 @@
                         element.style.right = right + "px";
                         right = right + 320;
                         element.style.display = "block";
+                        var scrollPopUp = document.getElementById(popups[iii]+"_scrollmsg")
+                        scrollPopUp.scrollTop = scrollPopUp.scrollHeight
+
+                        //load message
+                        scrollPopUp.onscroll = function(){
+                            if(scrollPopUp.scrollTop == 0){
+                            //    alert("xin chao")
+                            }
+                        }
                     }
                 }
                 
@@ -195,8 +204,15 @@
 
 						popups.unshift(id);
                         calculate_popups();
-                        document.getElementById(id+"_scrollmsg").scrollTop = 
-                            document.getElementById(id+"_scrollmsg").scrollHeight
+
+                        var scrollEventBoxChat = document.getElementById(id+"_scrollmsg")
+                        scrollEventBoxChat.scrollTop = scrollEventBoxChat.scrollHeight
+
+                        scrollEventBoxChat.onscroll = function(){
+                            if(scrollEventBoxChat.scrollTop == 0){
+                                alert("xin chao")
+                            }
+                        }
 
 						//show data to user
 
@@ -228,7 +244,7 @@
 
 						Message_send(id, time, MYPHOTO, message, 0)
 
-                        console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
+                     //   console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
                         var ismisspelling = 0;//khong co loi dich, tin nhan ok
                         Translate_or_Misspelling("/languageex/user/translate", 
                         MYPRIOEX, MYPRIONAT, val, function(data){
@@ -472,7 +488,6 @@
                     showeditmsg = '<span id="'+rid+'_infoeditmsg" style="margin-left: 3px;"'+
                         'class="glyphicon glyphicon glyphicon-eye-open" data-toggle="tooltip" title="show infor message"'+
                         ' onclick="showInfoEditMsg(event,\''+photo+'\',\''+replacementJSON+'\')"></span>'
-
         
                 }
 

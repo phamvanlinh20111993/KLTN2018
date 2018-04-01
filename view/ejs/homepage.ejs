@@ -109,7 +109,7 @@
 </noscript>
 
 
-<div class="modal fade" id="InformationEditMessage" role="dialog">
+  <div class="modal fade" id="InformationEditMessage" role="dialog">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -127,6 +127,27 @@
       </div>
     </div>
   </div>
+
+
+  <div class="modal fade" id="showNotifyHome" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" >
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Notify</h4>
+        </div>
+
+        <div class="modal-body">
+          <h4>My content</h4>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 
 <!-- Modal -->
@@ -215,7 +236,6 @@
   </div>
 
 
-
   <div class="modal fade" id="recordingAudio" role="dialog">
     <div class="modal-dialog modal-lg">
       <div class="modal-content" >
@@ -276,6 +296,7 @@
     </div>
   </div>
 
+
   <div class="modal fade" id="acceptCallvideoFromuser" role="dialog">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
@@ -330,6 +351,7 @@
 
       <div class="well" style="background: #f6f9fc;">
         <h4><i><%= user[0].name %></i></h4>
+         <p>ex: <span style="color: orange;"><%= user[0].exname %></span></p>
         <p>Level: <span style="color: orange;"><%= user[0].level %></span></p>
         <p>Score: <span style="color: orange;"><%= user[0].score %></span></p>
       </div>
@@ -358,11 +380,12 @@
       </div> -->
     
             <ul class="nav nav-pills nav-stacked" style="width: 114%;margin-left: -7%;">
-               <li class="active" style="text-align: left;"><a href="#"><span style="font-size: 130%;">
+
+               <li class="active" style="text-align: left;" id="autoclickcom"><a href="#" onclick="selectUserCommunity()"><span style="font-size: 130%;">
                   <span class="glyphicon glyphicon-user"></span> <span style="margin-left: 10%;">Community</span>
                </span></a></li>
 
-               <li style="text-align: left;margin-top:4%;"><a href="#"><span style="font-size: 130%;">
+               <li style="text-align: left;margin-top:4%;" id="autoclicknot"><a href="#" onclick="showMyNotify()"><span style="font-size: 130%;">
                   <span class="glyphicon glyphicon-bullhorn"></span><span style="margin-left: 10%;"> Notification </span><span style="color: red;"> (0)</span>
                </span></a></li>
 
@@ -429,9 +452,10 @@
       e.preventDefault();
    });
   
+  //bat su kien tooltip
    $(document).ready(function(){
       $('[data-toggle="tooltip"]').tooltip().click(function(e){
-         e.preventDefault();
+        e.preventDefault();
       });
    });
 
@@ -445,7 +469,7 @@
    }
 
    function Post(){
-      location.href = '/languageex/user/post?uid=' + encodeURIComponent("<%= user[0].id  %>")
+      location.href = '/languageex/user/post'//'?uid=' + encodeURIComponent("<%= user[0].id  %>")
    }
 
    function Messenger(){
