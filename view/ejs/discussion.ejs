@@ -139,7 +139,22 @@
   </div>
 
 
-
+<div class="modal fade" id="showuserlikespost" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body">
+          <p>content</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -250,7 +265,7 @@
                 <a style="cursor:pointer;" onclick="">xóa bài đăng</a>
                 <a style="cursor:pointer;" onclick="">sửa bài đăng</a>
                 <a style="cursor:pointer;" onclick="">tắt comment</a>
-                <a style="cursor:pointer;" onclick="">tắt thông báo</a><!-- mo rong -->
+                <a style="cursor:pointer;" onclick="">tắt thông báo</a>
               </div>
             </div>
 
@@ -268,13 +283,12 @@
               </table>
 
                 <div style="height:auto;margin-top:10px;" class="form-group" >
-                  <textarea readonly class="form-control" style="min-height:10px;resize:none;font-size:17px;color:orange;background-color:white;border:none;-webkit-box-shadow:none;-moz-box-shadow: none;box-shadow: none;">This is my statement one.&#13;&#10;This is my statement2. Mobile First means designing for mobile before designing for desktop or any other device (This will make the page display faster on smaller devices).
+                  <textarea readonly class="form-control" style="min-height:10px;resize:none;font-size:17px;color:orange;background-color:white;border:none;-webkit-box-shadow:none;-moz-box-shadow: none;box-shadow: none;">This is my statement one.&#13;&#10;This is my statement2. Mobile First means designing for mobile before designing for desktop or any other device (This will make the page display faster on smaller devices).dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
                   </textarea>
                        <a style="margin-left: 3%;cursor: pointer;">See translation</a>
                   <textarea readonly class="form-control" style="min-height:10px;resize:none;outline:none;font-size:15px;color:orange;background-color:white;border:none;-webkit-box-shadow: none;-moz-box-shadow: none;box-shadow:none;display: none;">
-                dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+                
                   </textarea>
-                  <div style="float:right;margin-right:10px;border: 1px solid blue;"></div>
 
                 </div>
 
@@ -290,6 +304,7 @@
                       <div style="margin-top:12px;">
                         <a class="a4" onclick = "">Show more comments(<span id="changecmt">8</span>)</a>
                       </div>
+                      <div style="height:auto;" id=0></div>
                   </div>
 
                   <form style="margin-top:18px;margin-left:10px;">
@@ -333,16 +348,13 @@
 
                   <div style="height:20px; margin-top:0px;"></div>
 
-
                 </div>  
 
-                </div>
-
+              </div>
             </div>
 
-         </div>
+         </div> 
       </div>
-
     </div>
 
 
@@ -358,33 +370,13 @@
 <!-- <footer class="container-fluid text-center" style="margin-top: 0px;">
   <p>Footer Text</p>
 </footer>  -->
-<script type="text/javascript">
-
-    $('li > a').click(function(e) {
-      $('li').removeClass();
-      $(this).parent().addClass('active');
-      e.preventDefault();
-   });
-
-   //ham nay cho phep tu dong tang chieu dai cua textarea khi nguoi dung comment vuot qua chieu dai co dinh
-   function Height(e) {
-      $(e).css({'height':'auto','overflow-y':'hidden'}).height(e.scrollHeight);
-   }
-      
-   $('textarea').each(function () {
-      Height(this);
-   }).on('input', function () {
-      Height(this);
-   });
-   
-   //dung tooltip
-   $(document).ready(function(){
-      $('[data-toggle="tooltip"]').tooltip();   
-   });
-  
-</script>
 
 <script type="text/javascript">
+
+  var MYNAME = "<%=user[0].name %>"
+  var MYSCORE = "<%=user[0].score %>"
+  var MYLEVEL =  "<%=user[0].level %>"
+
   function Logout(){
       sessionStorage.clear();
       location.href = '/languageex/user/logout'
@@ -418,6 +410,32 @@
 </script>
 
 <script type="text/javascript" src="/js/discussion_js.js"></script>
+
+<script type="text/javascript">
+
+    $('li > a').click(function(e) {
+      $('li').removeClass();
+      $(this).parent().addClass('active');
+      e.preventDefault();
+   });
+
+   //ham nay cho phep tu dong tang chieu dai cua textarea khi nguoi dung comment vuot qua chieu dai co dinh
+   function Height(e) {
+      $(e).css({'height':'auto','overflow-y':'hidden'}).height(e.scrollHeight);
+   }
+      
+   $('textarea').each(function () {
+      Height(this);
+   }).on('input', function () {
+      Height(this);
+   });
+   
+   //dung tooltip
+   $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip();   
+   });
+  
+</script>
 
 </body>
 </html>

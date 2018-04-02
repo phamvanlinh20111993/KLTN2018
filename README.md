@@ -29,3 +29,12 @@ git push -u https://github.com/phamvanlinh20111993/KLTN2018_AFTER.git master
 simple-peer
 peerjs
 socket.io p2p
+
+
+##, select my posts in database
+ SELECT p.id AS pid, p.content, p.ctime AS ptime, p.turnof_cmt, ti.id AS tid, ti.name AS tiname,
+ li1.id_user as melike,  COUNT(p.id) AS total, (select count(*) from comment c WHERE p.id = c.post_id) 
+ as totalc FROM post p  JOIN post_title ti ON ti.id = p.title_id  JOIN exchangelg ex 
+ ON ex.user_id = p.user_id  LEFT JOIN likes_post li ON li.id_post = p.id  
+ LEFT JOIN likes_post li1 ON (li1.id_user = 804260829616815200 AND li1.id_post = p.id ) 
+ WHERE p.user_id = 804260829616815200 GROUP BY p.id ORDER BY p.ctime DESC, ex.prio DESC

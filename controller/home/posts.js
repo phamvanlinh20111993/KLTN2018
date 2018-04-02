@@ -120,12 +120,35 @@ router.route('/user/loadpost')
 	}
 })
 
+router.route('/user/loadmypost')
+.post(function(req, res){
+
+	if(req.session.user_id){
+		postcomment.selectMyposts(req.session.user_id, function(data){
+			res.json({listmypost: data})
+		})
+	}
+})
+
+router.route('/user/loadrcpost')
+.post(function(req, res){
+
+	if(req.session.user_id){
+
+	}
+})
+
 
 router.route('/user/loadcmt')
 .post(function(req, res){
 
 	if(req.session.user_id){
-
+		var postid = req.body.data.id
+		if(postid){
+			postcomment.selectCmts(req.session.user_id, postid, function(data){
+				res.json({listcmts: data})
+			})
+		}
 	}
 })
 

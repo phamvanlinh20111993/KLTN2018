@@ -126,12 +126,12 @@
             }
 
             .divcmt2{
-                margin-top:8px;
+                margin-top:9px;
                 font-size:110%;
                 outline:none;
                 padding:3px;
                 border-width:1px solid #c2cec8;
-                min-height: 30px;
+                min-height: 40px;
                 margin-left: 10px;
                 width: 320%;
             }
