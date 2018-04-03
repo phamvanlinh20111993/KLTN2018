@@ -33,8 +33,9 @@
             function formatTime(date)
             {
                 var hours = date.getHours() + 7;
-                var minutes = date.getMinutes();
+                if(hours > 23) hours = hours - 24
 
+                var minutes = date.getMinutes();
                 var days = date.getDate();
                 var months = date.getMonth() + 1;//getMonth() return 0-11
                 var years = date.getFullYear();
@@ -56,7 +57,7 @@
                  ' ' + (date.getHours()) +
                  ':' + (date.getMinutes()) +
                  ':' + (date.getSeconds());
-}     
+            }     
         
             //this is used to close a popup
             function close_popup(id)

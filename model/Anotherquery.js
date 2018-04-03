@@ -43,7 +43,7 @@ var editMessage = function(idmsg, whoeditid, content, cb){
 					"' WHERE message_id = "+mysql.escape(idmsg) +
 					" AND whoedit = " + mysql.escape(whoeditid)
 
-				console.log("sql "+sqlString)
+			//	console.log("sql "+sqlString)
 				con.query(sqlString, function(err1, result1, fields1){
 					if(err) cb(null, err1)
 					else cb(result1.affectedRows, null)
@@ -54,9 +54,8 @@ var editMessage = function(idmsg, whoeditid, content, cb){
 					"VALUES("+ mysql.escape(idmsg) + ", " + mysql.escape(whoeditid) + 
 					", " + mysql.escape(content)+", '"+getDateTime(new Date())+"')";
 
-				console.log("sql1 "+sqlString)
+			//	console.log("sql1 "+sqlString)
 				con.query(sqlString, function(err1, result1, fields1){
-					console.log("ket qua la " + result1)
 					if(err) cb(null, err1)
 					else cb(result1.affectedRows, null)
 				})

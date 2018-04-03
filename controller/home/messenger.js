@@ -100,16 +100,18 @@ router.route('/user/editmsg')
 		var whoedit = req.session.user_id
 
 		console.log(req.body.id)
-
-		anotherquery.editMessage(messid, whoedit, content, function(data, err){
-			if(err) throw err
-			else{
-				if(data.length > 0){
-					console.log(data)
-				}
-				res.send(JSON.stringify({content:content}))
-			} 
-		})
+		if(messid){
+			anotherquery.editMessage(messid, whoedit, content, function(data, err){
+				if(err) throw err
+				else{
+					if(data.length > 0){
+						console.log(data)
+					}
+					res.send(JSON.stringify({content:content}))
+				} 
+			})
+		}else
+			res.send(JSON.stringify({content:null}))
 	}
 })
 
@@ -120,6 +122,7 @@ router.route('/user/translate')
 	if(req.session.user_id){
 		var myex = req.body.ex
 		var mynat = req.body.nat
+		//console.log(myex + "   " + mynat )
 		var content = req.body.content
 		var Trlcontent = {}
 

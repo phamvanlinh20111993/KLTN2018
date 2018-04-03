@@ -164,6 +164,19 @@ router.route('/user/loadnotify')
 	}
 })
 
+//info of user like post
+router.route('/user/loadinfolikepost')
+.post(function(req, res){
+
+	if(req.session.user_id){
+		var postid = req.body.data.id
+		if(postid){
+			postcomment.selectUserLikePost(req.session.user_id, postid, function(data){
+				res.json({userslikedpost: data})
+			})
+		}
+	}
+})
 
 
 module.exports = router;

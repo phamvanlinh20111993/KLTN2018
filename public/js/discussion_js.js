@@ -66,7 +66,6 @@ var requestServer = function(url, type, data, choose, cb){
             	var err = "Status code err: " + xhr.status
             	cb(err, null)
             }
-
         }
     }
 }
@@ -79,12 +78,12 @@ function Change_date(Date_time)
     d = new Date();//lay thoi gian hien tai
     d1 = new Date(String(Date_time));//;lay thoi gian da dang
     second = parseInt((d - d1)/1000);//thoi gian hien tai va thoi gian da dang
-    if(second < 60) text = "Vừa xong";
-    else if(second > 60 && second < 3600)            text =parseInt(second/60)+" Phút trước";
-    else if(second >= 3600 && second < 86400)        text = "Khoảng "+parseInt(second/3600)+" Tiếng trước"; 
-    else if(second >= 86400 && second < 2592000)     text = parseInt(second/86400)+" Ngày trước"; 
-    else if(second >= 2592000 && second < 946080000) text = parseInt(second/2592000)+" Tháng trước";
-    else                                             text = "Rất rất lâu.";     
+    if(second < 60) text = "Just now";
+    else if(second > 60 && second < 3600)            text =parseInt(second/60)+" Minutes before";
+    else if(second >= 3600 && second < 86400)        text = "About "+parseInt(second/3600)+" Hours ago"; 
+    else if(second >= 86400 && second < 2592000)     text = parseInt(second/86400)+" Days ago"; 
+    else if(second >= 2592000 && second < 946080000) text = parseInt(second/2592000)+" Months ago";
+    else                                             text = "Long time ago";     
     return text;                               
 }
 
@@ -147,15 +146,15 @@ var showPost = function(User, Posts, state)
 
 	var Time;
 	if(state == 0)
-		Time = formatTime(new Date(Posts.time))
+		Time = Change_date(Posts.time)
 	else
-		Time = formatTime(new Date())
+		Time = Change_date(new Date())
 
 	var isMyPost = "", notMypost = ""
 	if(User.id == MYID){
-		isMyPost = '<a style="cursor:pointer;" onclick="">Delete post</a>'+
-                '<a style="cursor:pointer;" onclick="">Edit post</a>'+
-                '<a style="cursor:pointer;" onclick="">Turn off comment</a>'
+		isMyPost = '<a style="cursor:pointer;" onclick="deleteMyPost('+id+')">Delete post</a>'+
+                '<a style="cursor:pointer;" onclick="editMyPost('+id+')">Edit post</a>'+
+                '<a style="cursor:pointer;" onclick="turnofComment('+id+')">Turn off comment</a>'
 	}
 
 	if(User.id != MYID){
@@ -163,7 +162,10 @@ var showPost = function(User, Posts, state)
                    '<a style="cursor:pointer;" onclick="">Turn off notify</a>'
 	}
 
-    element='<div class="popup-box4" id="'+id+'_posts">'+
+	var istracked = ""
+	if(Posts.istracked)  istracked = "(followed)"
+
+    element = '<div class="popup-box4" id="'+id+'_posts">'+
 
              '<div class="dropdown">'+
               '<a class="dropbtn"><h5 class="glyphicon glyphicon-chevron-down"></h5></a>'+
@@ -175,36 +177,40 @@ var showPost = function(User, Posts, state)
 
               '<table style="margin-left: 5px;height:80px;">'+
                 '<tr style="margin-top:5px;">'+
-                  '<td><img src="'+User.photo+'" style="height:47px;width:47px;"></td>'+
+                  '<td><img src="'+User.photo+'" style="height:47px;width:47px;" data="tooltip" title="'+User.email+'"></td>'+
                  '<td><div style="margin-left:8px;padding:0px;">'+
                           '<p style="color:blue;margin-top:4px;">'+
                               '<a style="font-size:108%;cursor:pointer;" class="text-justify" href="/languageex/user/profile?uid='+User.id+'"><b>'+User.name+'</b></a>'+
                                   ' discussed the topic <b style="color:black;font-size:150%;">'+Posts.title+'</b>'+
                           '</p><div style="margin-top:-9px;">'+
-                                  '<label style="font-size:90%;">'+Time+'</label></div></div>'+
+                                  '<label style="font-size:90%;">'+Time+'</label> '+istracked+'</div></div>'+
                     '</td>'+
                 '</tr>'+
               '</table>'+
 
                 '<div style="height:auto;margin-top:10px;" class="form-group" >'+
-                  '<div style="font-size:17px;color:orange;background-color:white;height:auto;word-wrap:break-word;margin-left:2%;">'+
+
+                  '<div id="'+id+'_contentofpost" style="font-size:17px;color:orange;background-color:white;height:auto;word-wrap:break-word;margin-left:2%;">'+
                    Posts.content+'</div>'+
+
+                   '<textarea id="'+id+'_contenteditpost" class="form-control" style="display:none;height:auto" autofocus>'+Posts.content+'</textarea>'+
 
                    '<div id="'+id+'_showtrans" style="font-size:17px;color:black;background-color:white;'+
                        'height:auto;word-wrap:break-word;margin-left:2%;display:none;margin-top:2%;"></div>'+
 
                   '<a id="'+id+'_showlink" style="margin-left:3%;cursor:pointer;text-decoration:none;" onclick="translatePost('+id+')">See translation</a>'+
                   '<a id="'+id+'_hiddenlink" style="margin-left:3%;cursor:pointer;text-decoration:none;display:none;" onclick="backUpTranslate('+id+')">Hidden trans</a>'+
+                  '<a id="'+id+'_editpostdone" style="margin-left:3%;cursor:pointer;text-decoration:none;display:none;" onclick="editPostDone('+id+')">Edit done</a>'+
                   '<input type = "hidden" id = "'+id+'_postcontent" value = "'+Posts.content+'">'+
                   '<div style="float:right;margin-right:10px;border: 1px solid blue;"></div>'+
                 '</div>'+
 
                 '<div class="divcmt">'+
                   '<img src="'+imgLike+'" onclick="likeOrDis('+id+')" id="'+id+'_likesrc" style="margin-left:5px;width:36;height:29px;">'+
-                  '<p style="margin-top:-24px;margin-left: 50px;color:blue;" id="'+id+'_likect">'+contentLike+'</p>'+
+                  '<p style="margin-top:-24px;margin-left:50px;color:blue;" id="'+id+'_likect">'+contentLike+'</p>'+
                   '<div style="margin-top:-22px;margin-left:26%;">'+
                      '<a style="cursor:pointer;" onclick="showUserLikePost('+id+')">'+
-                     '<span id="'+id+'_numlike">'+Posts.totalliked+'</span> people likes your post.</a></div>'+
+                     '<span id="'+id+'_numlike">'+Posts.totalliked+'</span> people likes post.</a></div>'+
                   '</div>'+
 
                   '<div class="divcmt1">'+
@@ -235,8 +241,66 @@ var showPost = function(User, Posts, state)
 
      document.getElementById("showpostusers").innerHTML += element
 }
+
+/**
+	@@ id is post id
+**/
+var editMyPost = function(id){
+	var _textareaEdit = document.getElementById(id+"_contenteditpost")
+	var _postcontent = document.getElementById(id+"_contentofpost")
+	var _buttonEditDone = document.getElementById(id+"_editpostdone")
+	_textareaEdit.style.display = "block"
+	_postcontent.style.display = "none"
+	_buttonEditDone.style.display = "block"
+}
+
+/** 
+	This function happen when event editMyPost are execute
+	@@ id is a post of id
+**/
+var editPostDone = function(id){
+	var _textareaEdit = document.getElementById(id+"_contenteditpost")
+	var _postcontent = document.getElementById(id+"_contentofpost")
+	var _buttonEditDone = document.getElementById(id+"_editpostdone")
+	var _showlink = document.getElementById(id+"_showlink")
+	var _showtrans = document.getElementById(id+"_showtrans")
+	var _postcontenthd = document.getElementById(id+"_postcontent")	//input type hidden
+	var newcontent = _textareaEdit.value
+
+	if(newcontent == "" || newcontent.length < 100)
+		alert("Please dont edit your post under 100 characters.")
+	else if(_postcontent.innerHTML == newcontent)//noi dung moi va cu trung nhau
+		alert("This is old content.Please try again.")
+	else{
+		_showtrans.innerHTML = "" //reset content of translation
+		_postcontenthd.value = newcontent
+		var data = {pid: id, uid: MYID, content: newcontent, time: new Date()}
+		requestServer('/languageex/user/editPost', 'PUT', data, 0, function(err, data){
+			if(err) alert(err)
+			_textareaEdit.style.display = "none"
+			_postcontent.innerHTML = newcontent
+			_postcontent.style.display = "block"
+			_showlink.style.display = "block"
+			_buttonEditDone.style.display = "none"
+		})
+	}
+}
+
+/**
+	this funtion will delete a post with id @@id
+**/
+var deleteMyPost = function(id){
+	var r = confirm("Are you sure want to delete your post?")
+	if(r == true){
+
+		alert("Done.")
+	}
+}
  
-//click event image like
+/**
+	click event image like
+	@@ id is id of post
+**/
 var likeOrDis = function(id){
 	var imgStateLike = document.getElementById(id+"_likesrc")
 	var contentLike = document.getElementById(id+"_likect")
@@ -268,12 +332,36 @@ var likeOrDis = function(id){
 /**
 	hien thi nhung nguoi dung like bai dang
 **/
-var showUserLikePost = function(postid){
+var showUserLikePost = function(postid)
+{
 	$('#showuserlikespost').modal('show')
+	var element = '<table class="table"><tbody>'
+	requestServer('/languageex/user/loadinfolikepost', 'POST', {id: postid}, 0, function(err, data){
+		if(err) alert(err)
+		else{
+			if(data){
+			 	var Length = data.userslikedpost.length
+			 	if(Length > 0){
+					for(var ind = 0; ind < Length; ind++){
+						element += '<tr><td><img class="img-rounded" height="40" width="40" alt="Avatar" src="'+
+					       data.userslikedpost[ind].photo+'"></td>'+
+					       '<td><h4>'+data.userslikedpost[ind].name+'</h4></td>'+
+					       '<td><button type="button" class="btn btn-success">View info</button></td>'
+					}
+					element += '</tbody></table>'
+
+					var modalBody = document.getElementById("showuserlikespost").getElementsByClassName("modal-body")[0]
+					modalBody.innerHTML = element
+			 }
+		    }
+		}
+	})
+
 }
 
 /**
 	translate content of post
+	@@ id is id of post
 **/
 var translatePost = function(id){
 
@@ -302,6 +390,10 @@ var translatePost = function(id){
 
 }
 
+/**
+	this funtion happen when user want to hidden translate text
+	@@ id is id of post
+**/
 var backUpTranslate = function(id){
 	var _showtrans = document.getElementById(id+"_showtrans")
     var _showlink = document.getElementById(id+"_showlink")	
@@ -363,18 +455,21 @@ var showComment = function(postid, Commentinfo, Userinfo, state){
 /**
  id is a random id of comment
 **/
+var MAXTIMESHOWTRANSCMT = 15000//max time show translate comment
 var translateCmt = function(id)
 {
-
 	var content = document.getElementById(id+"_cmtcontent").value
 	var _showtranscmt = document.getElementById(id+"_showtranscmt")
 	if(_showtranscmt.innerHTML == ""){
 		Translate_or_Misspelling("/languageex/user/translate", 
 			MYPRIOEX, MYPRIONAT, content, function(data){	  	
-			if(data.content.error == null){
-		   		_showtranscmt.innerHTML = data.content.translated
-			}else
+			if(data.content.error == null)
+				_showtranscmt.innerHTML = data.content.translated
+			else
 				_showtranscmt.innerHTML = data.content.error
+			setTimeout(function(){
+				_showtranscmt.style.display = "none"
+			}, MAXTIMESHOWTRANSCMT)
 		})
 	}
 }
@@ -399,7 +494,7 @@ var requestComment = function(postid){
 }
 
 /** 
-	@@ id la id cua comment
+	@@ id is id of comment
 **/
 var deleteMyCmt = function(id){
 
@@ -415,7 +510,9 @@ content.onclick = function(){
 	errnotify.style.display = "none"
 }
 
-
+/**
+	create post of user
+**/
 var submitPost = function(){
 	
 	if(content.value == ""){
@@ -429,20 +526,49 @@ var submitPost = function(){
 
 		var selectTitle = document.getElementById("topicpost")
 		var value = selectTitle[selectTitle.selectedIndex].value;
-		var data = {content: content.value, title: value, time: new Date()}
+		var data = {content: content.value, title: value, time: new Date()}//data submit to server
 
-		requestServer('/languageex/user/createPost', 'POST', data, 0, function(err,data){
+		var User = {
+			id: MYID,
+			email: MYEMAIL,
+			level: MYLEVEL,
+			name: MYNAME,
+			photo: MYPHOTO,
+			score: MYSCORE
+		}
+
+		var Posts = {
+			pid: null,
+			istracked: null,
+			meliked: false,
+			content: content.value,
+			time: data.time,
+			title: selectTitle[selectTitle.selectedIndex].text,
+			totalcomment:0,
+			totalliked:0,
+			turnofcmt:0,
+		}
+
+		requestServer('/languageex/user/createPost', 'POST', data, 0, function(err, data){
 			if(err) alert(err)
 			else{//tra du lieu ve thanh cong
 				content.value = ""
 				selectTitle.selectedIndex = "0";
-
+				var allpostafter = document.getElementById("showpostusers").innerHTML
+				document.getElementById("showpostusers").innerHTML = ""
+				console.log(data)
+				Posts.pid = data.resp
+				showPost(User, Posts, 1)
+				document.getElementById("showpostusers").innerHTML += allpostafter
 			}
 		})
 	}
 }
 
-
+/**
+	@@e: check event press keyboard
+	@@ postid: user comment in specifix post
+**/
 var submitComment = function(e, postid){
 	if(e.keyCode == 13){
 		var contentcmt = document.getElementById(postid+"_writecmts")
@@ -504,7 +630,9 @@ var selectRecentPost = function(){
 		}
 	})
 }
-
+/**
+	select post of own user
+**/
 var selectMyPost = function()
 {
 	document.getElementById("showpostusers").innerHTML = ""

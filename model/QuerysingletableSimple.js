@@ -43,11 +43,34 @@ var insertString = function(tbname, field, value, cb)
 	
 	console.log("Query: " + sqlString)
 
-	//query
-	con.query(sqlString, function(err, result){
-		if(err)
+	//start transaction
+	con.beginTransaction(function(err){
+		if (err) { 
+			throw err; 
 			cb(null, err)
-		cb(result, null)
+		}
+		//query
+		con.query(sqlString, function(err, result){
+			if(err){
+				con.rollback(function() {
+					throw err;
+       				cb(null, err)
+      			});
+			}
+
+			con.commit(function(err) {
+        		if (err) { 
+          			con.rollback(function() {
+            			throw err;
+            			cb(null, err)
+          			});
+        		}
+        		cb(result, null)
+        		console.log('Transaction Complete.');
+        		//con.end();
+      		});
+			
+		})
 	})
 }
 
@@ -137,11 +160,29 @@ var updateTable = function(tbname, fields, whcondi, cb)
 	}
 
 	//console.log("Query: " + sqlString)
-	//query
-	con.query(sqlString, function(err, result){
-		if(err)
-			cb(null, err)
-		cb(result, null)
+	//start transaction
+	con.beginTransaction(function(err){
+		if (err) { 
+			con.rollback(function() {
+       			cb(null, err)
+      		});
+		}
+		//query
+		con.query(sqlString, function(err, result){
+			if(err){
+				con.rollback(function() {
+       				cb(null, err)
+      			});
+			}  
+			con.commit(function(err) {
+        		if (err) { 
+          			con.rollback(function() {
+            			cb(null, err)
+          			});
+        		}
+        		cb(result, null)
+            });
+		})
 	})
 }
 
@@ -164,12 +205,30 @@ var deleteTable = function(tbname, whcondi, cb){
 	}
 
 //	console.log("Query: " + sqlString)
+   //start transaction
+	con.beginTransaction(function(err){
+		if(err){
+			con.rollback(function(){
+    			cb(null, err)
+    		})
+		}
+		con.query(sqlString, function (err, result) {
+    		if (err){
+    			con.rollback(function(){
+    				cb(null, err)
+    			})
+    		}
 
-	con.query(sqlString, function (err, result) {
-    	if (err)
-    		cb(null, err)
-    	cb(result, null)
-  });
+    		con.commit(function(err) {
+        		if (err) { 
+          			con.rollback(function() {
+            			cb(null, err)
+          			});
+        		}
+        		cb(result, null)
+            });
+  		});
+	})
 }
 
 //tao cau lenh truy van co ban co join bang

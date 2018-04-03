@@ -7,6 +7,17 @@ var postcomment = require('../../model/post_comments_query')
 var querysimple = require('../../model/QuerysingletableSimple')
 var anotherquery = require('../../model/Anotherquery')
 
+/**
+	get date time to insert sql
+**/
+function getDateTime(date){
+    return date.getFullYear() +
+     '-' + (date.getMonth() + 1) +
+     '-' + (date.getDate()) +
+     ' ' + (date.getHours()) +
+     ':' + (date.getMinutes()) +
+     ':' + (date.getSeconds());
+}
 
 router.route('/user/createPost')
 .post(function(req, res){
@@ -14,12 +25,14 @@ router.route('/user/createPost')
 	if(req.session.user_id){
 		var field = ["user_id", "content", "title_id", "turnof_cmt" , "ctime"]
 		var resobj = req.body.data
-		var value = [req.session.user_id, resobj.content, resobj.title, 0, resobj.time]
-		
+		var value = [req.session.user_id, resobj.content, resobj.title, 0, getDateTime(new Date(resobj.time))]
 		querysimple.insertTable("post", field, value, function(result, fields, err){
 			if(err) throw err
-			else
-				res.json({resp: "Success."})
+			else{
+				postcomment.selectMaxIdTable("post", function(data){
+					res.json({resp: parseInt(data)})
+				})
+			}
 		})
 	}
 })
@@ -31,8 +44,8 @@ router.route('/user/createcmt')
 	if(req.session.user_id){
 		var rqdata = req.body.data
 		var field = ["post_id", "user_id", "content", "ctime"]
-		var value = [rqdata.id, rqdata.uid, rqdata.content, rqdata.time]
-		postcomment.selectMaxIdCmt(function(data){
+		var value = [rqdata.id, rqdata.uid, rqdata.content, getDateTime(rqdata.time)]
+		postcomment.selectMaxIdTable("comment", function(data){
 			querysimple.insertTable("comment", field, value, function(result, fields, err){
 				if(err) throw err
 				else{
@@ -50,7 +63,25 @@ router.route('/user/editPost')
 .put(function(req, res){
 
 	if(req.session.user_id){
+		console.log(req.body.data)
 
+		var postid = req.body.data.pid
+		var ncontent = req.body.data.content
+		var time = req.body.data.time
+
+		if(postid && ncontent && time && req.session.user_id == req.body.data.uid)
+		{
+			var field = ["content", "ctime", "isedit"]
+			querysimple.updateTable("post", [{field: "content", value: ncontent}, 
+			 {field: "ctime", value: time},
+			 {field: "isedit", value: 1}], 
+			 [{op:"", field: "id", value: postid}], 
+			 function(result, err){
+				if(err) throw err
+				else
+					res.json({response: result.affectedRows})
+			 })
+		}
 	}
 })
 
@@ -109,6 +140,22 @@ router.route('/user/likepost')
 						}else
 							res.json({response: "No data."})
 					}
+			})
+		}
+	}
+})
+
+//delete post
+router.route('/user/delpost')
+.delete(function(req, res){
+	if(req.session.user_id)
+	{
+		var post_id = req.body.pid
+		if(post_id){
+			querysimple.deleteTable("post", [{op: "", field: "id", value: post_id}], 
+			 function(result, err){
+				if(err) throw err
+			    else res.json({response: result.affectedRows})
 			})
 		}
 	}

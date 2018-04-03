@@ -325,12 +325,12 @@ io.on('connection', function(client)
       {
          var idmessg = res[0].max
          //chen du lieu vao bang
-       //  querysimple.insertTable("message", 
-     //       ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
-        //    [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
-       //     function(result, err){
-          //     if(err)  throw err;
-           //    else{
+         querysimple.insertTable("message", 
+            ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
+            [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
+            function(result, err){
+              if(err)  throw err;
+               else{
                   console.log("1 record inserted messages.");
                   console.log("nhan tin vao room " + client.room)
 
@@ -346,8 +346,8 @@ io.on('connection', function(client)
                      id_receive: data.pid,
                      time: data.time
                   })
-        //       }
-      //   })
+               }
+         })
 
       })
    })
@@ -361,18 +361,16 @@ io.on('connection', function(client)
       else
          client.room = pid + myid
 
-    //  querysimple.updateTable("message", [{field: "ischeck", value: 2}], 
-     //    [{op: "", field: "userA", value: parseInt(pid)}, {op:"AND", field: "userB", value: parseInt(myid)}],
-     //  function(result, err){
-    //        if(err)   throw err
-     //       else{
+      querysimple.updateTable("message", [{field: "ischeck", value: 2}], 
+         [{op: "", field: "userA", value: parseInt(pid)}, {op:"AND", field: "userB", value: parseInt(myid)}],
+         function(result, err){
+            if(err)   throw err
+            else{
               console.log(result.affectedRows + " record(s) updated seen message");
                client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
-               //io.sockets.in(client.room)//ca 2 ben deu thay tin nhan-io.sockets se gui tin nhan cho het cac ben
-     //       }
-
-     //    })
-
+               io.sockets.in(client.room)//ca 2 ben deu thay tin nhan-io.sockets se gui tin nhan cho het cac ben
+            }
+         })
    })
 
 

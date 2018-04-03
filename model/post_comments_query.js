@@ -6,7 +6,8 @@ var con = mysql.createConnection({
   user: "root",
   password: "",
   database: "KLTN_ExLanguage",
-  charset: "utf8_general_ci"
+  charset: "utf8_general_ci",
+  timezone: 'utc' 
 });
 
 con.connect(function(err) {
@@ -216,8 +217,8 @@ var selectPosts_myfollow = function(myid, myex, cb){
 }
 
 //select max id comment in database to response to user edit or delete comment
-var selectMaxIdCmt = function(cb){
-   var sqlString = "SELECT MAX(id) AS maxid FROM comment "
+var selectMaxIdTable = function(tbname, cb){
+   var sqlString = "SELECT MAX(id) AS maxid FROM " + tbname
 
    con.query(sqlString, function(err, result){
       if(err){
@@ -231,11 +232,12 @@ var selectMaxIdCmt = function(cb){
 //lay thong tin nguoi dung like bai dang
 var selectUserLikePost = function(myid, postid, cb){
    var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, li.ctime "+
-                   " FROM User u JOIN likepost li "+
+                   " FROM User u JOIN likes_post li "+
                    " ON li.id_user = u.id "+
-                   " WHERE li.id_post = " + mysql.escape(myid)
+                   " WHERE li.id_post = " + mysql.escape(postid)+
+                   " AND li.id_user != " + mysql.escape(myid)
 
-   con.query(sqlString1, function(err, result){
+   con.query(sqlString, function(err, result){
       if(err) {
          throw err
          cb(null)
@@ -341,5 +343,5 @@ module.exports = {
    selectCmts: selectCmts,
    selectUserLikePost: selectUserLikePost,
    selectRecentPost: selectRecentPost,
-   selectMaxIdCmt: selectMaxIdCmt
+   selectMaxIdTable: selectMaxIdTable
 }
