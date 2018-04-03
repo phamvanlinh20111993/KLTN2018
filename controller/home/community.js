@@ -66,9 +66,9 @@ function APIComunityEx(id, cb)
 		    				for(ind = 0; ind < result.length; ind++){
 		    					for(index = 0; index < ListUser.length; index++){
 		    						if(result[ind].tracked == ListUser[index].infor.id){
-		    							ListUser[ind].infor.follow.id = result[ind].id;
-		    							ListUser[ind].infor.follow.tracked =  result[ind].tracked;
-										ListUser[ind].infor.follow.time = result[ind].ctime;
+		    							ListUser[index].infor.follow.id = result[ind].id;
+		    							ListUser[index].infor.follow.tracked =  result[ind].tracked;
+										ListUser[index].infor.follow.time = result[ind].ctime;
 		    						}
 		    					}
 		    				}
@@ -134,24 +134,25 @@ function APIComunityNative(id, cb)
 		    //check followers of this user
 		    querysimple.selectTable("follow", ["id","tracked", "ctime"], [{op: "", 
 		    	field: "followers", value: id }], 
-		    	null, null, null, function(result, fields, err){
-		    		if(err) throw err
-		    		else{
-		    			if(result.length > 0){
-		    				var ind = 0, index = 0;
-		    				for(ind = 0; ind < result.length; ind++){
-		    					for(index = 0; index < ListUser.length; index++){
-		    						if(result[ind].tracked == ListUser[index].infor.id){
-		    							ListUser[ind].infor.follow.id = result[ind].id;
-		    							ListUser[ind].infor.follow.tracked = result[ind].tracked;
-										ListUser[ind].infor.follow.time = result[ind].ctime;
-		    						}
+		    	null, null, null, function(result1, fields, err1){
+		    	if(err1) throw err1
+		    	else{
+		    		if(result1.length > 0){
+		    			var ind = 0, index = 0;
+		    			for(ind = 0; ind < result1.length; ind++){
+		    				for(index = 0; index < ListUser.length; index++){
+		    					if(result1[ind].tracked == ListUser[index].infor.id)
+		    					{
+		    						ListUser[index].infor.follow.id = result1[ind].id;
+		    						ListUser[index].infor.follow.tracked = result1[ind].tracked;
+									ListUser[index].infor.follow.time = result1[ind].ctime;
 		    					}
 		    				}
 		    			}
-
-		    			cb(ListUser)
 		    		}
+
+		    		cb(ListUser)
+		    	}
 		    })
 	 	}
 	 }) 
@@ -183,9 +184,7 @@ router.route('/home/follow')
 	if(req.session.user_id){
 		
 		var data = JSON.parse(req.body.data)
-		console.log(data)
-		console.log(req.body)
-		console.log(typeof req.body.data)
+		
 		querysimple.selectTable("follow", ["id"], 
 		 [{op:"", field: "followers", value: req.session.user_id}, 
 			  {op:"AND", field: "tracked", value: data.id}], 
@@ -196,10 +195,12 @@ router.route('/home/follow')
 					var field = ["followers", "tracked", "ctime"]
 					var value = [req.session.user_id, data.id, data.time]
 					querysimple.insertTable("follow", field, value, function(result, err){
+						
 						if(err) throw err
 						else  res.json({data: result.affectedRows})
 					})
-				}
+				}else
+					res.json({data: "Some error here."})
 			}
 		})
 	}
@@ -212,13 +213,16 @@ router.route('/home/unfollow')
 {
 	if(req.session.user_id){
 		var data = JSON.parse(req.body.data)
-
+		console.log(data)
+		console.log("id " + data.id)
 		querysimple.selectTable("follow", ["id"], 
 		 [{op:"", field: "followers", value: req.session.user_id}, 
 			  {op:"AND", field: "tracked", value: data.id}], 
 		null, null, null, function(result, fields, err){
 			if(err) throw err;
 			else{
+				console.log(result)
+				console.log("length " + result)
 				if(result.length > 0){
 					var whecdt = [{op: "", field: "followers", value: req.session.user_id}, 
 					{op: "AND", field: "tracked", value: data.id}]
@@ -226,7 +230,8 @@ router.route('/home/unfollow')
 						if(err) throw err
 						else res.json({data: result.affectedRows})
 					})
-				}
+				}else 
+					res.json({data: "Some error here."})
 			}
 		})
 	}

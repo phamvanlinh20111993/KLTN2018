@@ -500,7 +500,7 @@ var selectUserCommunityEx = function(id, cb){
 				" JOIN language la ON la.id = ex.language_id "+
 				" JOIN degree de ON ex.degree_id = de.id" +
 				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
-				"u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
+				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
 				" ORDER BY u.state DESC, le.level ASC";
 
 		//	console.log(sqlString)

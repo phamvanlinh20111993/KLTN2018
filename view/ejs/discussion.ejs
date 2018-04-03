@@ -117,7 +117,7 @@
 
 </head>
 
-<body>
+<body data-spy="scroll" data-target=".navbar" data-offset="0">
 
 
 
@@ -144,7 +144,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"></h4>
+          <h4 class="modal-title">Infomation likes</h4>
         </div>
         <div class="modal-body">
           <p>content</p>
@@ -237,8 +237,8 @@
             <p style="color: red;font-style: inherit;display: none;">##) Do not empty this field.</p>
           </div>
          <!-- <a href="#">
-            <input id="file-0a" class="file"  style="margin-left: 20%;" name = "tep" type="file" multiple data-min-file-count="1">  -->
-          </a>
+            <input id="file-0a" class="file"  style="margin-left: 20%;" name = "tep" type="file" multiple data-min-file-count="1"> 
+          </a> -->
           <table style="margin-left: 20%;">
             <tr>
               <td><h4><b>Choose topic: </b></h4></td>
@@ -256,108 +256,78 @@
 
          <div id="showpostusers">
 
-           <div class="popup-box4">
+         <!--   <div class="popup-box4" id="_posts">
 
-            <div class="dropdown">
+             <div class="dropdown">
               <a class="dropbtn"><h5 class="glyphicon glyphicon-chevron-down"></h5></a>
               <div class="dropdown-content">
-                <a style="cursor:pointer;" onclick="">Phản hồi bài đăng</a>
-                <a style="cursor:pointer;" onclick="">xóa bài đăng</a>
-                <a style="cursor:pointer;" onclick="">sửa bài đăng</a>
-                <a style="cursor:pointer;" onclick="">tắt comment</a>
-                <a style="cursor:pointer;" onclick="">tắt thông báo</a>
+                <a style="cursor:pointer;" onclick="">Delete post</a>
+                <a style="cursor:pointer;" onclick="">Edit post</a>
+                <a style="cursor:pointer;" onclick="">Turn off comment</a>
               </div>
-            </div>
+             </div>
 
               <table style="margin-left: 5px;height:80px;">
                 <tr style="margin-top:5px;">
                   <td><img src="" style="height:47px;width:47px;"></td>
-                  <td><div style="margin-left:8px;padding:0px;">
+                 <td><div style="margin-left:8px;padding:0px;">
                           <p style="color:blue;margin-top:4px;">
-                              <a style="font-size:110%;cursor:pointer;" class="text-justify"><b>Linh Van</b></a> discussed the topic <b style="color:black;font-size:160%;"> Vocabulary</b>
-                          </p>
-                    <div style="margin-top:-9px;"><label style="font-size:90%;">27/11/1994</label>
-                    </div></div>
+                              <a style="font-size:110%;cursor:pointer;" class="text-justify" href="/languageex/user/profile?uid="><b></b></a>
+                                   discussed the topic <b style="color:black;font-size:160%;"></b>
+                          </p><div style="margin-top:-9px;">
+                                  <label style="font-size:90%;"></label></div></div>
                     </td>
                 </tr>
               </table>
 
                 <div style="height:auto;margin-top:10px;" class="form-group" >
-                  <textarea readonly class="form-control" style="min-height:10px;resize:none;font-size:17px;color:orange;background-color:white;border:none;-webkit-box-shadow:none;-moz-box-shadow: none;box-shadow: none;">This is my statement one.&#13;&#10;This is my statement2. Mobile First means designing for mobile before designing for desktop or any other device (This will make the page display faster on smaller devices).dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+                  <textarea readonly class="form-control" style="min-height:10px;resize:none;font-size:17px;
+                      color:orange;background-color:white;border:none;-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;">
                   </textarea>
-                       <a style="margin-left: 3%;cursor: pointer;">See translation</a>
-                  <textarea readonly class="form-control" style="min-height:10px;resize:none;outline:none;font-size:15px;color:orange;background-color:white;border:none;-webkit-box-shadow: none;-moz-box-shadow: none;box-shadow:none;display: none;">
-                
-                  </textarea>
+                  <a style="margin-left:3%;cursor:pointer;text-decoration:none;" onclick="">See translation</a>
 
+                  <textarea readonly class="form-control" style="min-height:10px;resize:none;font-size:17px;display:none;
+                      color:orange;background-color:white;border:none;-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;">
+                  </textarea>
+                  <div style="float:right;margin-right:10px;border: 1px solid blue;"></div>
                 </div>
 
-              <div class="divcmt">
-                  <img src="/img/dalike.jpg" onclick = "" style="margin-left:5px;width:36;height:29px;">
-                  <p style="margin-top:-24px;margin-left: 50px;color:blue;">Đã thích</p>
+                <div class="divcmt">
+                  <img src="" onclick="" id="_likesrc" style="margin-left:5px;width:36;height:29px;">
+                  <p style="margin-top:-24px;margin-left: 50px;color:blue;" id="_likect"></p>
+                  <div style="margin-top:-22px;margin-left:26%;">
+                     <a style="cursor:pointer;" onclick="">
+                     <span id="_numlike"></span> people likes your post.</a></div>
+                  </div>
 
-                <div style="margin-top:-22px;margin-left:26%;"><a style="cursor:pointer;" data-toggle="modal" data-target="#showInfoLikePost" onclick=""><span>40</span> people your post.</a></div>
-              </div>
-
-                <div class="divcmt1">
-                  <div style="border:1px solid #d5e8e8;height:auto;">
+                  <div class="divcmt1">
+        
+                    <div style="border:1px solid #d5e8e8;height:auto;">
                       <div style="margin-top:12px;">
-                        <a class="a4" onclick = "">Show more comments(<span id="changecmt">8</span>)</a>
+                        <a class="a4" onclick="">Show more comments(<span id="_numcmt"></span>)</a>
                       </div>
-                      <div style="height:auto;" id=0></div>
-                  </div>
+                      <div style="width: auto;height: auto;" id=""></div>
+                    </div>
 
-                  <form style="margin-top:18px;margin-left:10px;">
-                    <table>
-                      <tr>
-                        <td><img src="" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;"></td>
+                    <form style="margin-top:18px;margin-left:10px;">
+                     <table>
+                       <tr>
+                        <td><img src="" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;" data="tooltip" title=""></td>
                         <td>
-                            <div>
-                              <textarea style="resize:none;" rows="1" placeholder="Viết bình luận" class="divcmt2"></textarea>
-                        </div>
+                           <textarea style="resize:none;" rows="1" placeholder="Write your comments...." class="divcmt2" onkeypress="submitComment()" id="_writecmts"></textarea>
                         </td>
-                      </tr>
-                    </table>
+                       </tr>
+                     </table>
+                    </form>
 
-                 </form>
-                <div style="height:30px; margin-top:0px;"></div>
-
-                <div style="width: auto;height: auto;" id="showcmtpostusers">
-
-                  <div style="min-height:40px;margin-top:5px;">
-                    <img src="" width="41" height="42" style="float:left;margin-left:10px;margin-top:-2px;">
-                    <p style="width:85%;word-wrap:break-word;margin-left:65px;"><span style="color:blue;font-size:108%;">Linh Văn </span> woa realy ok Dành tặng các bạn các khóa học Ngoại ngữ Tiếng Hàn, Trung, Nhật, Anh đang được ưu đãi 50%. Đăng ký 1 lần, học mọi lúc mọi nơi không giới hạn số lần học. 
-                      </br> <span style="font-style:inherit;">woa thực sự được đó(trans)</span>
-                    </p>
-                    <div style="height:10px;margin-left:65px;font-size:90%;color:#474343;margin-top:-7px;">
-                      <a class="a11" onclick="">  del  </a> <a class="a11" onclick="">  report  </a><a class="a11" onclick="">  trans  </a><span style="margin-left:10px;font-size: 80%;">11:25, 25/7/2018</span>
-                    </div>
+                   <div style="height:30px; margin-top:0px;"></div>
                   </div>
-
-                  <div style="height:20px; margin-top:0px;"></div>
-
-                  <div style="min-height:40px;margin-top:5px;">
-                    <img src="" width="41" height="42" style="float:left;margin-left:10px;margin-top:-2px;">
-                    <p style="width:85%;word-wrap:break-word;margin-left:65px;"><span style="color:blue;font-size:108%;">Linh Văn </span> woa realy ok Dành tặng các bạn các khóa học Ngoại ngữ Tiếng Hàn, Trung, Nhật, Anh đang được ưu đãi 50%. Đăng ký 1 lần, học mọi lúc mọi nơi không giới hạn số lần học. 
-                      </br> <span style="font-style:inherit;">woa thực sự được đó(trans)</span>
-                    </p>
-                    <div style="height:10px;margin-left:65px;font-size:90%;color:#474343;margin-top:-7px;">
-                      <a class="a11" onclick="">  del  </a> <a class="a11" onclick="">  report  </a><a class="a11" onclick="">  trans  </a><span style="margin-left:10px;font-size: 80%;">11:25, 25/7/2018</span>
-                    </div>
-                  </div>
-
-                  <div style="height:20px; margin-top:0px;"></div>
-
-                </div>  
-
-              </div>
-            </div>
+            </div>-->
 
          </div> 
+
       </div>
     </div>
-
-
 
 
      <div class="col-lg-2 sidenav" style="height:100%;width: 13%;border: 1px solid #BBBBBB;position:fixed;margin-left:87%;">
@@ -395,15 +365,11 @@
    }
 
 
-   //su dung socket.io
     var socket = io.connect();
-      //   var socket = io();
-    socket.on('connect', function(data) {
-         //ban dau la khi nguoi dung ket noi         
-      socket.emit('notifyOnline', MYID);//client bao voi server la t online roi
+    socket.on('connect', function(data) {       
+      socket.emit('notifyOnline', MYID);
     });
-
-       //loi ket noi
+   
     socket.on('connect_error', function(err){
       alert(err)
     })

@@ -22,7 +22,7 @@ var ajaxRequest = function(url, data, callback) {//data is a object
   $.ajax({
         type: "POST",
         url: url,
-        data:{data: JSON.stringify(data)},
+        data:{ data: JSON.stringify(data) },
         error: function(xhr, status, error){
           callback(null, error)
         },
@@ -50,12 +50,13 @@ var showUserCommunity = function(User)
 		isFollow = "color:red;"
 	}
 
+  var id = User.infor.id
 
-	var Interface = '<div id = "'+User.infor.id+'_community" class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">'+
+	var Interface = '<div id = "'+id+'_community" class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">'+
              			'<div class="card inf-content">' +
                				'<div style="width: 100%;height: 50%;" data-toggle="tooltip" title="View profile ">' +
                   				'<img src="'+User.infor.photo+'"alt="'+User.infor.name+'" style="width:100%;max-height:100%;cursor:pointer; '+
-            					     'border-radius:8px;border:1px solid #696969; " onclick = "viewProfileByImage(\''+User.infor.id+'\')">'+
+            					     'border-radius:8px;border:1px solid #696969; " onclick = "viewProfileByImage(\''+id+'\')">'+
               				'</div>'+
          					'<div style="line-height: 90%;">'+
        							isOnline +
@@ -65,12 +66,12 @@ var showUserCommunity = function(User)
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
-                  				'<a href="#" onclick="register_popup(event,'+User.infor.id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
+                  				'<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
                             ' data-toggle="tooltip" title="Send message" class="icon">'+
                   				'<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>' +
 
-                  				'<a href="#"  onclick="followUser('+User.infor.id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="Follow or Unfollow '+User.infor.name+
-                          '"class="icon"><i class="fa fa-eye" id="'+User.infor.id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
+                  				'<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="Follow or Unfollow '+User.infor.name+
+                          '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
 
                				'</div>'+
             			'</div>'+
@@ -91,7 +92,7 @@ Object.size = function(obj) {
 //tu dong hoi ham nay
 getListUserCommnunity(MYID, function(data, err)
 {
-  // console.log(data)
+   console.log(data)
   if(err) alert(err)
   else{
     var size = data.community.length;
@@ -138,16 +139,16 @@ $('#showNotifyHome').on('hidden.bs.modal', function () {
 var followUser = function(uid, name)
 {
   var idfollow = document.getElementById(uid+"_follow")
-
+ 
   if(idfollow.style.color == "red"){//da theo doi, bay gio bo theo doi
-    var data = {id: uid, follow: false} 
+      var data = {id: uid, follow: false} 
       ajaxRequest('/languageex/home/unfollow', data, function(data, err){
-         if(err) alert(err)
-         else{ 
-          idfollow.style.color = "#3399FF"
-          alert("You unfollowed "+ name)
-        }
-    })
+          if(err) alert(err)
+          else{ 
+             idfollow.style.color = "#3399FF"
+             alert("You unfollowed "+ name)
+         }
+      })
   }else{
     var data = {id: uid, follow: true, time: new Date()} 
     ajaxRequest('/languageex/home/follow', data, function(data, err){

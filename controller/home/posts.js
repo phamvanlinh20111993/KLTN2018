@@ -114,9 +114,10 @@ router.route('/user/loadtitle')
 
 router.route('/user/loadpost')
 .post(function(req, res){
-
 	if(req.session.user_id){
-
+		postcomment.selectNotMyposts(req.session.user_id, function(data){
+			res.json({data: data})
+		})
 	}
 })
 
@@ -132,9 +133,11 @@ router.route('/user/loadmypost')
 
 router.route('/user/loadrcpost')
 .post(function(req, res){
-
+	var LITMITPOSTRECENT = 20
 	if(req.session.user_id){
-
+		postcomment.selectRecentPost(req.session.user_id, LITMITPOSTRECENT, function(data){
+			res.json({data: data})
+		})
 	}
 })
 

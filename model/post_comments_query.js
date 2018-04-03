@@ -27,17 +27,19 @@ var selectMyposts = function(myid, cb){
     else{
      
       var ListMyPost = {}
-      ListMyPost.user = {  id: result[0].id,
-                           email: result[0].email, 
-                           name: result[0].name,
-                           photo: result[0].photo,
-                           score: result[0].score,
-                           level: result[0].level }
+      ListMyPost.user = {  
+         id: result[0].id,
+         email: result[0].email, 
+         name: result[0].name,
+         photo: result[0].photo,
+         score: result[0].score,
+         level: result[0].level 
+      }
 
       ListMyPost.posts = []
     
       var sqlString1 = "SELECT p.id AS pid, p.content, p.ctime AS ptime, p.turnof_cmt,"+
-                  " ti.id AS tid, ti.name AS tiname, li1.id_user as melike, "+
+                  " ti.id AS tid, ti.name AS tiname, li1.id_user AS melike, "+
                   " COUNT(p.id) AS total, "+
                   " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc" +
                   " FROM post p "+
@@ -46,7 +48,7 @@ var selectMyposts = function(myid, cb){
                   " LEFT JOIN likes_post li ON li.id_post = p.id "+
                   " LEFT JOIN likes_post li1 "+
                   " ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
-                  " WHERE p.user_id = " mysql.escape(myid)+
+                  " WHERE p.user_id = " + mysql.escape(myid)+
                   " GROUP BY p.id ORDER BY p.ctime DESC, ex.prio DESC"
 
      // console.log(sqlString1)
@@ -95,7 +97,8 @@ var selectCmts = function(myid, postid, cb){
                " c.id AS cid, c.content, c.ctime FROM User u "+
                " JOIN level le ON u.level_id = le.id "+
                " JOIN comment c ON c.user_id = u.id "+
-               " WHERE c.post_id = " + mysql.escape(postid)
+               " WHERE c.post_id = " + mysql.escape(postid)+
+               " ORDER BY c.ctime DESC "
 
    con.query(sqlString, function(err, result){
       if(err){
@@ -132,39 +135,78 @@ var selectCmts = function(myid, postid, cb){
 }
 
 //select all post from specific exchange language community
-var selectNotMyposts = function(myid, cb){
-	var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime as ptime, "+
-                  " p.turnof_cmt, ti.id AS tid, ti.name AS tiname, u.email, u.name AS uname, "+
-                  " u.photo, u.score, le.level FROM post p"+
-                  " JOIN User u ON p.user_id = u.id "+
-                  " JOIN post_title ti ON ti.id = p.title_id " +
-                  " JOIN level le ON le.id = u.level_id " +
-                  " JOIN exchangelg ex ON ex.user_id = u.id "+
-                  " WHERE p.user_id != "+ mysql.escape(myid) +
-                  " AND u.id NOT IN(SELECT blockwho FROM blocklist_user "+
-                  " WHERE whoblock="+mysql.escape(myid)+")"+
-                  " AND ex.id IN (SELECT id FROM exchangelg WHERE user_id = "+mysql.escape(myid)+")"+
-                  " ORDER BY p.ctime DESC, ex.prio DESC "
+var selectNotMyposts = function(myid, cb)
+{
+	var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime as ptime, ti.name AS tiname,"+
+         " p.turnof_cmt, ti.id AS tid, u.email, u.name AS uname, u.photo, u.score,"+
+         " le.level, (SELECT COUNT(*) FROM comment c WHERE p.id=c.post_id) AS totalc,"+
+         " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike, "+
+         " (SELECT ctime FROM post where post.id = p.id"+
+         " AND (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+"))"+
+         " AS timepostfl FROM post p"+
+         " JOIN User u ON p.user_id = u.id"+
+         " JOIN post_title ti ON ti.id = p.title_id"+
+         " JOIN level le ON le.id = u.level_id"+
+         " JOIN exchangelg ex ON ex.user_id = u.id"+
+         " JOIN language la ON la.id = ex.language_id"+
+         " LEFT JOIN follow fo ON (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+")"+
+         " LEFT JOIN likes_post li ON li.id_post = p.id "+
+         " LEFT JOIN likes_post li1 ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
+         " WHERE p.user_id != "+mysql.escape(myid)+
+         " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
+         " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
+         " GROUP BY p.id"+
+         " ORDER BY timepostfl DESC, p.ctime DESC, ex.prio DESC"
 
-  //chon 
-  var sqlString1 = "SELECT tracked FROM follow WHERE followers = " + mysql.escape(myid)
+   console.log(sqlString)
 
-  con.query(sqlString1, function(err, result){
-    if(err)  throw err
-    else{
+   con.query(sqlString, function(err, result){
+      if(err) {
+          throw err
+          cb(null)
+      }
+      else{
+         var ListPosts = []
+        
+         for(var ind = 0; ind < result.length; ind++)
+         {
+            ListPosts[ind] = {}
+            ListPosts[ind].user = {
+               id: result[ind].uid,
+               email: result[ind].email, 
+               name: result[ind].uname,
+               photo: result[ind].photo,
+               score: result[ind].score,
+               level: result[ind].level
+            }
 
-      con.query(sqlString, function(err1, result1){
-          if(err) {
-            throw err;
-            cb(null)
-          }else{
-            console.log(result1)
-            cb(result1)
-          }
-      })
+            var totalliked = 0
+            ListPosts[ind].posts = {
+               pid: result[ind].pid,
+               content: result[ind].content,
+               title: result[ind].tiname,
+               title_id: result[ind].tid,
+               turnofcmt: result[ind].turnof_cmt,
+               time: result[ind].ptime,
+               meliked: false,
+               totalcomment: result[ind].totalc, 
+               istracked: result[ind].istracked
+            }
+            totalliked = result[ind].totallike
+
+            if(result[ind].melike){
+               ListPosts[ind].posts.meliked = true
+               ListPosts[ind].posts.totalliked = totalliked; 
+            }else
+               ListPosts[ind].posts.totalliked = totalliked - 1; 
+            totalliked = 0;
+
+         }
+
+         cb(ListPosts)
     }
-
   })
+
 }
 
 
@@ -173,13 +215,122 @@ var selectPosts_myfollow = function(myid, myex, cb){
 
 }
 
-var selectUserLikePost = function(myid, myex, postid, cb){
-  var sqlString = ""
+//select max id comment in database to response to user edit or delete comment
+var selectMaxIdCmt = function(cb){
+   var sqlString = "SELECT MAX(id) AS maxid FROM comment "
+
+   con.query(sqlString, function(err, result){
+      if(err){
+         throw err
+         cb(null)
+      }else
+         cb(result[0].maxid)
+   })
+}
+
+//lay thong tin nguoi dung like bai dang
+var selectUserLikePost = function(myid, postid, cb){
+   var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, li.ctime "+
+                   " FROM User u JOIN likepost li "+
+                   " ON li.id_user = u.id "+
+                   " WHERE li.id_post = " + mysql.escape(myid)
+
+   con.query(sqlString1, function(err, result){
+      if(err) {
+         throw err
+         cb(null)
+       }
+      else{
+         var lisuserlikes = []
+         for(var ind = 0; ind < result.length; ind++){
+            lisuserlikes[ind] = {
+               id: result[ind].id,
+               email: result[ind].email,
+               name: result[ind].name,
+               photo: result[ind].photo,
+               score: result[ind].score,
+               liketime: result[ind].ctime
+            }
+         }
+
+         cb(lisuserlikes)
+
+      }
+
+   })
 
 }
 
-var selectRecentPost = function(myid, cb){
-  var sqlString = ""
+//lay ra nhung bai dang gan day nhat
+var selectRecentPost = function(myid, limit, cb)
+{
+   var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime as ptime, p.turnof_cmt,"+
+         " ti.name AS tiname, u.email, u.name AS uname, u.photo, u.score, le.level, ti.id AS tid,"+
+         " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc,"+
+         " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike FROM post p"+
+         " JOIN User u ON p.user_id = u.id"+
+         " JOIN post_title ti ON ti.id = p.title_id"+
+         " JOIN level le ON le.id = u.level_id"+
+         " JOIN exchangelg ex ON ex.user_id = u.id"+
+         " JOIN language la ON la.id = ex.language_id"+
+         " LEFT JOIN follow fo ON (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+")"+
+         " LEFT JOIN likes_post li ON li.id_post = p.id "+
+         " LEFT JOIN likes_post li1 ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
+         " WHERE p.user_id != "+mysql.escape(myid)+
+         " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
+         " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
+         " GROUP BY p.id"+
+         " ORDER BY p.ctime DESC, ex.prio DESC LIMIT "+mysql.escape(limit)
+
+   console.log(sqlString)
+
+   con.query(sqlString, function(err, result){
+      if(err) {
+          throw err
+          cb(null)
+      }
+      else{
+         var ListPosts = []
+
+         for(var ind = 0; ind < result.length; ind++)
+         {
+            ListPosts[ind] = {}
+            ListPosts[ind].user = {
+               id: result[ind].uid,
+               email: result[ind].email, 
+               name: result[ind].uname,
+               photo: result[ind].photo,
+               score: result[ind].score,
+               level: result[ind].level
+            }
+
+            var totalliked = 0
+            ListPosts[ind].posts = {
+               pid: result[ind].pid,
+               content: result[ind].content,
+               title: result[ind].tiname,
+               title_id: result[ind].tid,
+               turnofcmt: result[ind].turnof_cmt,
+               time: result[ind].ptime,
+               meliked: false,
+               totalcomment: result[ind].totalc, 
+               istracked: result[ind].istracked
+            }
+            totalliked = result[ind].totallike
+
+            if(result[ind].melike){
+               ListPosts[ind].posts.meliked = true
+               ListPosts[ind].posts.totalliked = totalliked; 
+            }else
+               ListPosts[ind].posts.totalliked = totalliked - 1; 
+            totalliked = 0;
+
+         }
+
+         cb(ListPosts)
+      }
+   })
+
 }
 
 
@@ -187,7 +338,8 @@ module.exports = {
 	selectPosts_myfollow: selectPosts_myfollow,
 	selectMyposts: selectMyposts,
 	selectNotMyposts: selectNotMyposts,
-  selectCmts: selectCmts,
-  selectUserLikePost: selectUserLikePost,
-  selectRecentPost: selectRecentPost
+   selectCmts: selectCmts,
+   selectUserLikePost: selectUserLikePost,
+   selectRecentPost: selectRecentPost,
+   selectMaxIdCmt: selectMaxIdCmt
 }

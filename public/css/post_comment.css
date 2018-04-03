@@ -126,14 +126,14 @@
             }
 
             .divcmt2{
-                margin-top:9px;
+                margin-top:5px;
                 font-size:110%;
                 outline:none;
                 padding:3px;
                 border-width:1px solid #c2cec8;
                 min-height: 40px;
                 margin-left: 10px;
-                width: 320%;
+                width: 100%;
             }
 
             .a4{
