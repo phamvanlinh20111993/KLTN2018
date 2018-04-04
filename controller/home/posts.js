@@ -164,7 +164,7 @@ router.route('/user/loadnotify')
 	}
 })
 
-//info of user like post
+//info of user like post 
 router.route('/user/loadinfolikepost')
 .post(function(req, res){
 

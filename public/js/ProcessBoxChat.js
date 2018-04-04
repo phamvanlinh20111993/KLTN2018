@@ -391,7 +391,7 @@
    															'<li><a href="#" onclick="translatePrio()">Translations priority</a></li>' + 
    															'<li><a href="#" onclick="misspellingPrio()">Misspellings priority</a></li>' + 
 														   '<li><a href="#" onclick="delConversation('+id+',\''+name+'\')">Delete Conversation</a></li>' + 
-														   '<li><a href="#" onclick="reportUser('+id+',\''+name+'\' )">Report <span style="color:orange;">'+name+'</span></a></li>' +
+														   '<li><a href="#" onclick="reportUser('+id+',\''+name+'\')">Report <span style="color:orange;">'+name+'</span></a></li>' +
 														'</ul>' + 
 				                                   '</div>' + 
 											 '</div>' + 
@@ -748,6 +748,7 @@
 								p_content.innerHTML = content
 								input_fix_content.style.display = "none"
 								//console.log(data)
+                             //   socket.emit('editmsg', {myid:MYID, pid: })
 							})
 						}
 					}
@@ -813,7 +814,14 @@
                 var modalEditMessage = document.getElementById('InformationEditMessage')
                 var modalEditMessage_body = modalEditMessage.getElementsByClassName('modal-body')[0]
 
-                var oldcontent = '<tr><td>Me</td><td>'+message.content +' (old)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+                var oldcontent = ""
+                if(message.userA == MYID)
+                    var oldcontent = '<tr><td>Me</td><td>'+message.content +' (old)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+                else{
+                    var oldcontent = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.content +' (old)</td><td>'+
+                       getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+                }
+
                 var anotheredit = ""
                 if(message.edit.length == 1){
                     if(message.edit[0].whoedit != MYID)

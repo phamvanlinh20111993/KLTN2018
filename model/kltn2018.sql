@@ -137,6 +137,7 @@ CREATE TABLE IF NOT EXISTS `Post`(
 	`file` varchar(1000), /* dinh kem file luu dia chi url*/
 	`nameoffile` varchar(500),
 	`ctime` DATETIME NOT NULL,
+	`isedit` int(1), NOT NULL,
 	`turnof_cmt` int(1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -146,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `Comment`(
 	`post_id` bigint(20) UNSIGNED NOT NULL,
 	`user_id` bigint(30) UNSIGNED NOT NULL,
 	`content` varchar(5000) NOT NULL,
+	`isedit` int(1) NOT NULL,
 	`ctime` DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

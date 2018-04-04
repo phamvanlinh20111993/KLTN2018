@@ -9,6 +9,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" type="text/css" href="/css/component.css" />
+  <script src="/socket.io/socket.io.js"></script>
   <style type="text/css">
 
           body{
@@ -64,6 +65,13 @@
          }
 
   </style>
+  <script type="text/javascript">
+     var MYID = parseInt("<%= session.user_id  %>")
+     var MYEMAIL = "<%= session.email %>"
+     var MYPHOTO = "<%= session.photo %>"
+     var MYPRIONAT = "<%= session.mynative %>"
+     var MYPRIOEX = "<%= session.myexchange %>"
+  </script>
   </head>
   <body>
   	
@@ -124,6 +132,50 @@
 
   </div>
 </div>
+
+
+
+<div id="blocklisusermodal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom: 0px;">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div id="followlisusermodal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header"  style="border-bottom: 0px;">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 
   <nav class="navbar navbar-inverse">
@@ -267,9 +319,9 @@
 
                     <a href="#" data-original-title="Edit info" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
 
-                     <a data-original-title="My blocks list" data-toggle="tooltip" type="button" class="btn btn-sm btn-danger"><i class="glyphicon glyphicon-folder-open"></i></a>
+                     <a data-original-title="My blocks list" data-toggle="tooltip" type="button" class="btn btn-sm btn-danger" onclick="myBlockList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-folder-open"></i></a>
 
-                     <a data-original-title="My followers list" data-toggle="tooltip" type="button" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-eye-close"></i></a>
+                     <a data-original-title="My followers list" data-toggle="tooltip" type="button" class="btn btn-sm btn-info" onclick="myFollowList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-eye-close"></i></a>
                   </span>
                  </div>
                <%}%>
@@ -286,6 +338,16 @@
 
    <script type="text/javascript" src="/js/component.js"></script>
   	<script type="text/javascript">
+
+      var socket = io.connect();
+      socket.on('connect', function(data) {       
+        socket.emit('notifyOnline', MYID);
+      });
+   
+      socket.on('connect_error', function(err){
+        alert(err)
+      })
+
 
        function readURL(input) {
 

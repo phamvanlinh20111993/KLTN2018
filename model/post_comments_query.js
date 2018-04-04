@@ -40,7 +40,7 @@ var selectMyposts = function(myid, cb){
       ListMyPost.posts = []
     
       var sqlString1 = "SELECT p.id AS pid, p.content, p.ctime AS ptime, p.turnof_cmt,"+
-                  " ti.id AS tid, ti.name AS tiname, li1.id_user AS melike, "+
+                  " ti.id AS tid, ti.name AS tiname, li1.id_user AS melike, p.isedit, "+
                   " COUNT(p.id) AS total, "+
                   " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc" +
                   " FROM post p "+
@@ -66,6 +66,7 @@ var selectMyposts = function(myid, cb){
                   content: result1[ind].content,
                   title: result1[ind].tiname,
                   title_id: result1[ind].tid,
+                  isedit: result1[ind].isedit,
                   turnofcmt: result1[ind].turnof_cmt,
                   time: result1[ind].ptime,
                   meliked: false,
@@ -95,7 +96,7 @@ var selectMyposts = function(myid, cb){
 //load comment from specific post id
 var selectCmts = function(myid, postid, cb){
   var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, le.level, "+
-               " c.id AS cid, c.content, c.ctime FROM User u "+
+               " c.id AS cid, c.isedit, c.content, c.ctime FROM User u "+
                " JOIN level le ON u.level_id = le.id "+
                " JOIN comment c ON c.user_id = u.id "+
                " WHERE c.post_id = " + mysql.escape(postid)+
@@ -124,6 +125,7 @@ var selectCmts = function(myid, postid, cb){
             ListCmts[ind].comment = {
                id: result[ind].cid,
                content:result[ind].content,
+               isedit: result[ind].isedit,
                time: result[ind].ctime
             }
 
@@ -139,7 +141,7 @@ var selectCmts = function(myid, postid, cb){
 var selectNotMyposts = function(myid, cb)
 {
 	var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime as ptime, ti.name AS tiname,"+
-         " p.turnof_cmt, ti.id AS tid, u.email, u.name AS uname, u.photo, u.score,"+
+         " p.turnof_cmt, ti.id AS tid, u.email, u.name AS uname, u.photo, u.score, p.isedit, "+
          " le.level, (SELECT COUNT(*) FROM comment c WHERE p.id=c.post_id) AS totalc,"+
          " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike, "+
          " (SELECT ctime FROM post where post.id = p.id"+
@@ -191,6 +193,7 @@ var selectNotMyposts = function(myid, cb)
                time: result[ind].ptime,
                meliked: false,
                totalcomment: result[ind].totalc, 
+               isedit: result[ind].isedit,
                istracked: result[ind].istracked
             }
             totalliked = result[ind].totallike
@@ -268,7 +271,7 @@ var selectRecentPost = function(myid, limit, cb)
 {
    var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime as ptime, p.turnof_cmt,"+
          " ti.name AS tiname, u.email, u.name AS uname, u.photo, u.score, le.level, ti.id AS tid,"+
-         " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc,"+
+         " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc, p.isedit, "+
          " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike FROM post p"+
          " JOIN User u ON p.user_id = u.id"+
          " JOIN post_title ti ON ti.id = p.title_id"+
@@ -316,6 +319,7 @@ var selectRecentPost = function(myid, limit, cb)
                time: result[ind].ptime,
                meliked: false,
                totalcomment: result[ind].totalc, 
+               isedit: result[ind].isedit,
                istracked: result[ind].istracked
             }
             totalliked = result[ind].totallike

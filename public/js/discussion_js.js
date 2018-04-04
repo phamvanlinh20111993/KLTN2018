@@ -44,7 +44,7 @@ var requestServer = function(url, type, data, choose, cb){
     // Set up a handler for when the request finishes.
     xhr.onload = function () {
         if (xhr.status === 200){
-            console.log("da chay thanh cong ham request")
+          //  console.log("da chay thanh cong ham request")
         }
         else{
         	cb("An unknown error. ", null)
@@ -145,10 +145,8 @@ var showPost = function(User, Posts, state)
 	}
 
 	var Time;
-	if(state == 0)
-		Time = Change_date(Posts.time)
-	else
-		Time = Change_date(new Date())
+	if(state == 0)	Time = Change_date(Posts.time)
+	else	Time = Change_date(new Date())
 
 	var isMyPost = "", notMypost = ""
 	if(User.id == MYID){
@@ -158,12 +156,21 @@ var showPost = function(User, Posts, state)
 	}
 
 	if(User.id != MYID){
-		notMypost = '<a style="cursor:pointer;" onclick="">Report post</a>'+
+		notMypost = '<a style="cursor:pointer;" onclick="reportPost('+id+',\''+User.name+'\')">Report post</a>'+
                    '<a style="cursor:pointer;" onclick="">Turn off notify</a>'
 	}
 
 	var istracked = ""
-	if(Posts.istracked)  istracked = "(followed)"
+	if(Posts.istracked){
+	  istracked = " (followed)"
+	  notMypost += '<a style="cursor:pointer;" onclick="unFollow('+User.id+')">Unfollow '+User.name.split(" ")[0]+'</a>'
+	}
+
+	var contenlikepost = ""
+	if(Posts.meliked)
+		contenlikepost='<span id="'+id+'_stringnumlike">You and </span><span>'+(Posts.totalliked-1)+'</span> people liked post.</a></div>'
+	else
+		contenlikepost='<span id="'+id+'_stringnumlike"></span><span>'+Posts.totalliked+'</span> people likes post.</a></div>'
 
     element = '<div class="popup-box4" id="'+id+'_posts">'+
 
@@ -210,14 +217,14 @@ var showPost = function(User, Posts, state)
                   '<p style="margin-top:-24px;margin-left:50px;color:blue;" id="'+id+'_likect">'+contentLike+'</p>'+
                   '<div style="margin-top:-22px;margin-left:26%;">'+
                      '<a style="cursor:pointer;" onclick="showUserLikePost('+id+')">'+
-                     '<span id="'+id+'_numlike">'+Posts.totalliked+'</span> people likes post.</a></div>'+
+                   	  contenlikepost+
                   '</div>'+
 
                   '<div class="divcmt1">'+
 				
                     '<div style="border:1px solid #d5e8e8;height:auto;">'+
                       '<div style="margin-top:12px;">'+
-                        '<a class="a4" onclick="">Show more comments(<span id="'+id+'_numcmt">'+Posts.totalcomment+'</span>)</a>'+
+                        '<a class="a4" onclick="showMoreComment('+id+')">Show more comments(<span id="'+id+'_numcmt">'+Posts.totalcomment+'</span>)</a>'+
                       '</div>'+
                       '<div style="width: auto;height: auto;" id="'+id+'_showcmt"></div>'+
                     '</div>'+
@@ -292,8 +299,13 @@ var editPostDone = function(id){
 var deleteMyPost = function(id){
 	var r = confirm("Are you sure want to delete your post?")
 	if(r == true){
-
-		alert("Done.")
+		requestServer('/languageex/user/delpost', 'DELETE', {pid: id}, 0, function(err, data){
+			if(err) alert(err)
+			else{
+			//	console.log(data)
+				document.getElementById(id+"_posts").style.display = "none"
+			}
+		})	
 	}
 }
  
@@ -304,7 +316,7 @@ var deleteMyPost = function(id){
 var likeOrDis = function(id){
 	var imgStateLike = document.getElementById(id+"_likesrc")
 	var contentLike = document.getElementById(id+"_likect")
-	var numlike = document.getElementById(id+"_numlike")
+	var strnumlike = document.getElementById(id+"_stringnumlike")
 
 	var namesrc = imgStateLike.src.replace(/^.*[\\\/]/, '');
 	if(namesrc == "dalike.jpg"){
@@ -313,17 +325,17 @@ var likeOrDis = function(id){
 			else{
 				imgStateLike.src = "/img/dislike.png"
 				contentLike.innerHTML = "Like"
-				numlike.innerHTML = parseInt(numlike.innerHTML)-1;
+				strnumlike.innerHTML = ""
 			}
 		})
 		
 	}else{
-		requestServer('/languageex/user/likepost', 'POST', {id: id}, 0, function(err, data){
+		requestServer('/languageex/user/likepost', 'POST', {id: id, time: new Date()}, 0, function(err, data){
 			if(err) alert(err)
 			else{
 				imgStateLike.src = "/img/dalike.jpg"
 				contentLike.innerHTML = "Liked"
-				numlike.innerHTML = parseInt(numlike.innerHTML)+1;
+				strnumlike.innerHTML = "You and "
 			}
 		})
 	}
@@ -341,22 +353,32 @@ var showUserLikePost = function(postid)
 		else{
 			if(data){
 			 	var Length = data.userslikedpost.length
+			 	var modalBody = document.getElementById("showuserlikespost").getElementsByClassName("modal-body")[0]
 			 	if(Length > 0){
 					for(var ind = 0; ind < Length; ind++){
 						element += '<tr><td><img class="img-rounded" height="40" width="40" alt="Avatar" src="'+
-					       data.userslikedpost[ind].photo+'"></td>'+
+					       data.userslikedpost[ind].photo+'" data="tooltip" title="'+data.userslikedpost[ind].email+'"></td>'+
 					       '<td><h4>'+data.userslikedpost[ind].name+'</h4></td>'+
-					       '<td><button type="button" class="btn btn-success">View info</button></td>'
+					       '<td><button type="button" class="btn btn-success" onclick="viewInfoLikePost('+data.userslikedpost[ind].id+')">View info</button></td>'
 					}
 					element += '</tbody></table>'
-
-					var modalBody = document.getElementById("showuserlikespost").getElementsByClassName("modal-body")[0]
 					modalBody.innerHTML = element
-			 }
+			 }else
+			 	modalBody.innerHTML = ""
 		    }
 		}
 	})
 
+}
+
+/**
+	when user click to show information of users like specific like post, button view infor 
+	is call with even viewInfoLikePost
+	@@ id of user
+**/
+var viewInfoLikePost = function(id){
+	alert("hihi")
+	location.href = "/languageex/user/profile?uid="+encodeURIComponent(id)
 }
 
 /**
@@ -421,8 +443,8 @@ function makerandomid(){
 	Userinfo la thong tin cua nguoi comment
 	state la trang thai load tu server hoac realtime
  **/
-var showComment = function(postid, Commentinfo, Userinfo, state){
-	var element = '', ismycmt = "";
+var showComment = function(postinfo, Commentinfo, Userinfo, state){
+	var element = '', ismycmt = "", ismypost = "";
 	var Time, randomid = makerandomid();
 	
 	if(state == 0)
@@ -431,17 +453,31 @@ var showComment = function(postid, Commentinfo, Userinfo, state){
 		Time = formatTime(new Date())
 
 	if(MYID == Userinfo.id){//neu comment la cua toi thi t co the xoa hoac edit no
-		ismycmt = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+')">  del  </a>'+
-                  '<a class="a11" onclick="">  edit  </a>'
+		ismycmt = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+',\''+randomid+'\')">  del  </a>'+
+                  '<a class="a11" onclick="editMyCmt(\''+randomid+'\')">  edit  </a>'
+	}else{
+		/*toi la chu so huu cua bai dang thi bat ki ai(tru toi) comment trong bai dang cua toi
+		thi toi co quyen xoa bai dang do nhung comment do khong phai la cua toi*/
+		if(MYID == postinfo.own)
+			ismypost = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+',\''+randomid+'\')">  del  </a>'
 	}
 
-    element = '<div style="min-height:40px;margin-top:5px;">'+
+	var isedit = ""
+	if(Commentinfo.isedit > 0)
+		isedit = '<span style="color:#660099;"> (edited)</span>'
+
+    element = '<div style="min-height:40px;margin-top:5px;" id="'+randomid+'_idcomment">'+
          '<img src="'+Userinfo.photo+'" width="41" height="42" style="float:left;margin-left:10px;margin-top:-2px;">'+
          '<p style="width:85%;word-wrap:break-word;margin-left:65px;"><span style="color:blue;font-size:108%;">'+Userinfo.name+'</span>  '+
-            Commentinfo.content+' </br> <span style="font-style:inherit;color:red;" id="'+randomid+'_showtranscmt"></span>'+
+           '<span id="'+randomid+'_cmtcontentshow">'+Commentinfo.content+'</span> '+ isedit+
+           '<textarea id="'+randomid+'_editcmtcontent" class="form-control" style="height:auto;display:none;" onkeypress="editCmtDone(event,'+Commentinfo.id+',\''+randomid+'\')"'+
+             'autofocus data="tooltip" title="Press enter end edit.">'+Commentinfo.content+'</textarea>'+
+            '</br> <span style="font-style:inherit;color:red;" id="'+randomid+'_showtranscmt"></span>'+
          '</p>'+
+
          '<div style="height:10px;margin-left:65px;font-size:90%;color:#474343;margin-top:-7px;">'+
          	ismycmt+
+         	ismypost+
             '<a class="a11" onclick="translateCmt(\''+randomid+'\')">  trans  </a>'+
             '<span style="margin-left:10px;font-size: 80%;">'+Time+'</span>'+
          '</div>'+
@@ -449,7 +485,7 @@ var showComment = function(postid, Commentinfo, Userinfo, state){
     '</div>'+
     '<div style="height:10px; margin-top:0px;"></div>'
 
-    document.getElementById(postid+"_showcmt").innerHTML += element
+    document.getElementById(postinfo.id+"_showcmt").innerHTML += element
 }
 
 /**
@@ -475,18 +511,19 @@ var translateCmt = function(id)
 }
 
 /**
-	@@postid lay cac comment cua bai dang postid
+	@@postinfo is a object contain post id and own of post
 **/
-var requestComment = function(postid){
-	requestServer('/languageex/user/loadcmt', 'POST', {id: postid}, 0, function(err, data){
+var requestComment = function(postinfo){
+	requestServer('/languageex/user/loadcmt', 'POST', {id: postinfo.id}, 0, function(err, data){
 		if(err) alert(err)
 		else{
+			//console.log(data)
 			var Length = data.listcmts.length
-			var _showmorecmt = document.getElementById(postid+"_numcmt")
+			var _showmorecmt = document.getElementById(postinfo.id+"_numcmt")
 			_showmorecmt.innerHTML = parseInt(_showmorecmt.innerHTML) - Length
 			if(Length > 0){
 				for(var ind = 0; ind < Length; ind++){
-					showComment(postid, data.listcmts[ind].comment, data.listcmts[ind].user, 0)
+					showComment(postinfo, data.listcmts[ind].comment, data.listcmts[ind].user, 0)
 				}
 			}
 		}
@@ -495,11 +532,75 @@ var requestComment = function(postid){
 
 /** 
 	@@ id is id of comment
+	@@ rid is set id for DOM element and we proces with this
 **/
-var deleteMyCmt = function(id){
-
+var deleteMyCmt = function(id, rid){
+	var r = confirm("Are you sure want to delete this comment?")
+	var _DOMcmt = document.getElementById(rid+"_idcomment")
+	if(r == true){
+		requestServer('/languageex/user/delcmt', 'DELETE', {id: id, uid: MYID}, 0, function(err, data){
+			if(err) alert(err)
+			else{//tra du lieu ve thanh cong
+				console.log(data)
+				_DOMcmt.style.display = "none"
+			}
+		})
+	}
 }
 
+/** 
+	@@ rid is set id for DOM element and we proces with this
+	show textarea, hidden content comment 
+**/
+var editMyCmt = function(rid){
+	var contentshow = document.getElementById(rid+"_cmtcontentshow")
+	var textareaedit = document.getElementById(rid+"_editcmtcontent")
+	var oldcontent = textareaedit.value
+	contentshow.innerHTML = ""
+	textareaedit.style.display = "block"
+	textareaedit.value = ""
+    textareaedit.focus()
+    textareaedit.value = oldcontent
+}
+
+/**
+	this function happen went user click edit cmt and take event press keyboard
+	@@ id is id of comment
+    @@ rid is set id for DOM element and we proces with this
+**/
+var editCmtDone = function(e, id, rid){
+	var oldcontent = document.getElementById(rid+"_cmtcontent").value
+	var textareaedit = document.getElementById(rid+"_editcmtcontent")
+    var _showtranscmt = document.getElementById(rid+"_showtranscmt")
+    var showcontentcmt = document.getElementById(rid+"_cmtcontentshow")
+   
+    if(e.keyCode == 13){
+    	e.preventDefault();
+    	var newcontent = textareaedit.value
+    	if(newcontent == oldcontent){
+    		alert("Comment not change.")
+    		textareaedit.style.display = "none"
+    		showcontentcmt.innerHTML = newcontent
+    	}else if(newcontent == ""){
+    		alert("Dont leave comment empty.")
+    	}else{
+    		var editcomment = {id: id, content: newcontent, time: new Date()}
+    		requestServer('/languageex/user/editCmt', 'PUT', editcomment, 0, function(err, data){
+				if(err) alert(err)
+				else{//tra du lieu ve thanh cong
+					//console.log(data)
+					textareaedit.style.display = "none"
+					oldcontent.value = newcontent
+					showcontentcmt.innerHTML = newcontent
+					_showtranscmt.innerHTML = "" //reset
+				}
+		    })
+    		
+    	}
+    	
+    }
+
+}
 
 var divcontentpost = document.getElementById("commentinpost")
 var content = divcontentpost.getElementsByTagName("textarea")[0]
@@ -528,7 +629,7 @@ var submitPost = function(){
 		var value = selectTitle[selectTitle.selectedIndex].value;
 		var data = {content: content.value, title: value, time: new Date()}//data submit to server
 
-		var User = {
+		var User = {//user object
 			id: MYID,
 			email: MYEMAIL,
 			level: MYLEVEL,
@@ -537,7 +638,7 @@ var submitPost = function(){
 			score: MYSCORE
 		}
 
-		var Posts = {
+		var Posts = {//post object
 			pid: null,
 			istracked: null,
 			meliked: false,
@@ -556,7 +657,6 @@ var submitPost = function(){
 				selectTitle.selectedIndex = "0";
 				var allpostafter = document.getElementById("showpostusers").innerHTML
 				document.getElementById("showpostusers").innerHTML = ""
-				console.log(data)
 				Posts.pid = data.resp
 				showPost(User, Posts, 1)
 				document.getElementById("showpostusers").innerHTML += allpostafter
@@ -582,10 +682,9 @@ var submitComment = function(e, postid){
 				if(err) alert(err)
 				else{
 					contentcmt.value = ""
-					data.id = dataid
+					data.id = dataid.res
 					var User = {id: MYID, name: MYNAME, photo: MYPHOTO, level: MYLEVEL, score: MYSCORE};
-					showComment(postid, data, User, 1)
-				    console.log(data)
+					showComment({id: postid, own: MYID}, data, User, 1)
 				}
 			})
 		}
@@ -605,7 +704,7 @@ var selectComunityPost = function(){
 				console.log(data)
 				for(var ind = 0; ind < Length; ind++){
 		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
-		 			requestComment(data.data[ind].posts.pid)
+		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
 		 		}
 		 	}
 		}
@@ -624,7 +723,7 @@ var selectRecentPost = function(){
 			if(Length){
 				for(var ind = 0; ind < Length; ind++){
 		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
-		 			requestComment(data.data[ind].posts.pid)
+		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
 		 		}
 		 	}
 		}
@@ -644,9 +743,48 @@ var selectMyPost = function()
 			if(Length){
 				for(var ind = 0; ind < Length; ind++){
 		 			showPost(data.listmypost.user, data.listmypost.posts[ind], 0)
-		 			requestComment(data.listmypost.posts[ind].pid)
+		 			requestComment({id: data.listmypost.posts[ind].pid, own: data.listmypost.user.id})
 		 		}
 		 	}
 		}
 	})
+}
+
+/**
+	report post with
+	@@ id param is id of post
+	@@ name post of user's name
+**/
+var reportPost = function(id, name)
+{
+	$('#reportPostUser').modal('show')
+	var reportp = document.getElementById("reportPostUser")
+	var reportpBody = reportp.getElementsByClassName("modal-body")[0]
+	var reportTitle = reportp.getElementsByClassName("modal-title")[0]
+	reportTitle.innerHTML = "Why report this post of "+name+" ?"
+
+	requestServer('/languageex/user/loadrppost', 'GET',{}, 0, function(err, data){
+		if(err) alert(err)
+		else{
+			var element = ""
+			console.log(data)
+			for(var ind = 0; ind < data.data.length; ind ++){
+		 		element += '<div class="checkbox">'+
+            	 	'<label><input type="checkbox" value="'+data.data[ind].code+'" name="'+data.data[ind].id+'">'+
+            		 data.data[ind].content+'</label></div>'
+			}
+			reportpBody.innerHTML = element
+		}
+	})
+}
+
+
+/**
+	@@id is id of post
+**/
+
+var showMoreComment = function(id){
+	alert("clicked me")
+	var totalcmt = document.getElementById(id+"_numcmt").innerHTML
+	totalcmt = parseInt(totalcmt)
 }

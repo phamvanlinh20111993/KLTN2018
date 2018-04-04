@@ -59,7 +59,11 @@ function Error(id){
 	return errstr;
 }
 
-
+var getDateTime = function(date){
+	return  (date.getDate())+
+                '/' + (date.getMonth() + 1) +
+                '/' + date.getFullYear();
+}
 
 function createSession(req, res, emailuser, passuser)
 {
@@ -249,6 +253,7 @@ router.route('/')
  								User.state = "me"
  							else
  								User.state = "something"
+ 							User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
  							res.render('ejs/Profile', {User: User})
  						}
  					})
