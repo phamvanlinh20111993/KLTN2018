@@ -49,9 +49,6 @@ router.route('/user/loasdusermsg')
 .get(function(req, res){
 	//khoi tao session
 	var uid = req.body.uid
-
-
-
 })
 .post(function(req, res)
 {

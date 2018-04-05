@@ -17,7 +17,7 @@ con.connect(function(err) {
 /**
   lay danh sach block list cua nguoi dung
 **/
-var selectMyBlockList = function(id, cb){
+var selectMyFollowList = function(id, cb){
 	var sqlString = "SELECT u.id, u.email, u.name, u.photo, le.level, fo.ctime "+
 					" FROM User u "+
 					" JOIN level le ON le.id = u.level_id "+
@@ -49,8 +49,8 @@ var selectMyBlockList = function(id, cb){
 /**
   lay danh sach follow list cua nguoi dung
 **/
-var selectMyFollowList = function(id, cb){
-	var sqlString = "SELECT u.id, u.email, u.name, u.photo, bl.timeblock, bl.time "+
+var selectMyBlockList = function(id, cb){
+	var sqlString = "SELECT u.id, u.email, u.name, u.photo, bl.timeblock, bl.ctime "+
 					" FROM User u "+
 					" JOIN blocklist_user bl ON bl.blockwho = u.id "+
 					" WHERE bl.whoblock = "+mysql.escape(id)
@@ -68,7 +68,7 @@ var selectMyFollowList = function(id, cb){
       	 		photo: result[ind].photo,
       	 		name: result[ind].name,
       	 		timeblock: result[ind].timeblock,
-      	 		time: result[ind].time
+      	 		time: result[ind].ctime
       	 	}
       	 }
 

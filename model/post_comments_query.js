@@ -138,8 +138,18 @@ var selectCmts = function(myid, postid, cb){
 }
 
 //select all post from specific exchange language community
-var selectNotMyposts = function(myid, cb)
+var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
 {
+
+  var likesearchcondi = ""
+  var likefilter = ""
+  if(searchcondi)
+    likesearchcondi = " AND(u.name LIKE'%"+searchcondi+"%' OR u.email LIKE '%"+searchcondi+"%')"
+  if(filtercondi){//search by title id
+    if(parseInt(filtercondi) > 0 && parseInt(filtercondi) < 20)
+      likefilter = " AND ti.id = "+parseInt(filtercondi)
+  }
+
 	var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime as ptime, ti.name AS tiname,"+
          " p.turnof_cmt, ti.id AS tid, u.email, u.name AS uname, u.photo, u.score, p.isedit, "+
          " le.level, (SELECT COUNT(*) FROM comment c WHERE p.id=c.post_id) AS totalc,"+
@@ -156,6 +166,8 @@ var selectNotMyposts = function(myid, cb)
          " LEFT JOIN likes_post li ON li.id_post = p.id "+
          " LEFT JOIN likes_post li1 ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
          " WHERE p.user_id != "+mysql.escape(myid)+
+         likesearchcondi+
+         likefilter +
          " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
          " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
          " GROUP BY p.id"+

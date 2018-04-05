@@ -2,6 +2,46 @@
 var _CHECKBOXTRANS = 0, _CHECKBOXMISS = 0;
 var _CHECKBOXREPORT = []
 
+//request json data to server
+var requestServer = function(url, type, data, cb){
+    // Set up the AJAX request.
+    var xhr = new XMLHttpRequest();
+    // Open the connection.
+    xhr.open(type, url, true);
+
+    var formData;
+
+   	formData = JSON.stringify({data: data})
+    xhr.setRequestHeader("Content-type", "application/json");
+
+    // Set up a handler for when the request finishes.
+    xhr.onload = function () {
+        if (xhr.status === 200){
+          //  console.log("da chay thanh cong ham request")
+        }
+        else{
+        	cb("An unknown error. ", null)
+           	console.log("xay ra loi khong xac dinh. Sorry!!!")
+        }
+    };
+
+    // Send the Data to server
+    xhr.send(formData);
+
+    //take data from server responsible
+    xhr.onreadystatechange = function(){
+    	//State = 4 is request finished and response is ready, xhr.status == 200 is 200: "OK"
+        if(xhr.readyState == 4){
+        	if(xhr.status === 200){
+        		var data_response = JSON.parse(xhr.responseText);
+            	cb(null, data_response)
+            }else{
+            	var err = "Status code err: " + xhr.status
+            	cb(err, null)
+            }
+        }
+    }
+}
 
 var selectAllmyNative_Exchange = function(url, id, cb){
 	$.ajax({
@@ -283,8 +323,11 @@ var blockmsg_autocheckmiss = function(url, pid, cb){
         data:{id: pid, time: new Date()},
         success: function(data)//hien thi message
         {
-            if(typeof cb == "function")
-                cb(JSON.parse(data));//tra ve du lieu
+            if(typeof cb == "function"){
+            	if(typeof data == "string")
+                	cb(JSON.parse(data));//tra ve du lieu
+                else cb(data)
+            }
         }
     })
 }
@@ -302,7 +345,8 @@ var Blockmessages = function(el, pid, name){
 	    	}) 
 
 	    	blockmsg_autocheckmiss("/languageex/user/blockmsg", pid, function(data){
-	    		console.log(data)
+	    	    alert("block successed.")
+	    		//alert(name + "auto blocked 15 days.")
 	    	})
 		}
 	}else{
@@ -313,8 +357,9 @@ var Blockmessages = function(el, pid, name){
             	signal: false
 	    	}) 
 
-	    	blockmsg_autocheckmiss("/languageex/user/blockmsg", pid, function(data){
+	    	blockmsg_autocheckmiss("/languageex/user/unblockmsg", pid, function(data){
 	    		console.log(data)
+	    		alert("Unblocked name successed.")
 	    	})
 	}
 }
@@ -345,13 +390,20 @@ socket.on('blockmsgdone', function(data){//tin hieu gui den cho 2 phia
 })
 
 
-var Auto_check_miss = function(el){
+var Auto_check_miss = function(el, pid){
 	if(el.checked){
-		AUTOCHECKMISSPELLING = true
-	}else{
-		AUTOCHECKMISSPELLING = false
-		blockmsg_autocheckmiss("/languageex/user/checkmiss", null, function(data){
+		blockmsg_autocheckmiss("/languageex/user/checkmiss", pid, function(data){
 	    	console.log(data)
+	    	var conf = confirm("Checked successed. Please refresh page.")
+	    	if(conf == true)
+	    		location.reload()
+	    })
+	}else{
+		blockmsg_autocheckmiss("/languageex/user/uncheckmiss", pid, function(data){
+	    	console.log(data)
+	    	var conf = confirm("Unchecked successed. Please refresh page.")
+	    	if(conf == true)
+	    		location.reload()
 	    })
 		//get to server
 	}

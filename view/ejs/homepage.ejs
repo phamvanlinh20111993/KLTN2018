@@ -9,6 +9,13 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!--  offline
+  <script src="/lib/bootstrap-3.3.7-dist/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="/lib/bootstrap-3.3.7-dist/font-awesome-4.7.0.min.css">
+  <link rel="stylesheet" href="/lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <script src="/lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>-->
+
    <script src="/socket.io/socket.io.js"></script>
   <style>
     /* Remove the navbar's default margin-bottom and rounded borders */ 
@@ -338,6 +345,14 @@
         <li><a href="#">Group</a></li>
         <li><a href="#">Courses</a></li>
       </ul>
+
+      <div class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" id= "searchuserex" class="form-control" placeholder="Search users..." data="tooltip" title="Search users by name or email" onkeypress="SearchUsersEnter(event,'<%= user[0].id %>')">
+        </div>
+        <input type="button" class="btn btn-default" value="Submit" onclick="SearchUsersClick('<%= user[0].id %>')">
+      </div>
+
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/languageex/user/logout" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       </ul>

@@ -37,9 +37,15 @@ var ajaxRequest = function(url, data, callback) {//data is a object
 
 var showUserCommunity = function(User)
 {
-	var isOnline = '<h4> <i class="fa fa-circle" style="color:red;"></i> '+User.infor.name+' </h4>'
+	var isOnline = '<h4 data="tooltip" title="'+User.infor.email+'"> <i class="fa fa-circle" style="color:red;"></i> '+User.infor.name+' </h4>'
 
 	var isFollow = "color:#3399FF;"
+  var tooltipFollow = "Follow "
+  var id = User.infor.id
+
+  var isblockedmsg = '<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
+                            ' data-toggle="tooltip" title="Send message" class="icon">'+
+                          '<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>'
 
 	if(User.infor.state == 1){//dang online
 		isOnline = '<h4> <i class="fa fa-circle" style="color:green;"></i> '+
@@ -47,10 +53,16 @@ var showUserCommunity = function(User)
 	}  
 
 	if(User.infor.follow.id > 0){
-		isFollow = "color:red;"
+		isFollow = "color:red;";
+    tooltipFollow = "Unfollow ";
 	}
 
-  var id = User.infor.id
+  if(User.infor.iswasblocked.state){
+    isblockedmsg = '<a href="#" onclick="wasBlock('+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\',\''+User.infor.iswasblocked.timeblock+'\' );" '+
+                            ' data-toggle="tooltip" title="Message blocked" class="icon">'+
+                          '<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>'
+  }
+
 
 	var Interface = '<div id = "'+id+'_community" class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">'+
              			'<div class="card inf-content">' +
@@ -66,11 +78,8 @@ var showUserCommunity = function(User)
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
-                  				'<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
-                            ' data-toggle="tooltip" title="Send message" class="icon">'+
-                  				'<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>' +
-
-                  				'<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="Follow or Unfollow '+User.infor.name+
+                  				isblockedmsg +
+                  				'<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="'+tooltipFollow+User.infor.name+
                           '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
 
                				'</div>'+
@@ -119,7 +128,7 @@ var selectUserCommunity = function(){
       //  console.log(data)
       for(ind = 0; ind < size; ind++)
         showUserCommunity(data.community[ind])
-    }
+     }
   })
 }
 
@@ -163,3 +172,95 @@ var followUser = function(uid, name)
 }
 
 
+//search users in commnunity
+
+//search by click
+var SearchUsersClick = function(id){
+  var searchvalue = document.getElementById("searchuserex")
+    if(searchvalue.value == ""){
+      alert("Null value.")
+    }else{
+      var MycommunityExchange =  document.getElementById("MycommunityExchange")
+      requestServer('/languageex/home/search', 'POST', {value: searchvalue.value}, 
+        function(err, data){
+          MycommunityExchange.innerHTML = ""
+          if(data.community.length == 0){
+            MycommunityExchange.innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
+               "<strong>Danger!</strong>No results match.</div>"+
+               "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+          }else{
+            MycommunityExchange.innerHTML = "("+data.community.length+") Results match."
+            for(ind = 0; ind <  data.community.length; ind++){
+               showUserCommunity(data.community[ind])
+            }
+             MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+         }
+      })
+    }
+}
+
+//search by press enter keyboard
+var SearchUsersEnter = function(e, id){
+  if(e.keyCode == 13){
+    var searchvalue = document.getElementById("searchuserex")
+    if(searchvalue.value == ""){
+      alert("Null value.")
+    }else{
+      var MycommunityExchange =  document.getElementById("MycommunityExchange")
+      requestServer('/languageex/home/search', 'POST', {value: searchvalue.value}, 
+        function(err, data){
+          MycommunityExchange.innerHTML = ""
+          if(data.community.length == 0){
+            MycommunityExchange.innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
+                     "<strong>Danger!</strong>No results match.</div>"+
+                     "<button type='button' onclick='backToStart()' class='btn btn-link'>Back to the start</button"
+
+          }else{
+             MycommunityExchange.innerHTML = "("+data.community.length+") Results match."
+            for(ind = 0; ind <  data.community.length; ind++){
+               showUserCommunity(data.community[ind])
+            }
+            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+         }
+      })
+    }
+
+  }
+}
+
+var backToStart = function(){
+   getListUserCommnunity(MYID, function(data, err){
+      if(err) alert(err)
+      else{
+         document.getElementById("MycommunityExchange").innerHTML = ""
+         var size = data.community.length;
+         var ind = 0;
+            //  console.log(data)
+         for(ind = 0; ind < size; ind++)
+               showUserCommunity(data.community[ind])
+      }
+   })
+}
+
+
+//ham chuyen doi thoi gian so voi hien tai
+function Change_date(Date_time)
+{
+    var second, d, d1, date_now, text; 
+    d = new Date();//lay thoi gian hien tai
+    d1 = new Date(String(Date_time));//;lay thoi gian da dang
+    second = parseInt((d - d1)/1000);//thoi gian hien tai va thoi gian da dang
+    if(second < 60) text = "Just now";
+    else if(second > 60 && second < 3600)            text =parseInt(second/60)+" Minutes before";
+    else if(second >= 3600 && second < 86400)        text = "About "+parseInt(second/3600)+" Hours ago"; 
+    else if(second >= 86400 && second < 2592000)     text = parseInt(second/86400)+" Days ago"; 
+    else if(second >= 2592000 && second < 946080000) text = parseInt(second/2592000)+" Months ago";
+    else                                             text = "Long time ago";     
+    return text;                               
+}
+
+
+//khi bi nguoi khac block tin nhan thi tinh nang nay thong bao nguoi dung da bi block
+var wasBlock = function(id, name, photo, time){
+  alert("you was blocked by " + name + " at " + Change_date(time))
+} 

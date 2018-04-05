@@ -70,7 +70,7 @@ var myBlockList = function(id)
             var element = "<table class='table table-condensed'><tbody>"
             if(Length > 0){
                 for(var ind = 0; ind < Length; ind++){
-                    element += "<tr><td><img src='"+data.data[ind].photo+"' class='img-rounded' alt='Avatar' height='40'></td>"+
+                    element += "<tr id='"+data.data[ind].id+"_blocklist'><td><img src='"+data.data[ind].photo+"' class='img-rounded' alt='Avatar' height='40'></td>"+
                          "<td>"+data.data[ind].name+"</td>"+
                          "<td><button type='button' class='btn btn-warning' onclick='reMoveBlock("+data.data[ind].id+")'>Remove</button></td></tr>"
                 }
@@ -84,7 +84,8 @@ var myBlockList = function(id)
 }
 
 var reMoveBlock = function(id){
-
+    var DOM_unblock = document.getElementById(id+"_blocklist")
+    DOM_userfollow.style.display = "none"
 }
 
 
@@ -101,12 +102,12 @@ var myFollowList = function(id)
         else{
              var Length = data.data.length
              myfollowlistsTitle.innerHTML = "Your follow lists ("+Length+")"
-             var element = ""
+             var element = "<table class='table table-condensed'><tbody>"
             if(Length > 0){
                 for(var ind = 0; ind < Length; ind++){
-                     element += "<tr><td><img src='"+data.data[ind].photo+"' class='img-rounded' alt='Avatar' height='40'></td>"+
+                     element += "<tr id='"+data.data[ind].id+"_follow'><td><img src='"+data.data[ind].photo+"' class='img-rounded' alt='Avatar' height='40'></td>"+
                          "<td>"+data.data[ind].name+"</td>"+
-                         "<td><button type='button' class='btn btn-info' onclick='unFollowList("+data.data[ind].id+")'>Remove</button></td></tr>"
+                         "<td><button type='button' class='btn btn-info' onclick='unFollowList("+data.data[ind].id+")'>Unfollow</button></td></tr>"
                 }
                 element += "</tbody></table>"
 
@@ -117,5 +118,6 @@ var myFollowList = function(id)
 }
 
 var unFollowList = function(id){
-
+    var DOM_userfollow = document.getElementById(id+"_follow")
+    DOM_userfollow.style.display = "none"
 }

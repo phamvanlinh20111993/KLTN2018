@@ -1,4 +1,22 @@
 
+//theo doi hoac bo theo doi nguoi dung
+var ajaxRequest = function(url, data, callback) {//data is a object
+  // body...
+  $.ajax({
+        type: "POST",
+        url: url,
+        data:{ data: JSON.stringify(data) },
+        error: function(xhr, status, error){
+          callback(null, error)
+        },
+        success: function(data)
+        {
+            if(typeof callback == "function"){
+                callback(data, null);//tra ve du lieu
+            }
+        }
+    })
+}
 
 //gui du lieu len server
 var Translate_or_Misspelling = function(url, myex, mynat, content, cb){
@@ -88,9 +106,19 @@ function Change_date(Date_time)
 }
 
 
-var formatTime = function(date){
-	return date.getHours()+":"+ date.getMinutes() + " "+
-			date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
+var formatTime = function(datestr){
+	var date = new Date(datestr)
+	var Hours = date.getHours()
+	var Day = date.getDate()
+
+	Hours = Hours - 7;
+	if(Hours < 0){
+		Hours = Hours + 24
+		Day--;
+	}
+
+	return Hours+":"+ date.getMinutes() + " "+
+			Day + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
 }
 
 var Notify = function(){
@@ -122,8 +150,31 @@ var loadTitlePost = function(){
 		else   showTopic(data.data)
 	})	
 }
-
 loadTitlePost()
+
+
+var showOrderTopic = function(topic)//topic is a object
+{
+	//console.log(topic)
+	var topicPost = document.getElementById('fitlerbytopicpost')
+	var tpLg = topic.length-1;
+	var element = '<option style="font-size:130%;" selected value="-1">None</option>'
+
+	for(var index = tpLg; index >= 0; index--){
+		element += '<option style="font-size:130%;" value="'+topic[index].id+'">'+
+		           '<b>'+topic[index].name+'</b></option>'
+	}
+
+	topicPost.innerHTML = element
+}
+
+var loadRequirePost = function(){
+	requestServer('/languageex/user/loadtitle', 'POST', {}, 0, function(err, data){
+		if(err)  alert(err)
+		else   showOrderTopic(data.data)
+	})	
+}
+loadRequirePost()
 	
 /**
 	Posts: object chua thong tin cua bai dang
@@ -163,7 +214,7 @@ var showPost = function(User, Posts, state)
 	var istracked = ""
 	if(Posts.istracked){
 	  istracked = " (followed)"
-	  notMypost += '<a style="cursor:pointer;" onclick="unFollow('+User.id+')">Unfollow '+User.name.split(" ")[0]+'</a>'
+	  notMypost += '<a style="cursor:pointer;" onclick="unFollow('+User.id+', \''+User.name+'\')">Unfollow '+User.name.split(" ")[0]+'</a>'
 	}
 
 	var contenlikepost = ""
@@ -447,9 +498,9 @@ var showComment = function(postinfo, Commentinfo, Userinfo, state){
 	var element = '', ismycmt = "", ismypost = "";
 	var Time, randomid = makerandomid();
 	
-	if(state == 0)
-		Time = formatTime(new Date(Commentinfo.time))
-	else
+	if(state == 0){
+		Time = formatTime(Commentinfo.time)
+	}else
 		Time = formatTime(new Date())
 
 	if(MYID == Userinfo.id){//neu comment la cua toi thi t co the xoa hoac edit no
@@ -494,20 +545,31 @@ var showComment = function(postinfo, Commentinfo, Userinfo, state){
 var MAXTIMESHOWTRANSCMT = 15000//max time show translate comment
 var translateCmt = function(id)
 {
-	var content = document.getElementById(id+"_cmtcontent").value
+	var contenttrans = document.getElementById(id+"_cmtcontent").value
 	var _showtranscmt = document.getElementById(id+"_showtranscmt")
+
 	if(_showtranscmt.innerHTML == ""){
 		Translate_or_Misspelling("/languageex/user/translate", 
-			MYPRIOEX, MYPRIONAT, content, function(data){	  	
-			if(data.content.error == null)
-				_showtranscmt.innerHTML = data.content.translated
+			MYPRIOEX, MYPRIONAT, contenttrans, function(data){	  	
+			if(data.content.error == null){
+				if(data.content.translated == "")
+					_showtranscmt.innerHTML = "Error translate."
+				else
+					_showtranscmt.innerHTML = data.content.translated
+			}
 			else
 				_showtranscmt.innerHTML = data.content.error
 			setTimeout(function(){
 				_showtranscmt.style.display = "none"
 			}, MAXTIMESHOWTRANSCMT)
 		})
+	}else{
+		_showtranscmt.style.display = "block"
+		setTimeout(function(){
+			_showtranscmt.style.display = "none"
+		}, MAXTIMESHOWTRANSCMT)
 	}
+
 }
 
 /**
@@ -590,7 +652,7 @@ var editCmtDone = function(e, id, rid){
 				else{//tra du lieu ve thanh cong
 					//console.log(data)
 					textareaedit.style.display = "none"
-					oldcontent.value = newcontent
+					document.getElementById(rid+"_cmtcontent").value =  newcontent
 					showcontentcmt.innerHTML = newcontent
 					_showtranscmt.innerHTML = "" //reset
 				}
@@ -696,6 +758,7 @@ var submitComment = function(e, postid){
 **/
 var selectComunityPost = function(){
 	document.getElementById("showpostusers").innerHTML = ""
+	document.getElementById("fitlerbytopicpost").selectedIndex = "0";
 	requestServer('/languageex/user/loadpost', 'POST', {}, 0, function(err, data){
 		if(err) alert(err)
 		else{
@@ -710,10 +773,11 @@ var selectComunityPost = function(){
 		}
 	})
 }
-//tu dong load comment về máy
+//tu dong load comment về máy cung post
 selectComunityPost();
 
 var selectRecentPost = function(){
+	document.getElementById("fitlerbytopicpost").selectedIndex = "0";
 	document.getElementById("showpostusers").innerHTML = ""
 	requestServer('/languageex/user/loadrcpost', 'POST', {}, 0, function(err, data){
 		if(err) alert(err)
@@ -734,6 +798,7 @@ var selectRecentPost = function(){
 **/
 var selectMyPost = function()
 {
+	document.getElementById("fitlerbytopicpost").selectedIndex = "0";
 	document.getElementById("showpostusers").innerHTML = ""
 	requestServer('/languageex/user/loadmypost', 'POST', {}, 0, function(err, data){
 		if(err) alert(err)
@@ -787,4 +852,117 @@ var showMoreComment = function(id){
 	alert("clicked me")
 	var totalcmt = document.getElementById(id+"_numcmt").innerHTML
 	totalcmt = parseInt(totalcmt)
+}
+
+
+/**
+	find post's user
+**/
+
+//search by click
+var SearchUsersClick = function(id){
+  var searchvalue = document.getElementById("searchuserex")
+    if(searchvalue.value == ""){
+      alert("Null value.")
+    }else{
+      document.getElementById("showpostusers").innerHTML = ""
+	  requestServer('/languageex/user/post/search', 'POST', {value: searchvalue.value}, 0, function(err, data){
+		 if(err) alert(err)
+		 else{
+			var Length = data.data.length
+			if(Length > 0){
+				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Results match.</h3>"
+				for(var ind = 0; ind < Length; ind++){
+		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
+		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
+		 		}
+		 		MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 	}else{
+		 		document.getElementById("showpostusers").innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
+                      "<strong>Danger!</strong>No results match.</div>"+
+                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 	}
+		 }
+	 })
+	}
+}
+
+//search by press enter keyboard
+var SearchUsersEnter = function(e, id){
+  if(e.keyCode == 13){
+    var searchvalue = document.getElementById("searchuserex")
+    if(searchvalue.value == ""){
+      alert("Null value.")
+    }else{
+      document.getElementById("showpostusers").innerHTML = ""
+	  requestServer('/languageex/user/post/search', 'POST', {value: searchvalue.value}, 0, function(err, data){
+		 if(err) alert(err)
+		 else{
+			var Length = data.data.length
+			if(Length > 0){
+				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Results match.</h3>"
+				for(var ind = 0; ind < Length; ind++){
+		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
+		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
+		 		}
+		 		document.getElementById("showpostusers").innerHTML+=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 	}else{
+		 		document.getElementById("showpostusers").innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
+                      "<strong>Danger!</strong>No results match.</div>"+
+                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 	}
+		 }
+	 })
+    }
+  }
+}
+
+var backToStart = function(){
+   document.getElementById("fitlerbytopicpost").selectedIndex = "0";
+   selectComunityPost();
+}
+
+//loc bai dang theo chu de
+var filterByTopicPost = function(){
+  $('#fitlerbytopicpost option').each(function() {
+    if($(this).is(':selected'))
+    {
+    	var topicid = $(this).val()
+    	document.getElementById("showpostusers").innerHTML = ""
+	    requestServer('/languageex/user/post/filter', 'POST', {value: topicid}, 0, function(err, data){
+		 if(err) alert(err)
+		 else{
+			var Length = data.data.length
+			if(Length > 0){
+				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Results match.</h3>"
+				for(var ind = 0; ind < Length; ind++){
+		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
+		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
+		 		}
+		 		document.getElementById("showpostusers").innerHTML+=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 	}else{
+		 		document.getElementById("showpostusers").innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
+                      "<strong>Danger!</strong>No results match.</div>"+
+                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 	}
+		 }
+	    })
+	   
+    }
+  })
+}
+
+//unfollow user
+var unFollow = function(id, name){
+	var conf = confirm("Are you sure want to unfollow "+ name + " ?")
+	if(conf == true){
+		var data = {id: id, follow: false} 
+	    ajaxRequest('/languageex/home/unfollow', data, function(data, err){
+			if(err) alert(err)
+            else{
+                alert("You unfollowed "+ name)
+                location.reload()
+            }
+		})
+	}
 }

@@ -115,11 +115,35 @@ router.route('/user/loadtitle')
 router.route('/user/loadpost')
 .post(function(req, res){
 	if(req.session.user_id){
-		postcomment.selectNotMyposts(req.session.user_id, function(data){
+		//3 param, userid, search condition, fitle condition
+		postcomment.selectNotMyposts(req.session.user_id, null, null, function(data){
 			res.json({data: data})
 		})
 	}
 })
+
+//filter post by name or filter
+router.route('/user/post/search')
+.post(function(req, res){
+	if(req.session.user_id){
+		var valuesearch = req.body.data.value
+		postcomment.selectNotMyposts(req.session.user_id, valuesearch, null, function(data){
+			res.json({data: data})
+		})
+	}
+})
+
+//filter post by topic post
+router.route('/user/post/filter')
+.post(function(req, res){
+	if(req.session.user_id){
+		var valuefilter = req.body.data.value
+		postcomment.selectNotMyposts(req.session.user_id, null, valuefilter, function(data){
+			res.json({data: data})
+		})
+	}
+})
+
 
 router.route('/user/loadmypost')
 .post(function(req, res){

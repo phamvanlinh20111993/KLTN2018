@@ -6,10 +6,12 @@ var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
 
 
-
-function APIComunityEx(id, cb)
+/**
+searchcondi is param for user seach users by name, or email
+**/
+function APIComunityEx(id, searchcondi, cb)
 {
-	querysimple.selectUserCommunityEx(id, function(result, err){
+	querysimple.selectUserCommunityEx(id, searchcondi, function(result, err){
 	    if(err) throw err;
 	 	else{
 	 		var res = result
@@ -32,6 +34,13 @@ function APIComunityEx(id, cb)
 				ListUser[ind].infor.level = res[ind].level
 				ListUser[ind].infor.state = res[ind].state // 1 is on, 0 is off
 				ListUser[ind].infor.dateofbirth = res[ind].dateofbirth
+
+				ListUser[ind].infor.iswasblocked = {
+					state: false,//danh sach nguoi dung da block message voi toi
+					timeblock: res[ind].timeblock
+				}
+				if(res[ind].whoblock)
+					ListUser[ind].infor.iswasblocked.state = true
 				
 				ListUser[ind].infor.exlanguage = []
 				ListUser[ind].infor.exlanguage[0] = {}
@@ -109,6 +118,13 @@ function APIComunityNative(id, cb)
 				ListUser[ind].infor.state = res[ind].state // 1 is on, 0 is off
 				ListUser[ind].infor.dateofbirth = res[ind].dateofbirth
 
+				ListUser[ind].infor.iswasblocked = {
+					state: false,//danh sach nguoi dung da block message voi toi
+					timeblock: res[ind].timeblock
+				}
+				if(res[ind].whoblock)
+					ListUser[ind].infor.iswasblocked.state = true
+
 				ListUser[ind].infor.nativelg = []
 				ListUser[ind].infor.nativelg[0] = {}
 				ListUser[ind].infor.nativelg[0].laname = res[ind].lname
@@ -169,7 +185,7 @@ router.route('/home/community')
 	var iduser = req.body.id 
 	if(req.session.user_id){
 		if(iduser && parseInt(iduser) == parseInt(req.session.user_id)){
-			APIComunityEx(req.session.user_id, function(data){
+			APIComunityEx(req.session.user_id, null, function(data){
 				res.send(JSON.stringify({community: data}))
 			})
 		}
@@ -212,6 +228,7 @@ router.route('/home/unfollow')
 .post(function(req, res)
 {
 	if(req.session.user_id){
+		console.log(data)
 		var data = JSON.parse(req.body.data)
 		console.log(data)
 		console.log("id " + data.id)
@@ -236,5 +253,18 @@ router.route('/home/unfollow')
 		})
 	}
 })
+
+
+router.route('/home/search')
+.post(function(req, res){
+	if(req.session.user_id){
+		var searchvalue = req.body.data.value
+		APIComunityEx(req.session.user_id, searchvalue, function(data){
+			console.log(data)
+			res.send(JSON.stringify({community: data}))
+		})
+	}
+})
+
 
 module.exports = router;

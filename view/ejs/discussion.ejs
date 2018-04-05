@@ -11,6 +11,13 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
  <!-- <link href="/css/lib/fileinput.css" media="all" rel="stylesheet" type="text/css" />-->
   <link href="/css/post_comment.css" media="all" rel="stylesheet" type="text/css" />
+
+<!--  offline
+  <script src="/lib/bootstrap-3.3.7-dist/jquery-3.3.1.min.js"></script>
+   <link href="/lib/bootstrap-3.3.7-dist/font-awesome-4.4.0.min.css"></script>
+  <link rel="stylesheet" href="/lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <script src="/lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>-->
+
   <script src="/socket.io/socket.io.js"></script>
   <style>
   
@@ -197,6 +204,14 @@
         <li><a href="#">Group</a></li>
         <li><a href="#">Courses</a></li>
       </ul>
+
+      <div class="navbar-form navbar-left">
+        <div class="form-group">
+          <input type="text" id= "searchuserex" class="form-control" placeholder="Search users..." data="tooltip" title="Search users by name or email" onkeypress="SearchUsersEnter(event,'<%= user[0].id %>')">
+        </div>
+        <input type="button" class="btn btn-default" value="Submit" onclick="SearchUsersClick('<%= user[0].id %>')">
+      </div>
+
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/languageex/user/logout" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
       </ul>
@@ -353,6 +368,10 @@
 
 
      <div class="col-lg-2 sidenav" style="height:100%;width: 13%;border: 1px solid #BBBBBB;position:fixed;margin-left:87%;">
+     <h3>Filter by</h3>
+     <select class= "form-control" style="width: 100%;" id="fitlerbytopicpost" data="tooltip" title="show posts by topic" onchange="filterByTopicPost()">
+        <option style="font-size:130%;" value="value"><b>value</b></option>
+      </select>
    </div>
 
   </div>

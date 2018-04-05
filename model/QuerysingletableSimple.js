@@ -372,10 +372,10 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 
 var loadMessageSetting = function(idme, idB, cb)
 {
-	var sqlString = "SELECT ch.whocheck, ch.checkwho, ch.value FROM checkmisspellings ch" + //select setting from user A and B
+	var sqlString = "SELECT ch.whocheck, ch.checkwho, ch.ctime FROM checkmisspellings ch" + //select setting from user A and B
 					" WHERE ch.whocheck="+mysql.escape(idme)+ " AND ch.checkwho=" + mysql.escape(idB);
 
-	var sqlString1 = "SELECT bl.whoblock, bl.blockwho, bl.time FROM blockmessages bl" +
+	var sqlString1 = "SELECT bl.whoblock, bl.blockwho, bl.ctime FROM blockmessages bl" +
 					 " WHERE bl.whoblock="+mysql.escape(idme)+ " AND bl.blockwho=" +mysql.escape(idB)
 
 	var setting = {}
@@ -386,7 +386,7 @@ var loadMessageSetting = function(idme, idB, cb)
 				setting.misspelling = {}
 				setting.misspelling.whocheck = result[0].whocheck
 				setting.misspelling.checkwith = result[0].checkwho
-				setting.misspelling.value = result[0].value
+				setting.misspelling.time = result[0].ctime
 			}
 
 			con.query(sqlString1, function(err1, result1, fields1){
@@ -394,9 +394,9 @@ var loadMessageSetting = function(idme, idB, cb)
 				else{
 					if(result1.length > 0){
 						setting.blockmsg = {}
-						setting.blockmsg.whoblock = result2[0].whoblock
-						setting.blockmsg.blockwith = result2[0].blockwho
-						setting.misspelling.starttime = result2[0].time
+						setting.blockmsg.whoblock = result1[0].whoblock
+						setting.blockmsg.blockwith = result1[0].blockwho
+						setting.blockmsg.starttime = result1[0].ctime
 					}
 
 					cb(setting)
@@ -507,15 +507,18 @@ var selectUserCommunityNative = function(id, cb){
 			if(resu.length > 1) orcondi +=")"
 
 			//all user online and have max lever sorted, max level
-			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, "+
+			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, bm.whoblock, "+
+				" bm.ctime AS timeblock, "+
 				" u.photo, u.gender, u.score, la.name AS lname, le.level FROM user u " +
 				" JOIN level le ON u.level_id = le.id"+
 				" JOIN nativelg nat ON u.id = nat.user_id "+
 				" JOIN language la ON la.id = nat.language_id " +
+				" LEFT JOIN blockmessages bm ON (bm.blockwho="+id+" AND bm.whoblock=u.id ) "+
 				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
 				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
 				" ORDER BY u.state DESC, le.level ASC";
 			
+			console.log(sqlString)
 			con.query(sqlString, function(error, res, fields)
 			{
 				if(error)	cb(null, error)
@@ -529,7 +532,7 @@ var selectUserCommunityNative = function(id, cb){
 
 
 //tra ve cong dong nguoi dung su dung exchange language voi nguoi dung id
-var selectUserCommunityEx = function(id, cb){
+var selectUserCommunityEx = function(id, searchcd, cb){
 	//select my id, my exchangelanguage
 	var sqlstr = "SELECT user.id, exchangelg.language_id as exid FROM user "+
 			  "JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(id)
@@ -550,24 +553,35 @@ var selectUserCommunityEx = function(id, cb){
 			}
 			if(resu.length > 1) orcondi +=")"
 
+			var searchcondition = ""
+			if(searchcd){
+				searchcondition = " AND ( u.email LIKE '%" + searchcd+ 
+								  "%' OR u.name LIKE '%"+searchcd+"%')"
+			}
+
 			//all user online and have max lever sorted, max level
-			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, "+
+			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, bm.whoblock, "+
+				" bm.ctime AS timeblock, "+
 				"u.photo, u.gender, u.score, u.dateofbirth, de.name AS dename, " +
 				" la.name AS lname, le.level FROM user u " +
 				" JOIN level le ON u.level_id = le.id "+
 				" JOIN exchangelg ex ON u.id = ex.user_id "+
 				" JOIN language la ON la.id = ex.language_id "+
 				" JOIN degree de ON ex.degree_id = de.id" +
+				" LEFT JOIN blockmessages bm ON (bm.blockwho="+id+" AND bm.whoblock=u.id ) "+
 				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
 				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
+				searchcondition +
 				" ORDER BY u.state DESC, le.level ASC";
 
-		//	console.log(sqlString)
+			console.log(sqlString)
 
 			con.query(sqlString, function(error, res, fields){
 				if(error)	cb(null, error)
 				else if(res.length > 0)
 					cb(res, null)
+				else 
+					cb({}, null)
 			})
 		}
 	})

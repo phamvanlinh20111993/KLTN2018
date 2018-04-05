@@ -71,9 +71,8 @@ router.route('/user/editPost')
 
 		if(postid && ncontent && time && req.session.user_id == req.body.data.uid)
 		{
-			var field = ["content", "ctime", "isedit"]
+			var field = ["content", "isedit"]
 			querysimple.updateTable("post", [{field: "content", value: ncontent}, 
-			 {field: "ctime", value: time},
 			 {field: "isedit", value: 1}], 
 			 [{op:"", field: "id", value: postid}], 
 			 function(result, err){
@@ -88,16 +87,15 @@ router.route('/user/editPost')
 
 router.route('/user/editCmt')
 .put(function(req, res){
-
 	if(req.session.user_id){
+		console.log("ưtf")
 		var content = req.body.data.content
 		var time = req.body.data.time
 		var cmtid = req.body.data.id
 		if(cmtid && time && content)
 		{
-			var field = ["content", "ctime", "isedit"]
+			var field = ["content","isedit"]
 			querysimple.updateTable("comment", [{field: "content", value: content}, 
-			 {field: "ctime", value: time},
 			 {field: "isedit", value: 1}], 
 			 [{op:"", field: "id", value: cmtid}], 
 			 function(result, err){
