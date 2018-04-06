@@ -1,5 +1,22 @@
 
-
+//theo doi hoac bo theo doi nguoi dung
+var ajaxRequest = function(url, data, callback) {//data is a object
+  // body...
+  $.ajax({
+        type: "POST",
+        url: url,
+        data:{ data: JSON.stringify(data) },
+        error: function(xhr, status, error){
+          callback(null, error)
+        },
+        success: function(data)
+        {
+            if(typeof callback == "function"){
+                callback(data, null);//tra ve du lieu
+            }
+        }
+    })
+}
 
 var HTTP_REQUEST = function(url, type, data, cb){
 	// Set up the AJAX request.
@@ -42,17 +59,89 @@ var HTTP_REQUEST = function(url, type, data, cb){
 }
 
 /** client **/
-var Follow = function(id){
-	alert(id)
+var Follow = function(id, name){
+	var data = {id: id, follow: true, time: new Date()}
+    ajaxRequest('/languageex/home/follow', data, function(data, err){
+        if(err) alert(err)
+        else{
+            alert("You followed " + name)
+            location.reload()
+        }
+    })
 }
 
-var Report = function(id){
-	alert(id)
+var unFollow = function(id, name){
+    var data = {id: id, follow: false}
+    ajaxRequest('/languageex/home/unfollow', data, function(data, err){
+        if(err) alert(err)
+        else{
+            alert("You unfollowed " + name)
+            location.reload()
+        }
+    })
 }
 
-var Block = function(id){
+//mai lam
+var Report = function(id, name){
 	alert(id)
+    $('#reportPostUser').modal('show')
+    var reportp = document.getElementById("reportPostUser")
+    var reportpBody = reportp.getElementsByClassName("modal-body")[0]
+    var reportTitle = reportp.getElementsByClassName("modal-title")[0]
+    reportTitle.innerHTML = "Why report this post of "+name+" ?"
+
+    HTTP_REQUEST('/languageex/user/loadrppost', 'GET',{}, 0, function(err, data){
+        if(err) alert(err)
+        else{
+            var element = ""
+            console.log(data)
+            for(var ind = 0; ind < data.data.length; ind ++){
+                element += '<div class="checkbox">'+
+                    '<label><input type="checkbox" value="'+data.data[ind].code+'" name="'+data.data[ind].id+'">'+
+                     data.data[ind].content+'</label></div>'
+            }
+            reportpBody.innerHTML = element
+        }
+    })
 }
+
+
+var blockModal = document.getElementById("blockUserModal")
+var Block = function(id, name){
+	$('#blockUserModal').modal({backdrop: 'static', keyboard: false})
+    var blockModalBody = blockModal.getElementsByClassName("modal-body")[0]
+    var blockModalTitle = blockModal.getElementsByClassName("modal-title")[0]
+    blockModalTitle.innerHTML = "<h3> Block box "+name+"</h3>"
+    //done
+    var blockModalButton = blockModal.getElementsByTagName("button")[1]
+    blockModalButton.onclick = function(){
+        $('#blockUserModal').modal("hide")
+        var Reason = blockModal.getElementsByTagName("textarea")[0]
+        var data = {id: id, reason: Reason.value, time: new Date()}
+        HTTP_REQUEST('/languageex/user/blockuser', 'POST', data, function(err, data){
+            if(err) alert(err)
+            else{
+                alert("You blocked " + name)
+                location.reload()
+            }
+        })
+    }
+}
+
+
+var unBlock = function(id, name){
+   var data = {id: id, time: new Date()}
+   HTTP_REQUEST('/languageex/user/unblockuser', 'DELETE', data, function(err, data){
+        if(err) alert(err)
+        else{
+            console.log(data)
+            alert("You unblocked "+ name)
+            location.reload()
+        }
+    })
+}
+
+
 
 /** own profile **/
 var myBlockList = function(id)
@@ -107,7 +196,7 @@ var myFollowList = function(id)
                 for(var ind = 0; ind < Length; ind++){
                      element += "<tr id='"+data.data[ind].id+"_follow'><td><img src='"+data.data[ind].photo+"' class='img-rounded' alt='Avatar' height='40'></td>"+
                          "<td>"+data.data[ind].name+"</td>"+
-                         "<td><button type='button' class='btn btn-info' onclick='unFollowList("+data.data[ind].id+")'>Unfollow</button></td></tr>"
+                         "<td><button type='button' class='btn btn-info' onclick='unFollowList("+data.data[ind].id+")', \'"+data.data[ind].name+"\'>Unfollow</button></td></tr>"
                 }
                 element += "</tbody></table>"
 
@@ -117,7 +206,14 @@ var myFollowList = function(id)
     })
 }
 
-var unFollowList = function(id){
+var unFollowList = function(id, name){
     var DOM_userfollow = document.getElementById(id+"_follow")
-    DOM_userfollow.style.display = "none"
+    var data = {id: id, follow: false} 
+    ajaxRequest('/languageex/home/unfollow', data, function(data, err){
+        if(err) alert(err)
+        else{ 
+            DOM_userfollow.style.display = "none"
+            alert("You unfollowed "+ name)
+        }
+     })
 }

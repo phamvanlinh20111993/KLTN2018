@@ -140,7 +140,8 @@
             //creates markup for a new popup. Adds the id to popups array.
             function register_popup(event, id, name, photo)
             {
-                event.preventDefault()
+                if(event)
+                    event.preventDefault()
 
                 socket.emit('createroomchat', {myid: MYID, pid: id})
 
@@ -158,9 +159,9 @@
                 //load message setting and content message
                 takeSettingMessage(id, function(setting)
                 {
-                     console.log(setting)
-                     sessionStorage.setItem("_block_"+id, false);
-                     sessionStorage.setItem("_checkmiss_"+id, false);
+                   //  console.log(setting)
+                    sessionStorage.setItem("_block_"+id, false);
+                    sessionStorage.setItem("_checkmiss_"+id, false);
                     if(setting.settingmsg){//co ton tai setting
                         if(setting.settingmsg.blockmsg){
                             sessionStorage.setItem("_block_"+id, true);
@@ -175,7 +176,7 @@
                				Show_pop_up_message(id, name, photo, setting); 
                         var myMessages = {}
 
-                        console.log(content)
+                    //    console.log(content)
                         if(content.listmessage)
                             myMessages = content.listmessage.messages
 
@@ -361,7 +362,6 @@
 				var misspellings = ""//tu dong check loi chinh ta
                 var checkblockmsg = ""//check co bi block message khong
                
-
                 if(sessionStorage.getItem("_block_"+id) == "true"){
                     checkblockmsg = "checked"
                 }

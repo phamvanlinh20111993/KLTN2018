@@ -86,12 +86,39 @@ router.route('/user/report')
 	}
 })
 
-
+//xoa hoi thoai
 router.route('/user/delconversation')
 .delete(function(req, res){
 
 	if(req.session.filter){
-		console.log(req.body)
+		var id = req.body.id
+		var time = new Date(req.body.time)
+
+		if(id && time){
+			querysimple.selectTable("delconversation", ["id"], 
+				[{op:"", field: "whodel", value: req.session.user_id }, {op:"AND", field: "delwho", value: id}],
+			null, null, null, function(result, fields, err){
+				if(err) throw err
+				else{
+					if (result.length > 0) {
+						querysimple.updateTable("delconversation", [{field: "ctime", value: time}], 
+							[{op: "", field: "whodel", value: req.session.user_id}, 
+							{op: "AND", field: "delwho", value: id}], function(result1, err1){
+								if (err1) {throw err1}
+							   else res.json({data: "Updated " + result1.affectedRows + " rows"})
+							})
+					}else{
+						var field = ["whodel", "delwho", "ctime"]
+						var value = [req.session.user_id, id, time]
+						querysimple.insertTable("delconversation", field, value, function(result1, err1){
+							if (err1) {throw err1}
+							else res.json({data: "Inserted " + result1.affectedRows + " rows"})
+						})
+					}
+				}
+			})
+			
+		}
 	}
 })
 

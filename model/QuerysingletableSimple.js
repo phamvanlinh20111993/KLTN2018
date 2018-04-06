@@ -14,6 +14,17 @@ con.connect(function(err) {
   console.log("Mysql Connected Querysingle table simple Successful!");
 });
 
+
+//return sql string date format
+var getDateTime = function(date){
+	return date.getFullYear() +
+         '-' + (date.getMonth() + 1) +
+         '-' + (date.getDate()) +
+         ' ' + (date.getHours()) +
+         ':' + (date.getMinutes()) +
+         ':' + (date.getSeconds());
+}
+
 /* insert table */
 var insertString = function(tbname, field, value, cb)
 {
@@ -278,33 +289,34 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 				Listmessages.userB.score = result[1].score
 
 				//delete conversation
-				var sqlString1 = "SELECT del.whodel, del.delwho, del.time" +
+				var sqlString1 = "SELECT del.whodel, del.delwho, del.ctime" +
 	                 " FROM delconversation del WHERE del.whodel = " +mysql.escape(idme)+ 
 	                 " AND del.delwho = "+mysql.escape(idB)+
-	                 " ORDER BY del.time DESC LIMIT 1"
+	                 " ORDER BY del.ctime DESC LIMIT 1"
 
 	            con.query(sqlString1, function(err1, result1, fields1){
 	            	if(err) throw err;
 	            	else{
 
 	            		var deltime = ""
+	            		console.log(result1)
 	            		if(result1.length > 0)
-	            			deltime = " me.time <= " + new Date(result1[0].time)
+	            			deltime = " AND me.time > '" + getDateTime(new Date(result1[0].ctime))+"'"
 
 	            		//select all message between idme and idB 
-						var sqlString2 = "SELECT me.id, me.userA, me.userB, CAST(me.data AS CHAR(100000) CHARACTER SET utf8) AS data, "+
-						" me.content, me.misspelling, " +
-						 " me.ischeck, me.time, ed.whoedit as idedit, ed.newcontent as ncontent, ed.ctime as ntime "+
-						 " FROM message me LEFT JOIN editmessage ed ON ed.message_id = me.id "+
-	 		    		 " WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
-	 					 " OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
-	 					 deltime +
-	 					 " ORDER BY me.time DESC"
+							var sqlString2 = "SELECT me.id, me.userA, me.userB, CAST(me.data AS CHAR(100000) CHARACTER SET utf8) AS data, "+
+							" me.content, me.misspelling, " +
+						 	" me.ischeck, me.time, ed.whoedit as idedit, ed.newcontent as ncontent, ed.ctime as ntime "+
+						 	" FROM message me LEFT JOIN editmessage ed ON ed.message_id = me.id "+
+	 		    		 	" WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
+	 					 	" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
+	 					 	deltime +
+	 					 	" ORDER BY me.time DESC"
 
-	 					 console.log(sqlString2)
+	 					   console.log(sqlString2)
 
-	 					con.query(sqlString2, function(err2, result2, fields2)
-	 					{
+	 					 con.query(sqlString2, function(err2, result2, fields2)
+	 					 {
 	 						if(err2) cb(err2, null)
 	 						else{
 
@@ -409,7 +421,7 @@ var loadMessageSetting = function(idme, idB, cb)
 }
 
 
-//tra ve full thong tin nguoi dung id
+//tra ve full thong tin nguoi dung co ma id
 var selectProfile = function(id, cb){//hien thi thong tin profile
 
 	var sqlString = "SELECT u.id, u.name as username, u.email, u.photo, u.score, u.des, u.gender, "+
@@ -483,6 +495,54 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 	})	
 }
 
+//dua ra thong tin trang thai theo doi, follow giua nguoi dung A va B(A la chu the)
+var selectWatchUser = function(idA, idB, cb)
+{
+	var sqlString = "SELECT bol.id AS bolid, bol.ctime AS boltime "+
+	            " FROM blocklist_user bol "+
+	            " WHERE bol.whoblock = "+mysql.escape(idA)+ " AND bol.blockwho = "+ mysql.escape(idB)
+	//console.log(sqlString)
+
+	con.query(sqlString, function(err, result, fields){
+		if(err){
+		 	throw err
+		 	cb(null)
+		}else{
+			 var watchuser = {
+			 	isblock : false,
+			 	btime : null,
+			 	isfollow : false,
+			    ftime : null
+			 }
+
+			 if(result.length > 0){
+			 	watchuser.isblock = true
+			 	watchuser.btime = result[0].boltime
+			 }
+
+			 var sqlString1 = "SELECT fo.id AS foid, fo.ctime AS fotime "+
+			 		" FROM follow fo "+
+			 	    " WHERE fo.followers="+mysql.escape(idA)+ " AND fo.tracked="+ mysql.escape(idB)
+			// console.log(sqlString1)
+
+			 con.query(sqlString1, function(err1, result1, fields1){
+			 	if(err1){
+			 	   throw err1
+			 	   cb(null)
+			 	}else{
+			 		if(result1.length > 0){
+			 			watchuser.isfollow = true
+			 			watchuser.ftime = result1[0].fotime
+			 		}
+			 		cb(watchuser)
+			 	}
+			 })	
+
+		} 
+	})
+
+}
+
 
 //tra ve cong dong nguoi dung su dung native language voi nguoi dung id
 var selectUserCommunityNative = function(id, cb){
@@ -513,9 +573,9 @@ var selectUserCommunityNative = function(id, cb){
 				" JOIN level le ON u.level_id = le.id"+
 				" JOIN nativelg nat ON u.id = nat.user_id "+
 				" JOIN language la ON la.id = nat.language_id " +
-				" LEFT JOIN blockmessages bm ON (bm.blockwho="+id+" AND bm.whoblock=u.id ) "+
-				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
-				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
+				" LEFT JOIN blockmessages bm ON (bm.blockwho="+mysql.escape(id)+" AND bm.whoblock=u.id ) "+
+				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+" AND "+
+				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+mysql.escape(id)+")"+
 				" ORDER BY u.state DESC, le.level ASC";
 			
 			console.log(sqlString)
@@ -554,24 +614,35 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 			if(resu.length > 1) orcondi +=")"
 
 			var searchcondition = ""
+		    var morefield = "bll.blockwho AS blockuser1, bll.reason, bll.ctime AS timebluser, ",
+		    morejoin = " LEFT JOIN blocklist_user bll ON (bll.whoblock= u.id "+
+							" AND bll.blockwho = "+mysql.escape(id)+") "
+
+			var blockusers = " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock="+mysql.escape(id)+")"
+
 			if(searchcd){
 				searchcondition = " AND ( u.email LIKE '%" + searchcd+ 
 								  "%' OR u.name LIKE '%"+searchcd+"%')"
+				blockusers = ""//cho phep tim kiem ca nhung nguoi da blocked
+				morefield = "bll.blockwho AS blockuser, bll.reason, bll.ctime AS timebluser, "
+				morejoin = " LEFT JOIN blocklist_user bll ON (bll.whoblock="+mysql.escape(id)+
+							" AND bll.blockwho = u.id) "
 			}
 
 			//all user online and have max lever sorted, max level
 			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, bm.whoblock, "+
-				" bm.ctime AS timeblock, "+
-				"u.photo, u.gender, u.score, u.dateofbirth, de.name AS dename, " +
+				" bm.ctime AS timeblock, "+ morefield +
+				" u.photo, u.gender, u.score, u.dateofbirth, de.name AS dename, " +
 				" la.name AS lname, le.level FROM user u " +
 				" JOIN level le ON u.level_id = le.id "+
 				" JOIN exchangelg ex ON u.id = ex.user_id "+
 				" JOIN language la ON la.id = ex.language_id "+
 				" JOIN degree de ON ex.degree_id = de.id" +
-				" LEFT JOIN blockmessages bm ON (bm.blockwho="+id+" AND bm.whoblock=u.id ) "+
-				" WHERE u.id != " +id+ " AND "+orcondi+" AND "+
-				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+id+")"+
-				searchcondition +
+				" LEFT JOIN blockmessages bm ON (bm.blockwho = "+mysql.escape(id)+" AND bm.whoblock = u.id ) "+
+				 morejoin+
+				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+
+				 blockusers+
+				 searchcondition +
 				" ORDER BY u.state DESC, le.level ASC";
 
 			console.log(sqlString)
@@ -663,6 +734,11 @@ var selectUserMessenger = function(myid, userid, cb)
 	})
 }
 
+//select state is block messages, is follower between uses A, and userB
+var selectStateBlockOrFollow = function(myid, userA, cb){
+	var sqlString = "SELECT timeblock, ctime"
+}
+
 
 module.exports = {
 	insertTable: insertString,
@@ -677,5 +753,6 @@ module.exports = {
 	selectTableJoin: selectTableJoin,
 	selectMessage: selectMessage,
 	selectListUserMessenger: selectListUserMessenger,
-	loadMessageSetting: loadMessageSetting
+	loadMessageSetting: loadMessageSetting,
+	selectWatchUser: selectWatchUser
 }

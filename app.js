@@ -484,6 +484,13 @@ io.on('connection', function(client)
       client.broadcast.emit('donerefusecall', data)
    })
 
+   //thong bao tat comment tren post
+   client.on('turnoffcmt', function(data){
+      console.log("My community " + client.handshake.session.community)
+      if( client.handshake.session.community)
+          io.sockets.in(client.handshake.session.community).emit('turnoffcmtnotify', data)
+   })
+
 })
 
 

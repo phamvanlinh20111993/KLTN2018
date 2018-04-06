@@ -106,8 +106,11 @@ var choosedelConversation = function(idw, time, cb){
         data:{id: idw, time: time},
         success: function(data)//hien thi message
         {
-            if(typeof cb == "function")
-                cb(JSON.parse(data));//tra ve du lieu
+            if(typeof cb == "function"){
+            	if(typeof data =="string")
+                 cb(JSON.parse(data));//tra ve du lieu
+               else cb(data)
+            }
         }
     })
 }
@@ -176,7 +179,6 @@ var translatePrio = function()
 
 			changeTranslate_Misspelling("/languageex/user/changetrasprio", value, function(data){
 				MYPRIONAT = natsy
-
 				console.log(data)
 			})
 		}
@@ -264,6 +266,7 @@ var delConversation = function(id, name){
 		var time = new Date()
 		choosedelConversation(id, time, function(data){
 			console.log(data)
+			document.getElementById(id+"_content").innerHTML = "";
 		})
 	}
 }
@@ -338,32 +341,35 @@ var Blockmessages = function(el, pid, name){
 		var c = confirm("Are you sure want to block with "+ name + " ?")
 		if(c){
 			socket.emit('blockmsg', {
-            	myid: MYID,
-            	pid: pid,
-            	name: name,
-            	signal: true
+            myid: MYID,
+            pid: pid,
+            name: name,
+            signal: true
 	    	}) 
 
 	    	blockmsg_autocheckmiss("/languageex/user/blockmsg", pid, function(data){
-	    	    alert("block successed.")
+	    	    alert("Block "+name+" successed.")
 	    		//alert(name + "auto blocked 15 days.")
+	    	//	sessionStorage.setItem("_block_"+pid, true);
 	    	})
 		}
 	}else{
 		socket.emit('blockmsg', {
-            	myid: MYID,
-            	pid: pid,
-            	name: name,
-            	signal: false
-	    	}) 
+         myid: MYID,
+         pid: pid,
+         name: name,
+         signal: false
+	   }) 
 
-	    	blockmsg_autocheckmiss("/languageex/user/unblockmsg", pid, function(data){
-	    		console.log(data)
-	    		alert("Unblocked name successed.")
-	    	})
+	   blockmsg_autocheckmiss("/languageex/user/unblockmsg", pid, function(data){
+	    	console.log(data)
+	      alert("Unblocked "+name+" successed.")
+	    	//	sessionStorage.setItem("_block_"+pid, false);//reset value of session
+	   })
 	}
 }
 
+//block message between two people
 socket.on('blockmsgdone', function(data){//tin hieu gui den cho 2 phia
 	
 	if(data.signal){

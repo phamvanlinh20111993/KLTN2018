@@ -194,6 +194,7 @@ router.route('/user/delcmt')
 	}
 })
 
+
 //get report content to user
 router.route('/user/loadrppost')
 .get(function(req, res){
@@ -208,6 +209,7 @@ router.route('/user/loadrppost')
 	}
 })
 
+
 //receive report of user
 router.route('/user/reportpost')
 .post(function(req, res){
@@ -216,5 +218,39 @@ router.route('/user/reportpost')
 	}
 })
 
+
+//turnoff comment
+router.route('/user/turnoffcmt')
+.put(function(req, res)
+{
+	if(req.session.user_id){
+		var postid = req.body.data.id
+		if(postid){
+			querysimple.updateTable("post", [{field: "turnof_cmt", value: 1}], 
+				[{op: "", field: "id", value: postid}], function(result, err){
+					if (err) {throw err}
+					else
+						res.json({data: "Updated "+ result.affectedRows + " row(s)"})
+				})
+		}
+	}
+})
+
+//turn on comment
+router.route('/user/turnoncmt')
+.put(function(req, res){
+
+	if(req.session.user_id){
+		var postid = req.body.data.id
+		if(postid){
+			querysimple.updateTable("post", [{field: "turnof_cmt", value: 0}], 
+				[{op: "", field: "id", value: postid}], function(result, err){
+					if (err) {throw err}
+					else
+						res.json({data: "Updated "+ result.affectedRows + " row(s)"})
+				})
+		}
+	}
+})
 
 module.exports = router;

@@ -249,12 +249,25 @@ router.route('/')
  						if(err1) throw err1
  						else{
  							var User = result1
- 							if(userid == req.session.user_id)
+ 							if(userid == req.session.user_id){
  								User.state = "me"
- 							else
+ 								User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
+ 							    res.render('ejs/Profile', {User: User})
+ 							}else{//toi xem thong tin cua nguoi dung khac:
+ 								//co follow nguoi nay khong, co dang block nguoi nay khong
  								User.state = "something"
- 							User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
- 							res.render('ejs/Profile', {User: User})
+ 								//now query database
+ 								querysimple.selectWatchUser(req.session.user_id, parseInt(userid), 
+ 								 function(data){
+ 									if(data)   User.watchuser = data
+
+ 									User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
+ 									console.log(User)
+ 							        res.render('ejs/Profile', {User: User})
+ 								})
+
+ 								
+ 							}
  						}
  					})
  				}else{

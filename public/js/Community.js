@@ -35,8 +35,23 @@ var ajaxRequest = function(url, data, callback) {//data is a object
     })
 }
 
+function formatAMPM(date)
+{
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm +" "+ data.getDate() + "/" + (date.getMonth()+1)+
+                date.getYear();
+
+  return strTime;
+}    
+
 var showUserCommunity = function(User)
 {
+  
 	var isOnline = '<h4 data="tooltip" title="'+User.infor.email+'"> <i class="fa fa-circle" style="color:red;"></i> '+User.infor.name+' </h4>'
 
 	var isFollow = "color:#3399FF;"
@@ -46,6 +61,9 @@ var showUserCommunity = function(User)
   var isblockedmsg = '<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
                             ' data-toggle="tooltip" title="Send message" class="icon">'+
                           '<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>'
+
+  var followstr = '<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="'+tooltipFollow+User.infor.name+
+                          '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
 
 	if(User.infor.state == 1){//dang online
 		isOnline = '<h4> <i class="fa fa-circle" style="color:green;"></i> '+
@@ -60,7 +78,24 @@ var showUserCommunity = function(User)
   if(User.infor.iswasblocked.state){
     isblockedmsg = '<a href="#" onclick="wasBlock('+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\',\''+User.infor.iswasblocked.timeblock+'\' );" '+
                             ' data-toggle="tooltip" title="Message blocked" class="icon">'+
-                          '<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>'
+                          '<i class="fa fa-comment" style="font-size:36px;color:black;"></i></a>'
+  }
+
+  if(User.youblocked){//trong truong hop tim kiem nguoi dung,se tim kiem ca nhung nguoi da block
+    isblockedmsg = ""
+    followstr = '<div class="alert alert-info"'+
+         '<strong>Info!</strong> You blocked '+User.infor.name +
+         ' At '+formatAMPM(new Date(User.youblocked.time))+
+    '</div>'
+  }
+
+  if(User.youwasblocked){
+    isblockedmsg = ""
+    followstr = '<div class="alert alert-info"'+
+         '<strong>Info!</strong> You was blocked by '+User.infor.name +
+         ' At '+formatAMPM(new Date(User.youwasblocked.time))+
+         ' with Reason: ' + User.youwasblocked.reason
+    '</div>'
   }
 
 
@@ -79,9 +114,7 @@ var showUserCommunity = function(User)
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
                   				isblockedmsg +
-                  				'<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="'+tooltipFollow+User.infor.name+
-                          '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
-
+                  				followstr+
                				'</div>'+
             			'</div>'+
           			'</div>'

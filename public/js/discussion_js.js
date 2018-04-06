@@ -217,6 +217,13 @@ var showPost = function(User, Posts, state)
 	  notMypost += '<a style="cursor:pointer;" onclick="unFollow('+User.id+', \''+User.name+'\')">Unfollow '+User.name.split(" ")[0]+'</a>'
 	}
 
+	//tat comment trong bai dang
+	var isturnofcmt = "", notifyturnof = ""
+	if(Posts.turnofcmt > 0){
+		isturnofcmt = "disabled"
+		notifyturnof = User.name+' turned off comments for this post'
+	}
+
 	var contenlikepost = ""
 	if(Posts.meliked)
 		contenlikepost='<span id="'+id+'_stringnumlike">You and </span><span>'+(Posts.totalliked-1)+'</span> people liked post.</a></div>'
@@ -286,12 +293,12 @@ var showPost = function(User, Posts, state)
                         '<td><img src="'+MYPHOTO+'" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;" data="tooltip" title="'+MYNAME+'"></td>'+
                         '<td style="width:94%;">'+
                            '<input type="text" placeholder="Write your comments...." class="divcmt2" '+
-                             'onkeypress="submitComment(event,'+id+')" id="'+id+'_writecmts">'+
+                             isturnofcmt + ' onkeypress="submitComment(event,'+id+')" id="'+id+'_writecmts" >'+
                         '</td>'+
                        '</tr>'+
                      '</table>'+
                     '</div>'+
-
+                    '<h5 style="margin-left:5%;" id="'+id+'_notifyturnofcmt">'+notifyturnof+'</h5>'+
                    '<div style="height:30px; margin-top:0px;"></div>'+
                 '</div>'+
 
@@ -966,3 +973,30 @@ var unFollow = function(id, name){
 		})
 	}
 }
+
+//turn off comment
+var turnofComment = function(id){//id of post
+	var data = {id: id, turnof: true, time: new Date()}
+	requestServer('/languageex/user/turnoffcmt', 'PUT', data, 0, function(data1){
+		alert("Turned off comments for your post.")
+		socket.emit('turnoffcmt', data)
+	})
+}
+
+//turn off comment
+var turnonComment = function(id){//id of post
+	var data = {id: id, turnof: false, time: new Date()}
+	requestServer('/languageex/user/turnoncmt', 'PUT', data, 0, function(data1){
+		console.log(data)
+	})
+}
+
+//bat su kien
+socket.on('turnoffcmtnotify', function(data){
+	var id = data.id
+	if(typeof document.getElementById(id+"_writecmts") != "undefined"){
+		var postidwasturnoff = document.getElementById(id+"_writecmts")
+		postidwasturnoff.disabled = true;
+		document.getElementById(id+"_notifyturnofcmt").innerHTML = "The owner of the post has disabled the comment function"
+	}
+})

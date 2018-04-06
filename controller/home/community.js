@@ -41,6 +41,22 @@ function APIComunityEx(id, searchcondi, cb)
 				}
 				if(res[ind].whoblock)
 					ListUser[ind].infor.iswasblocked.state = true
+
+				if(result[ind].blockuser){//khi tim kiem nguoi dung khac 
+					ListUser[ind].youblocked = {
+						id: result[ind].blockuser,
+						reason: result[ind].reason,
+						time: result[ind].timebluser
+					}
+				}
+
+				if(result[ind].blockuser1){//nguoi dung khac da blocked toi
+					ListUser[ind].youwasblocked = {
+						id: result[ind].blockuser1,
+						reason: result[ind].reason,
+						time: result[ind].timebluser
+					}
+				}
 				
 				ListUser[ind].infor.exlanguage = []
 				ListUser[ind].infor.exlanguage[0] = {}
