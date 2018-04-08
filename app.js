@@ -234,35 +234,39 @@ io.on('connection', function(client)
    
 
    client.on('createroomchat', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      var isexistroom = false;
+      if(data)
+      {
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         var isexistroom = false;
 
-      if(myid > pid){
-         client.join(myid + pid)
-         client.room = myid + pid
-      }else{
-         client.join(pid + myid)
-         client.room = pid + myid
-      }
-
-      for(var room in roomchats){
-         if(room.room == client.room){
-            isexistroom = true;
-            break;
+         if(myid > pid){
+            client.join(myid + pid)
+            client.room = myid + pid
+         }else{
+            client.join(pid + myid)
+            client.room = pid + myid
          }
-      }
 
-      //create a new room
-      if(!isexistroom){
-         roomchats[roomchats.length] = {}
-         roomchats[roomchats.length-1].room = client.room
-         roomchats[roomchats.length-1].idM1 = data.myid//id of users in room
-         roomchats[roomchats.length-1].idM2 = data.pid//id of users in room
+         for(var room in roomchats){
+            if(room.room == client.room){
+               isexistroom = true;
+               break;
+            }
+         }
+
+         //create a new room
+         if(!isexistroom){
+            roomchats[roomchats.length] = {}
+            roomchats[roomchats.length-1].room = client.room
+            roomchats[roomchats.length-1].idM1 = data.myid//id of users in room
+            roomchats[roomchats.length-1].idM2 = data.pid//id of users in room
+         }
+
+         console.log("Da tao room " + client.room)
       }
      
-      console.log("Da tao room " + client.room)
-   })
+   }) 
 
 
    client.on('leaveroomchat', function(data){
@@ -472,7 +476,7 @@ io.on('connection', function(client)
       client.in(client.room).emit('doneendcall', data)
    })
 
-
+   //event tu choi cuoc goi ben phia nguoi dung
    client.on('refusecall', function(data){//nguoi dung tu choi cuoc goi
       var myid = data.myid.toString();
       var pid = data.pid.toString();
@@ -484,16 +488,21 @@ io.on('connection', function(client)
       client.broadcast.emit('donerefusecall', data)
    })
 
-   //thong bao tat comment tren post
+   //thong bao tat comment tren post id
    client.on('turnoffcmt', function(data){
-      console.log("My community " + client.handshake.session.community)
       if( client.handshake.session.community)
-          io.sockets.in(client.handshake.session.community).emit('turnoffcmtnotify', data)
+         io.sockets.in(client.handshake.session.community).emit('turnoffcmtnotify', data)
+   })
+
+   //thong bao bat comment tren post id
+   client.on('turnoncmt', function(data){
+      if( client.handshake.session.community)
+         io.sockets.in(client.handshake.session.community).emit('turnoncmtnotify', data)
    })
 
 })
 
 
 server.listen(port, function(){
-	console.log('Server dang chay tai cong %s!', port)
+	console.log('Server running on port %s!', port)
 });

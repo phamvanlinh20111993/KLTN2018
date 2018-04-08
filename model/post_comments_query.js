@@ -94,13 +94,13 @@ var selectMyposts = function(myid, cb){
 
 
 //load comment from specific post id
-var selectCmts = function(myid, postid, cb){
+var selectCmts = function(myid, postid, limit, cb){
   var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, le.level, "+
                " c.id AS cid, c.isedit, c.content, c.ctime FROM User u "+
                " JOIN level le ON u.level_id = le.id "+
                " JOIN comment c ON c.user_id = u.id "+
                " WHERE c.post_id = " + mysql.escape(postid)+
-               " ORDER BY c.ctime DESC "
+               " ORDER BY c.ctime ASC LIMIT "+limit.from+", "+limit.total
 
    con.query(sqlString, function(err, result){
       if(err){

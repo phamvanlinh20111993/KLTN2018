@@ -681,10 +681,17 @@ var selectListUserMessengerMaxContent = function(id, cb)
 var selectListUserMessenger = function(id, cb)
 {
 
-	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, u.state, MAX(me.time) as max"+
-	        " FROM user u JOIN message me ON (me.userA = u.id AND me.userB = "+id+") "+
-	        " OR (me.userA = "+id+" AND me.userB = u.id) "+
-	        " WHERE u.id != "+id+" GROUP BY u.id"
+	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, u.state, MAX(me.time) AS max, "+
+	        " fo.tracked "+
+	        " FROM user u JOIN message me ON (me.userA = u.id AND me.userB = "+mysql.escape(id)+") "+
+	        " OR (me.userA = "+mysql.escape(id)+" AND me.userB = u.id) "+
+	        " LEFT JOIN follow fo ON (fo.followers = "+mysql.escape(id)+" AND tracked = u.id)"+
+	        " WHERE u.id != "+mysql.escape(id)+
+	        " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+mysql.escape(id)+")"+
+	        " GROUP BY u.id"+
+	        " ORDER BY max DESC, u.state DESC"
+
+	console.log(sqlString)
 
     con.query(sqlString, function(error, res, fields){
 		if(error)	cb(null, error)

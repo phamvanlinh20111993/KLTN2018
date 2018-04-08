@@ -103,12 +103,12 @@ var showUserCommunity = function(User)
              			'<div class="card inf-content">' +
                				'<div style="width: 100%;height: 50%;" data-toggle="tooltip" title="View profile ">' +
                   				'<img src="'+User.infor.photo+'"alt="'+User.infor.name+'" style="width:100%;max-height:100%;cursor:pointer; '+
-            					     'border-radius:8px;border:1px solid #696969; " onclick = "viewProfileByImage(\''+id+'\')">'+
+            					     'border-radius:8px;border:1px solid #696969; " onclick="viewProfileByImage(\''+id+'\')">'+
               				'</div>'+
          					'<div style="line-height: 90%;">'+
        							isOnline +
         						'<p class="title">Leanrning: '+User.infor.exlanguage[0].laname+'</p>'+
-         						'<p class="title">Degree: '+User.infor.exlanguage[0].dename+'</p>'+
+         						'<p class="title">Degree: <span style="color:orange;">'+User.infor.exlanguage[0].dename+'</span></p>'+
         						'<p class="title">Level: '+User.infor.level+'</p>'+
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
@@ -261,6 +261,7 @@ var SearchUsersEnter = function(e, id){
   }
 }
 
+//quay lai man hinh bat dau cua commnunity
 var backToStart = function(){
    getListUserCommnunity(MYID, function(data, err){
       if(err) alert(err)

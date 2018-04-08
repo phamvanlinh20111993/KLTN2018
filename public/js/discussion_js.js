@@ -196,14 +196,17 @@ var showPost = function(User, Posts, state)
 	}
 
 	var Time;
-	if(state == 0)	Time = Change_date(Posts.time)
-	else	Time = Change_date(new Date())
+	if(state == 0)	Time = Change_date(Posts.time)//khi tao moi bai dang
+	else	Time = Change_date(new Date())//khi load bai dang tu server
 
 	var isMyPost = "", notMypost = ""
+    //moi bai dang se duoc cap quyen 
 	if(User.id == MYID){
 		isMyPost = '<a style="cursor:pointer;" onclick="deleteMyPost('+id+')">Delete post</a>'+
                 '<a style="cursor:pointer;" onclick="editMyPost('+id+')">Edit post</a>'+
-                '<a style="cursor:pointer;" onclick="turnofComment('+id+')">Turn off comment</a>'
+                '<a style="cursor:pointer;" id="'+id+'_turnoffcmt" onclick="turnoffComment('+id+')">Turn off comment</a>'+
+                '<a style="cursor:pointer;display:none;" id="'+id+'_turnoncmt" onclick="turnonComment('+id+')">Turn on comment</a>'
+
 	}
 
 	if(User.id != MYID){
@@ -282,7 +285,7 @@ var showPost = function(User, Posts, state)
 				
                     '<div style="border:1px solid #d5e8e8;height:auto;">'+
                       '<div style="margin-top:12px;">'+
-                        '<a class="a4" onclick="showMoreComment('+id+')">Show more comments(<span id="'+id+'_numcmt">'+Posts.totalcomment+'</span>)</a>'+
+                        '<a class="a4" onclick="showMoreComment('+id+','+User.id+')">Show more comments(<span id="'+id+'_numcmt">'+Posts.totalcomment+'</span>)</a>'+
                       '</div>'+
                       '<div style="width: auto;height: auto;" id="'+id+'_showcmt"></div>'+
                     '</div>'+
@@ -293,18 +296,24 @@ var showPost = function(User, Posts, state)
                         '<td><img src="'+MYPHOTO+'" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;" data="tooltip" title="'+MYNAME+'"></td>'+
                         '<td style="width:94%;">'+
                            '<input type="text" placeholder="Write your comments...." class="divcmt2" '+
-                             isturnofcmt + ' onkeypress="submitComment(event,'+id+')" id="'+id+'_writecmts" >'+
+                             isturnofcmt+' onkeypress="submitComment(event,'+id+')" id="'+id+'_writecmts" >'+
                         '</td>'+
                        '</tr>'+
                      '</table>'+
                     '</div>'+
-                    '<h5 style="margin-left:5%;" id="'+id+'_notifyturnofcmt">'+notifyturnof+'</h5>'+
+                    '<h5 style="margin-left:5%;" id="'+id+'_notifyturnoffcmt">'+notifyturnof+'</h5>'+
                    '<div style="height:30px; margin-top:0px;"></div>'+
                 '</div>'+
 
             '</div>'
 
      document.getElementById("showpostusers").innerHTML += element
+
+     //sau khi post duoc hien thi tren new feed thi xu li event turn off or turn on comment
+     if(User.id == MYID && Posts.turnofcmt > 0){
+     	document.getElementById(id+"_turnoffcmt").style.display = "none"
+     	document.getElementById(id+"_turnoncmt").style.display = "block"
+     }
 }
 
 /**
@@ -435,7 +444,6 @@ var showUserLikePost = function(postid)
 	@@ id of user
 **/
 var viewInfoLikePost = function(id){
-	alert("hihi")
 	location.href = "/languageex/user/profile?uid="+encodeURIComponent(id)
 }
 
@@ -495,6 +503,7 @@ function makerandomid(){
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     return text;
 }
+
 /**
 	postid la id cua bai dang
 	Commentinfor la 1 object chua thong tin cua commnet
@@ -526,19 +535,23 @@ var showComment = function(postinfo, Commentinfo, Userinfo, state){
 
     element = '<div style="min-height:40px;margin-top:5px;" id="'+randomid+'_idcomment">'+
          '<img src="'+Userinfo.photo+'" width="41" height="42" style="float:left;margin-left:10px;margin-top:-2px;">'+
-         '<p style="width:85%;word-wrap:break-word;margin-left:65px;"><span style="color:blue;font-size:108%;">'+Userinfo.name+'</span>  '+
-           '<span id="'+randomid+'_cmtcontentshow">'+Commentinfo.content+'</span> '+ isedit+
-           '<textarea id="'+randomid+'_editcmtcontent" class="form-control" style="height:auto;display:none;" onkeypress="editCmtDone(event,'+Commentinfo.id+',\''+randomid+'\')"'+
-             'autofocus data="tooltip" title="Press enter end edit.">'+Commentinfo.content+'</textarea>'+
-            '</br> <span style="font-style:inherit;color:red;" id="'+randomid+'_showtranscmt"></span>'+
-         '</p>'+
+         '<div style="width:85%;word-wrap:break-word;margin-left:65px;background-color:white; border-radius: 10px;">'+
+            '<div style="margin-left: 1%;padding:1%;">'+
+         	 '<span style="font-size:108%;">'+
+              '<a style="cursor:pointer;color:blue;font-weight:700;" href="/languageex/user/profile?uid='+Userinfo.id+'">'+Userinfo.name+'</a></span> '+
+             '<span id="'+randomid+'_cmtcontentshow">'+Commentinfo.content+'</span> '+ isedit+
+             '<textarea id="'+randomid+'_editcmtcontent" class="form-control" style="height:auto;display:none;" onkeypress="editCmtDone(event,'+Commentinfo.id+',\''+randomid+'\')"'+
+                'autofocus data="tooltip" title="Press enter end edit.">'+Commentinfo.content+'</textarea>'+
+              '</br> <span style="font-style:inherit;color:red;" id="'+randomid+'_showtranscmt"></span>'+
+            '</div>'+
+          '</div>'+
 
-         '<div style="height:10px;margin-left:65px;font-size:90%;color:#474343;margin-top:-7px;">'+
+          '<div style="height:10px;margin-left:70px;font-size:93%;color:#474343;margin-top:0px;">'+
          	ismycmt+
          	ismypost+
             '<a class="a11" onclick="translateCmt(\''+randomid+'\')">  trans  </a>'+
             '<span style="margin-left:10px;font-size: 80%;">'+Time+'</span>'+
-         '</div>'+
+          '</div>'+
          '<input type="hidden" value="'+Commentinfo.content+'" id="'+randomid+'_cmtcontent" >'+
     '</div>'+
     '<div style="height:10px; margin-top:0px;"></div>'
@@ -583,7 +596,15 @@ var translateCmt = function(id)
 	@@postinfo is a object contain post id and own of post
 **/
 var requestComment = function(postinfo){
-	requestServer('/languageex/user/loadcmt', 'POST', {id: postinfo.id}, 0, function(err, data){
+	var data = {
+		id: postinfo.id,
+		limit :{
+			from: 0,
+			total: 7//so luong comment ban dau tai ve khi load post
+		}
+	}
+	requestServer('/languageex/user/loadcmt', 'POST', data, 
+	 0, function(err, data){
 		if(err) alert(err)
 		else{
 			//console.log(data)
@@ -780,6 +801,7 @@ var selectComunityPost = function(){
 		}
 	})
 }
+
 //tu dong load comment về máy cung post
 selectComunityPost();
 
@@ -855,10 +877,36 @@ var reportPost = function(id, name)
 	@@id is id of post
 **/
 
-var showMoreComment = function(id){
-	alert("clicked me")
-	var totalcmt = document.getElementById(id+"_numcmt").innerHTML
+var showMoreComment = function(pid, uid){
+	var totalcmt = document.getElementById(pid+"_numcmt").innerHTML
 	totalcmt = parseInt(totalcmt)
+	var data = {
+		id: pid,
+		limit :{
+			from: totalcmt - 7,
+			total: totalcmt//so luong comment ban dau tai ve khi load post
+		}
+	}
+	if(totalcmt > 0){
+		requestServer('/languageex/user/loadcmt', 'POST', data, 0, function(err, data){
+			if (err) {alert(err)}
+			else{
+				//console.log(data)
+				var postinfo = {
+					id: pid, 
+					own: uid
+				}
+				var Length  = data.listcmts.length
+				document.getElementById(pid+"_numcmt").innerHTML = totalcmt - Length
+				if(Length > 0){
+				for(var ind = 0; ind < Length; ind++){
+					showComment(postinfo, data.listcmts[ind].comment, data.listcmts[ind].user, 0)
+				}
+			}
+			}
+		})
+	}
+
 }
 
 
@@ -924,6 +972,7 @@ var SearchUsersEnter = function(e, id){
   }
 }
 
+//back to communypost
 var backToStart = function(){
    document.getElementById("fitlerbytopicpost").selectedIndex = "0";
    selectComunityPost();
@@ -975,19 +1024,25 @@ var unFollow = function(id, name){
 }
 
 //turn off comment
-var turnofComment = function(id){//id of post
+var turnoffComment = function(id){//id of post
 	var data = {id: id, turnof: true, time: new Date()}
 	requestServer('/languageex/user/turnoffcmt', 'PUT', data, 0, function(data1){
-		alert("Turned off comments for your post.")
+		alert("You turned off comments for your post. Nobody can comments on this.")
 		socket.emit('turnoffcmt', data)
+		//xư lí dom event turn on comment bật event turn off comment bị tắt
+		document.getElementById(id+"_turnoffcmt").style.display = "none"
+		document.getElementById(id+"_turnoncmt").style.display = "block"
 	})
 }
 
-//turn off comment
+//turn on comment
 var turnonComment = function(id){//id of post
 	var data = {id: id, turnof: false, time: new Date()}
 	requestServer('/languageex/user/turnoncmt', 'PUT', data, 0, function(data1){
-		console.log(data)
+		alert("You turned on comments for your post. Everybody can comments on this.")
+		socket.emit('turnoncmt', data)
+		document.getElementById(id+"_turnoffcmt").style.display = "block"
+		document.getElementById(id+"_turnoncmt").style.display = "none"
 	})
 }
 
@@ -997,6 +1052,16 @@ socket.on('turnoffcmtnotify', function(data){
 	if(typeof document.getElementById(id+"_writecmts") != "undefined"){
 		var postidwasturnoff = document.getElementById(id+"_writecmts")
 		postidwasturnoff.disabled = true;
-		document.getElementById(id+"_notifyturnofcmt").innerHTML = "The owner of the post has disabled the comment function"
+		document.getElementById(id+"_notifyturnoffcmt").innerHTML = "The owner of the post has disabled the comment function"
+	}
+})
+
+//bat su kien
+socket.on('turnoncmtnotify', function(data){
+	var id = data.id
+	if(typeof document.getElementById(id+"_writecmts") != "undefined"){
+		var postidwasturnoff = document.getElementById(id+"_writecmts")
+		postidwasturnoff.disabled = false;
+		document.getElementById(id+"_notifyturnoffcmt").innerHTML = ""
 	}
 })

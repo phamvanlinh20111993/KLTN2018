@@ -9,6 +9,7 @@ var CryptoJS = require("crypto-js")
 var libfunction = require('../../local_modules/customfunction')
 var workfile = require('../../local_modules/workwithfile')
 var querysimple = require('../../model/QuerysingletableSimple')
+var anotherquery = require('../../model/Anotherquery')
 
 function Error(id){
 	var errstr = "";
@@ -82,11 +83,12 @@ function createSession(req, res, emailuser, passuser)
 					req.session.email = result[0].email
 					req.session.password = result[0].password
 					req.session.photo = result[0].photo
+					req.session.name = result[0].name
 
 					anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
 						req.session.mynative = data[0].natsy
 						req.session.myexchange = data[0].exsy
-						res.render('ejs/messenges', {user: result})
+						res.render('ejs/messenger', {User: result})
 					})
 				})
 			}else

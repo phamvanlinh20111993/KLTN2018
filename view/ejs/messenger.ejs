@@ -66,6 +66,7 @@
   <script type="text/javascript">
      var MYID = parseInt("<%= session.user_id  %>")
      var MYEMAIL = "<%= session.email %>"
+     var MYNAME = "<%= session.name %>"
      var MYPHOTO = "<%= session.photo %>"
      var MYPRIONAT = "<%= session.mynative %>"
      var MYPRIOEX = "<%= session.myexchange %>"
@@ -235,15 +236,15 @@
   
   <div class="content">
     <div class="contact-profile">
-      <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-      <p>Harvey Specter</p>
+      <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" id="user_pid_src"/>
+      <p id="user_pid_name">Harvey Specter</p>
       <div class="social-media">
       <!--  <i class="fa fa-facebook" aria-hidden="true"></i>
         <i class="fa fa-twitter" aria-hidden="true"></i>
          <i class="fa fa-instagram" aria-hidden="true"></i> -->
-		 <i class="fa fa-camera" aria-hidden="true"></i>
-		 <i class="fa fa-phone" aria-hidden="true"></i>
-		 <i class="fa fa-cogs"  aria-hidden="true" onclick="Setting()"></i>
+		    <i class="fa fa-camera" aria-hidden="true"></i>
+		    <i class="fa fa-phone" aria-hidden="true"></i>
+		    <i class="fa fa-cogs"  aria-hidden="true" onclick="Setting()"></i>
      
       </div>
     </div>
@@ -341,10 +342,22 @@
     </div>
 	
     <div class="message-input">
+
+      <li class="sent" style="display:none;margin-left: 4%;" id="liuseristyping">
+        <table >
+        <tr>
+        <td><img src="http://emilcarlsson.se/assets/mikeross.png" id="useristyping" alt="" style="height: 40px;width: 40px;" /></td>
+         <td> <span>.....</span>
+          <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+          <span>.....</span></td>
+        </tr>
+        </table>
+      </li>
+
       <div class="wrap">
-      <input type="text" placeholder="Write your message..." />
+      <input type="text" id="contentMessage" placeholder="Write your message..."  onkeypress="SendMessage(event)" />
       <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
-      <button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+      <button class="submit" onclick="WriteMessage()"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
       </div>
     </div>
 	
@@ -394,7 +407,7 @@
 });
 
 
- function newMessage()
+/* function newMessage()
  {
      message = $(".message-input input").val();
      if($.trim(message) == '') {
@@ -416,7 +429,7 @@ $(window).on('keydown', function(e) {
       return false;
    }
 });
-
+ */
 
 function Setting(){
   $('#Settingmessenger').modal({backdrop: 'static', keyboard: false})  

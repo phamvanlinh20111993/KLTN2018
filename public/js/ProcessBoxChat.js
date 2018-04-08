@@ -58,6 +58,23 @@
                  ':' + (date.getMinutes()) +
                  ':' + (date.getSeconds());
             }     
+
+            //ham nay chuyen doi phat hien tu ngu nao sai va cach sua doi tuong ung, [convert]=>convert
+            var matchMisspelling = function(content, newcontent){
+                var space = content.split(" ")//lay cac tu trong doan van ban
+                var newspace = newcontent.split(" ")
+                var str = ""
+               
+                for(var ind = 0; ind < newspace.length; ind++){
+                    var word = newspace[ind].toString()
+                    if(word.length > 0 && word[0] == "["){
+                        str += "<span>"+space[ind]+" => "+newspace[ind].substr(1, newspace[ind].length-2)
+                        str += "</span></br>"
+                    }
+                }
+
+                return str
+            }
         
             //this is used to close a popup
             function close_popup(id)
@@ -247,21 +264,22 @@
 
                      //   console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
                         var ismisspelling = 0;//khong co loi dich, tin nhan ok
-                        Translate_or_Misspelling("/languageex/user/translate", 
-                        MYPRIOEX, MYPRIONAT, val, function(data){
+                        Translate_or_Misspelling("/languageex/user/checkmisspelling", 
+                         MYPRIOEX, MYPRIONAT, val, function(data){
 
                            if(data.content.error == null){
                                 if(data.content.value==""){
                                     ismisspelling = 0;//tin nhan ok
                                 }else{
                                     if(data.content.language == MYPRIOEX)
-                                        ismisspelling = 1;//co loi chinh ta
+                                        ismisspelling = 1;//co loi chinh ta(đỏ)
                                     else
-                                        ismisspelling = 2//khong phai ngon ngu dang trao doi
+                                        ismisspelling = 2//khong phai ngon ngu dang trao doi(vàng)
                                 }
                            }else
-                                ismisspelling = 3;//loi dich tin nhan
+                                ismisspelling = 3;//loi dich tin nhan(cam)
 
+                           console.log("gia tri la: " + ismisspelling)
                             message.misspelling = ismisspelling
 						    socket.emit('sendmsg', {
 							   content: message,
@@ -468,7 +486,17 @@
                 else
                     Time = formatAMPM(new Date())
 
-                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left: 3px;" onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
+                var changeclmisspell = ""
+                //thay doi mau sac cua thanh check loi chinh ta
+                if(message.misspelling == 2)//khong dung ngon ngu trao doi
+                    changeclmisspell = "color: yellow;"
+                else if(message.misspelling == 1)//co loi chinh ta
+                    changeclmisspell = "color: red;"
+                else if(message.misspelling == 3)//lỗi dịch tin nhắn
+                    changeclmisspell = "color: orange;"
+
+                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;'+changeclmisspell+'" '+
+                              'onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
                 if(sessionStorage.getItem("_checkmiss_"+id) == "true")
                     ischeckmisspelling = "";
 
@@ -556,7 +584,17 @@
                 else          //hien thi thoi gian khi dang nhan tin socket
                     Time = formatAMPM(new Date())
 
-                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;" onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
+                var changeclmisspell = ""
+                //thay doi mau sac cua thanh check loi chinh ta
+                if(message.misspelling == 2)//khong dung ngon ngu trao doi
+                    changeclmisspell = "color: yellow;"
+                else if(message.misspelling == 1)//co loi chinh ta
+                    changeclmisspell = "color: red;"
+                else if(message.misspelling == 3)//lỗi dịch tin nhắn
+                    changeclmisspell = "color: orange;"
+
+                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;'+changeclmisspell+'" '+
+                       'onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
                 if(sessionStorage.getItem("_checkmiss_"+id) == "true")
                     ischeckmisspelling = "";
 
@@ -681,11 +719,11 @@
 								showcheckedmis.innerHTML = "your message ok."
 							}else{
 								if(data.content.language == MYPRIOEX){
-									showcheckedmis.innerHTML = "Did you mean: " + data.content.value
+									showcheckedmis.innerHTML = "Did you mean: " + matchMisspelling(content, data.content.value)
 									document.getElementById(id+"_check").style.color = "red"
 								}
 								else{
-									showcheckedmis.innerHTML = "Not valid this: " + data.content.value
+									showcheckedmis.innerHTML = "Detected language: " + data.content.language +"(symbol)"
 									document.getElementById(id+"_check").style.color = "yellow"
 								}
 							}

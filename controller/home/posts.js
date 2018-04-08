@@ -171,8 +171,13 @@ router.route('/user/loadcmt')
 
 	if(req.session.user_id){
 		var postid = req.body.data.id
-		if(postid){
-			postcomment.selectCmts(req.session.user_id, postid, function(data){
+		var limit = {
+			from: req.body.data.limit.from,
+			total: req.body.data.limit.total
+		}
+
+		if(postid && limit){
+			postcomment.selectCmts(req.session.user_id, postid, limit, function(data){
 				res.json({listcmts: data})
 			})
 		}

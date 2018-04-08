@@ -56,9 +56,10 @@ router.route('/user/loasdusermsg')
 	{
 		querysimple.selectListUserMessenger(req.session.user_id, function(data, err){
 			if(err) throw err;
-			else
-				console.log(data)
-			res.send(JSON.stringify({listuser: data}))
+			else{
+		//		console.log(data)
+				res.send(JSON.stringify({listuser: data}))
+			}
 		})
 		
 	}else
@@ -126,6 +127,10 @@ router.route('/user/translate')
 		translate(content, {from: myex, to: mynat}).then(resp => {
             Trlcontent.translated = resp.text
             Trlcontent.error = null
+            Trlcontent.from = resp.from.language.iso
+            Trlcontent.mean = resp.from.language.didYouMean //gợi ý một sự sửa đổi trong ngôn ngữ nguồn
+            Trlcontent.didYouMean = resp.from.text.didYouMean //đúng nếu API đã đề nghị chỉnh sửa văn bản
+            Trlcontent.autoCorrected = resp.from.text.autoCorrected // true nếu API tự động sửa văn bản
 
             console.log(resp);
             console.log(resp.text);
@@ -143,7 +148,59 @@ router.route('/user/translate')
 	
 })
 
+//phat hien ngon ngu va dich
+router.route('/user/transbymatch')
+.post(function(req, res){
 
+	if(req.session.user_id){
+		var mynat = req.body.data.nat
+		//console.log(myex + "   " + mynat )
+		var content = req.body.data.content
+		var Trlcontent = {}
+
+		translate(content, {to: mynat}).then(resp => {
+            Trlcontent.translated = resp.text
+            Trlcontent.error = null
+            Trlcontent.from = resp.from.language.iso//ngon ngu phat hien duoc
+            Trlcontent.mean = resp.from.language.didYouMean //gợi ý một sự sửa đổi trong ngôn ngữ nguồn
+            Trlcontent.didYouMean = resp.from.text.didYouMean //đúng nếu API đã đề nghị chỉnh sửa văn bản
+            Trlcontent.autoCorrected = resp.from.text.autoCorrected // true nếu API tự động sửa văn bản
+            Trlcontent.successChange = resp.from.text.value
+
+            console.log(resp);
+            console.log(resp.text);
+            console.log(resp.from.text.autoCorrected);
+            console.log(resp.from.text.value);
+            console.log(resp.from.text.didYouMean);
+
+            querysimple.selectTable("language", ["name"], [{op:"", field: "symbol", value: Trlcontent.from}],
+            	null, null, null, function(result, field, err){
+            		if(err) throw err
+            		else{
+            			if(result.length > 0)
+                        	Trlcontent.from = result[0].name
+                        else 
+                        	Trlcontent.from += "(symbol)"
+            			res.send(JSON.stringify({content:Trlcontent}))
+            	    }
+            	})
+
+           
+
+        }).catch(err => {
+         	console.error(err);
+         
+         	Trlcontent.translated = null
+         	Trlcontent.error = err
+
+         	res.send(JSON.stringify({content:Trlcontent}))
+      });
+	}
+	
+})
+
+
+//check loi chinh ta
 router.route('/user/checkmisspelling')
 .post(function(req, res){
 
@@ -170,7 +227,7 @@ router.route('/user/checkmisspelling')
             res.send(JSON.stringify({content:Misscontent}))
         }).catch(err => {
          	console.error(err);
-            Misscontent.error =  err
+            Misscontent.error = err
             Misscontent.value = null
          	
          	res.send(JSON.stringify({content:Misscontent}))
