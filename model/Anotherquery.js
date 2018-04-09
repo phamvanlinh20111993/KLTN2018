@@ -24,9 +24,14 @@ var getDateTime = function(date){
                 ':' + (date.getMinutes()) +
                 ':' + (date.getSeconds());
 }
+/**
+	@@idmsg: id cua tin nhan trong table message(tham chieu)
+	@@whoeditid: id cua nguoi da sua tin nhan trong table user(tham chieu)
+	@@content: noi dung sua tin nhan moi, co thay doi so voi ban cu
+	@@ismisselling: check loi chinh ta cua tin nhan nay
+**/
 
-
-var editMessage = function(idmsg, whoeditid, content, cb){
+var editMessage = function(idmsg, whoeditid, content, ismisselling, cb){
 
 	var sql = "SELECT message_id, whoedit FROM editmessage WHERE message_id="+mysql.escape(idmsg)+
 			   " AND whoedit = " + mysql.escape(whoeditid)
@@ -38,9 +43,9 @@ var editMessage = function(idmsg, whoeditid, content, cb){
 			console.log(result)
 			if(result.length > 0){
 
-				sqlString = "UPDATE editmessage SET newcontent = "+ mysql.escape(content) +
-					", ctime = '"+ getDateTime(new Date()) +
-					"' WHERE message_id = "+mysql.escape(idmsg) +
+				sqlString = "UPDATE editmessage SET newcontent="+ mysql.escape(content) +
+					", ctime='"+ getDateTime(new Date()) + "', misspelling="+mysql.escape(ismisselling)+
+					" WHERE message_id = "+mysql.escape(idmsg) +
 					" AND whoedit = " + mysql.escape(whoeditid)
 
 			//	console.log("sql "+sqlString)
@@ -50,9 +55,10 @@ var editMessage = function(idmsg, whoeditid, content, cb){
 				})
 
 			}else{//chua co du lieu
-				sqlString = "INSERT INTO editmessage(message_id, whoedit, newcontent, ctime) "+
-					"VALUES("+ mysql.escape(idmsg) + ", " + mysql.escape(whoeditid) + 
-					", " + mysql.escape(content)+", '"+getDateTime(new Date())+"')";
+				sqlString = "INSERT INTO editmessage(message_id, whoedit, newcontent, misspelling, ctime)"+
+					"VALUES("+ mysql.escape(idmsg)+", "+mysql.escape(whoeditid)+ 
+					", "+mysql.escape(content)+", "+mysql.escape(ismisselling)+
+					", '"+getDateTime(new Date())+"')";
 
 			//	console.log("sql1 "+sqlString)
 				con.query(sqlString, function(err1, result1, fields1){
@@ -192,6 +198,7 @@ var select_max_prio_Ex_and_Navtive = function(id, cb){
 	})
 }
 
+//lay toan bo exchange language cua nguoi dung (1 nguoi co the trao doi 1 hoac nhieu language)
 var selectAllExchangelg = function(id, cb){
 	var sqlstr = "SELECT la.id as id, la.symbol AS exsy, la.name AS exname, ex.prio"+
 	        " FROM exchangelg ex JOIN language la "+
@@ -205,6 +212,7 @@ var selectAllExchangelg = function(id, cb){
 	})
 }
 
+//lay toan bo native language cua nguoi dung (1 nguoi co the co 1 hoac nhieu native language)
 var selectAllNativelg = function(id, cb){
 	var sqlstr = "SELECT la.id as id, la.symbol AS natsy, la.name AS natname, nat.prio"+
 	        " FROM nativelg nat JOIN language la "+

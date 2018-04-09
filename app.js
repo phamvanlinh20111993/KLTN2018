@@ -1,3 +1,4 @@
+//ứng dụng: Phát triển dịch vụ trực tuyến hỗ trợ thực hành ngôn ngữ
 var express = require('express')
 var app = express()//su dung
 var bodyParser = require('body-parser')//Đây là một lớp trung gian node.js để xử lí JSON, dự liệu thô, text và mã hóa URL.

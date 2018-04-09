@@ -849,27 +849,70 @@ var selectMyPost = function()
 	@@ id param is id of post
 	@@ name post of user's name
 **/
+
+var _CHECKBOXREPORTPOST = []//mang luu tru cac gia tri
 var reportPost = function(id, name)
 {
 	$('#reportPostUser').modal('show')
 	var reportp = document.getElementById("reportPostUser")
 	var reportpBody = reportp.getElementsByClassName("modal-body")[0]
 	var reportTitle = reportp.getElementsByClassName("modal-title")[0]
-	reportTitle.innerHTML = "Why report this post of "+name+" ?"
+	reportTitle.innerHTML = "Why report this post of <h4><b>"+name+"</b></h4> ?"
 
-	requestServer('/languageex/user/loadrppost', 'GET',{}, 0, function(err, data){
+	requestServer('/languageex/user/loadrppost', 'GET', {}, 0, function(err, data){
 		if(err) alert(err)
 		else{
 			var element = ""
-			console.log(data)
-			for(var ind = 0; ind < data.data.length; ind ++){
+		//	console.log(data)
+			for(var ind = 0; ind < data.data.length; ind++){
 		 		element += '<div class="checkbox">'+
             	 	'<label><input type="checkbox" value="'+data.data[ind].code+'" name="'+data.data[ind].id+'">'+
             		 data.data[ind].content+'</label></div>'
 			}
+			element += '<div class="alert alert-warning">'+
+              '<strong>Warning!</strong> Do not abuse this feature, administrators will review and block who abuses this feature. Best regards'+
+            '</div>'
+
 			reportpBody.innerHTML = element
 		}
 	})
+
+	var modelreportp_footer = reportp.getElementsByClassName("modal-footer")[0]
+	var modelreportp_footer_button = modelreportp_footer.getElementsByTagName("button")[0]
+
+	modelreportp_footer_button.onclick = function(){
+
+		var index = 0, pos = 0;
+		var input_checkbox = reportpBody.getElementsByTagName("input")
+
+		for(index = 0; index < input_checkbox.length; index++){
+			if(input_checkbox[index].checked){
+				_CHECKBOXREPORTPOST[pos] = input_checkbox[index].name
+				pos++;
+			}
+		}
+
+		if(_CHECKBOXREPORTPOST.length > 0){
+			var data = {
+				whorpp: MYID,
+				postid: id,
+				code: _CHECKBOXREPORTPOST,
+				time: new Date(), 
+				type: 2//report post with code 2
+			}
+
+			requestServer('/languageex/user/reportpost', 'POST', data, 0, function(err, data){
+				if(err) throw err
+				//console.log(data)
+			    alert("Report successed!")
+				for(index = 0; index < input_checkbox.length; index++)
+					input_checkbox[index].checked = false;
+				$('#reportPostUser').modal('hide');
+			})
+
+			_CHECKBOXREPORTPOST = []
+		}
+	}
 }
 
 

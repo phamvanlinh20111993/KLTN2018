@@ -61,10 +61,11 @@
 
             //ham nay chuyen doi phat hien tu ngu nao sai va cach sua doi tuong ung, [convert]=>convert
             var matchMisspelling = function(content, newcontent){
+                content = content.trim()//bo ki tu trong o dau va cuoi string
                 var space = content.split(" ")//lay cac tu trong doan van ban
                 var newspace = newcontent.split(" ")
                 var str = ""
-               
+            
                 for(var ind = 0; ind < newspace.length; ind++){
                     var word = newspace[ind].toString()
                     if(word.length > 0 && word[0] == "["){
@@ -210,6 +211,7 @@
                             }
 
                             //show all message
+                            document.getElementById(id+"_content").innerHTML = "";
                             for(var ind = myMessages.length-1; ind >= 0; ind--){
                                 if(MYID == myMessages[ind].idA){//toi la nguoi gui
                                     Message_send(id, myMessages[ind].time, myInfo.photo, myMessages[ind], 1)
@@ -292,13 +294,13 @@
 						//reset input box
 						document.getElementById(id + "_mymsg").value = "";
 
-					}
-			  	}else{//nguoi dung dang nhap ban phim
+					    }
+			  	    }else{//nguoi dung dang nhap ban phim
 			  		socket.emit('chatting', {
                      	myid: MYID,
                      	pid: id
-                  	})  
-			  	}
+                  })  
+			  	   }
             }
 
             //luu ma tin nhan vua gui di trong input hidden
@@ -378,74 +380,71 @@
 			function Show_pop_up_message(id, name, photo, setting)
 			{
 				var misspellings = ""//tu dong check loi chinh ta
-                var checkblockmsg = ""//check co bi block message khong
+            var checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')"> Block messages</label>'//check co bi block message khong
                
-                if(sessionStorage.getItem("_block_"+id) == "true"){
-                    checkblockmsg = "checked"
-                }
+            if(sessionStorage.getItem("_block_"+id) == "true"){
+               checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')" checked> Block messages</label>'
+            }
 
-                if(sessionStorage.getItem("_checkmiss_"+id) == "false")
-                    misspellings = "checked"
+            if(sessionStorage.getItem("_checkmiss_"+id) == "false")
+               misspellings = "checked"
 
 				var element = '<div class="popup-box-chat" id="'+ id +'">' + 
-									'<div style="background-color:  #5b5bef;height: 10%;">' + 
-                                        '<div style="height:100%;display:table;float:left;width:70%;" data="tooltip" title="'+id+'">' + 
-				                            '<a href = "/languageex/user/profile?uid='+id+'"><p style="font-size:110%;color:black;margin-left:6%;margin-top:4%;">' +
-                                               '<b><i>'+ name +'</i></b>' +
-											 '</p></a>' +
-									    '</div>' +   
-                                        '<div style="float:right;width:30%;">' + 
-				                             '<div style="float:left;width:50%;margin-top:10%;">' + 
-				                                  '<div class="dropdown">' + 
-				                                       '<a style="color: black;font-size:18px;cursor:pointer;" class="dropdown-toggle" data-toggle="dropdown">' + 
-													       '<span class="glyphicon glyphicon-cog"></span>' + 
+									   '<div style="background-color:  #5b5bef;height: 10%;">' + 
+                                 '<div style="height:100%;display:table;float:left;width:70%;" data="tooltip" title="'+id+'">' + 
+				                       '<a href = "/languageex/user/profile?uid='+id+'"><p style="font-size:110%;color:black;margin-left:6%;margin-top:4%;">' +
+                                       '<b><i>'+ name +'</i></b>' +
+											  '</p></a>' +
+									      '</div>' +   
+                                 '<div style="float:right;width:30%;">' + 
+				                       '<div style="float:left;width:50%;margin-top:10%;">' + 
+				                          '<div class="dropdown">' + 
+				                             '<a style="color: black;font-size:18px;cursor:pointer;" class="dropdown-toggle" data-toggle="dropdown">' + 
+													      '<span class="glyphicon glyphicon-cog"></span>' + 
 													   '</a>' + 
-				                                       '<ul class="dropdown-menu" style="z-index:999;">' + 
-													       '<li> <div class="checkbox" style="margin-left:10%;">' +
-      																'<label><input type="checkbox" value="" '+misspellings+' onclick="Auto_check_miss(this,'+id+')"> Auto misspellings</label>'+
-   															   '</div></li>' + 
-   															'<li><a href="/languageex/messenger?uid='+id+'">Open in messenger</a></li>' + 
+				                              '<ul class="dropdown-menu" style="z-index:999;">' + 
+													     '<li><div class="checkbox" style="margin-left:10%;">' +
+      														'<label><input type="checkbox" '+misspellings+' onclick="Auto_check_miss(this,'+id+')"> Auto misspellings</label>'+
+   														'</div></li>' + 
+   														'<li><a href="/languageex/messenger?uid='+id+'">Open in messenger</a></li>' + 
 														   '<li><div class="checkbox" style="margin-left:10%;">' +
-      																'<label><input type="checkbox" value="" onclick="Blockmessages(this,'+id+',\''+name+'\')" '+checkblockmsg+'> Block messages</label>'+
-   															   '</div></li>' +
-   															'<li><a href="#" onclick="translatePrio()">Translations priority</a></li>' + 
-   															'<li><a href="#" onclick="misspellingPrio()">Misspellings priority</a></li>' + 
+      															checkblockmsg+
+   														 '</div></li>' +
+   														'<li><a href="#" onclick="translatePrio()">Translations priority</a></li>' + 
+   														'<li><a href="#" onclick="misspellingPrio()">Misspellings priority</a></li>' + 
 														   '<li><a href="#" onclick="delConversation('+id+',\''+name+'\')">Delete Conversation</a></li>' + 
 														   '<li><a href="#" onclick="reportUser('+id+',\''+name+'\')">Report <span style="color:orange;">'+name+'</span></a></li>' +
 														'</ul>' + 
-				                                   '</div>' + 
-											 '</div>' + 
+				                           '</div>' + 
+											   '</div>' + 
 											 
-				                             '<div style="float:right;width:50%;margin-top:4%;">' + 
+				                       '<div style="float:right;width:50%;margin-top:4%;">' + 
 											      '<button class="close1 close2" onclick="close_popup(\''+id+'\')">X</button>' + 
-											 '</div>' + 
-											 
-                                        '</div>' + 
-								    '</div>' + 
+											  '</div>' + 
+					
+                                 '</div>' + 
+								      '</div>' + 
 				
-                                    '<div style="height:80%;width:100%;background-color:#CCCCCC;overflow:auto;" id="'+id+'_scrollmsg">' + //#bcd1c6
-                                       '<div style="text-align: center; margin-top:3%;">Welcome to talk with <span style="color: red;">'+ name +'</span></div>'+
-                                       '<div><ul id="'+id+'_content" class="ulclass"></ul></div>' + //content message
+                              '<div style="height:80%;width:100%;background-color:#CCCCCC;overflow:auto;" id="'+id+'_scrollmsg">' + //#bcd1c6
+                                 '<div style="text-align: center; margin-top:3%;">Welcome to talk with <span style="color:red;">'+ name +'</span></div>'+
+                                 '<div><ul id="'+id+'_content" class="ulclass"></ul></div>' + //content message
 									   
-										'<div style="background-color:#CCCCCC;z-index:1;display:none;bottom: 0;" id="'+id+'_typing">' +
-									      '<img src="'+photo+'" class="img-rounded" alt="Anh dai dien" width="40" height="40" style="margin-top:-1%;">' + 
-										  '<span>.....</span>' + 
-										  '<i class="fa fa-spinner fa-spin" style="font-size:24px"></i>' + 
-										  '<span>.....</span>' + 
-								        '</div>' +
-										
-                                    '</div>' +
+										   '<div style="background-color:#CCCCCC;z-index:1;display:none;bottom: 0;" id="'+id+'_typing">' +
+									         '<img src="'+photo+'" class="img-rounded" alt="Anh dai dien" width="40" height="40" style="margin-top:-1%;">' + 
+										      '<span>.....</span>' + 
+										      '<i class="fa fa-spinner fa-spin" style="font-size:24px"></i>' + 
+										      '<span>.....</span>' + 
+								         '</div>' +
+                              '</div>' +
 							
-                                    '<div style="margin-top:5px;box-shadow: 1px 2px 5px #ccccff;height: 10%;">' + 
-                                          '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
-                                            ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
-				                          '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px" onclick="msgRecord('+id+')"></i></a>' + 
-				                          '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\', \''+name+'\', \''+photo+'\')"></i></a>' + 
-                                          '<div style="clear: both;"></div>'
-									'</div>';
-				
-                               '</div>'; // end
-				
+                              '<div style="margin-top:5px;box-shadow: 1px 2px 5px #ccccff;height: 10%;">' + 
+                                 '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
+                                       ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
+				                    '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px" onclick="msgRecord('+id+')"></i></a>' + 
+				                    '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\', \''+name+'\', \''+photo+'\')"></i></a>' + 
+                              '<div style="clear: both;"></div>'+
+									'</div>'+
+                        '</div>' // end    
 				return element;
 				
 			}
@@ -460,6 +459,21 @@
     			return text;
 			}
 
+         //tinh toan mau sac hien thi tren thanh checkmisspeliing
+         function calCheckmiss(value){
+            var changeclmisspell;
+
+            if(value == 2)//khong dung ngon ngu trao doi
+               changeclmisspell = "color: yellow;"
+            else if(value == 1)//co loi chinh ta
+               changeclmisspell = "color: red;"
+            else if(value == 3)//lỗi dịch tin nhắn
+               changeclmisspell = "color: orange;"
+            else changeclmisspell = "";
+
+            return changeclmisspell;
+         }
+
             //thay the tat ca string 'search' trong 'string' bang string 'replacement'
             var replaceAll = function(string, search, replacement) {
                 return string.replace(new RegExp(search, 'g'), replacement);
@@ -472,11 +486,12 @@
             //bien state de check la day la load tin nhan tu server hay nguoi dung dang nhan tin
 			function Message_send(id, date, photo, message, state)
 			{
-				var rid = parseInt(makerandomid())
+				   var rid = parseInt(makerandomid())
 	            var content  = message.content
-                var Time, msgid = "";
+               var Time, msgid = "";
 
-                INPUT_HIDDEN_SAVE_MSSID = rid;
+               var changeclmisspell = calCheckmiss(message.misspelling)//tinh toan gia tri
+               INPUT_HIDDEN_SAVE_MSSID = rid;
 
                 if(message.messageid)
                     msgid = message.messageid 
@@ -486,35 +501,24 @@
                 else
                     Time = formatAMPM(new Date())
 
-                var changeclmisspell = ""
-                //thay doi mau sac cua thanh check loi chinh ta
-                if(message.misspelling == 2)//khong dung ngon ngu trao doi
-                    changeclmisspell = "color: yellow;"
-                else if(message.misspelling == 1)//co loi chinh ta
-                    changeclmisspell = "color: red;"
-                else if(message.misspelling == 3)//lỗi dịch tin nhắn
-                    changeclmisspell = "color: orange;"
-
-                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;'+changeclmisspell+'" '+
-                              'onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
-                if(sessionStorage.getItem("_checkmiss_"+id) == "true")
-                    ischeckmisspelling = "";
-
-
                 var changecolor = ""//doi mau the span edit
                 var showeditmsg = ""//nhung js
                 var oldcontent = ""//noi dung tin nhan moi
+
                 if(message.edit.length > 0){//nếu tin nhắn được edit thì chạy hàm này
                     oldcontent = content
                     if(message.edit.length == 1){
                         content = message.edit[0].newcontent
+                        changeclmisspell = calCheckmiss(message.edit[0].misspelling)
                         Time = formatTime(new Date(message.edit[0].time))
                     }else{
                         if(MYID == message.edit[0].whoedit){
                             content = message.edit[0].newcontent
                             Time = formatTime(new Date(message.edit[0].time))
+                            changeclmisspell = calCheckmiss(message.edit[0].misspelling)
                         }else if(MYID == message.edit[1].whoedit){
                             content = message.edit[1].newcontent
+                            changeclmisspell = calCheckmiss(message.edit[1].misspelling)
                             Time = formatTime(new Date(message.edit[1].time))
                         }
                     }  
@@ -527,6 +531,11 @@
         
                 }
 
+                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;'+changeclmisspell+'" '+
+                              'onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
+                if(sessionStorage.getItem("_checkmiss_"+id) == "true")
+                    ischeckmisspelling = "";
+
                 //du lieu van ban
                 var messageType = ""
                 if(message.content != null){
@@ -534,6 +543,7 @@
                                 '<input type="text" value="'+content+'" autofocus style="border:0px;outline-width:0;background:orange;display:none;" id="'+rid+'_fixcontmsg">' +
                                 '<p><small>'+Time+'</small></p>' +
                                 '<input type="hidden" id="'+rid+'_saveidms" value="'+msgid+'">'+
+                                '<input type="hidden" id="'+rid+'_savecontentms" value="'+content+'">'+
                                 '<a href="#">' +
                                     '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" style="'+changecolor+'" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
                                      showeditmsg+
@@ -584,20 +594,8 @@
                 else          //hien thi thoi gian khi dang nhan tin socket
                     Time = formatAMPM(new Date())
 
-                var changeclmisspell = ""
-                //thay doi mau sac cua thanh check loi chinh ta
-                if(message.misspelling == 2)//khong dung ngon ngu trao doi
-                    changeclmisspell = "color: yellow;"
-                else if(message.misspelling == 1)//co loi chinh ta
-                    changeclmisspell = "color: red;"
-                else if(message.misspelling == 3)//lỗi dịch tin nhắn
-                    changeclmisspell = "color: orange;"
-
-                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;'+changeclmisspell+'" '+
-                       'onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
-                if(sessionStorage.getItem("_checkmiss_"+id) == "true")
-                    ischeckmisspelling = "";
-
+               //thay doi mau sac cua thanh check loi chinh ta
+                var changeclmisspell = calCheckmiss(message.misspelling)//tinh toan gia tri
                 var changecolor = ""//doi mau the span edit
                 var showeditmsg = ""//nhung js
                 var oldcontent = ""//noi dung tin nhan moi
@@ -606,13 +604,16 @@
                     if(message.edit.length == 1){
                         content = message.edit[0].newcontent
                         Time = formatTime(new Date(message.edit[0].time))
+                        changeclmisspell = calCheckmiss(message.edit[0].misspelling)
                     }else{
                         if(MYID == message.edit[0].whoedit){
-                            content = message.edit[0].newcontent
-                            Time = formatTime(new Date(message.edit[0].time))
+                           content = message.edit[0].newcontent
+                           Time = formatTime(new Date(message.edit[0].time))
+                           changeclmisspell = calCheckmiss(message.edit[0].misspelling)
                         }else if(MYID == message.edit[1].whoedit){
                             content = message.edit[1].newcontent
                             Time = formatTime(new Date(message.edit[1].time))
+                            changeclmisspell = calCheckmiss(message.edit[1].misspelling)
                         }
                     }  
 
@@ -628,6 +629,11 @@
 
                 }
 
+                var ischeckmisspelling = '<span id = "'+rid+'_check" class="glyphicon glyphicon-check" style="margin-left:3px;'+changeclmisspell+'" '+
+                       'onclick="showMisspelling(event,'+rid+', '+id+','+state+',\''+content+'\')"></span>';
+                if(sessionStorage.getItem("_checkmiss_"+id) == "true")
+                    ischeckmisspelling = "";
+
                 var messageType = ""
 
                 if(message.content != null){
@@ -635,6 +641,7 @@
                                 '<input id="'+rid+'_fixcontmsg" type="text" value="'+content+'" autofocus style="border:0px;background:orange;outline-width:0;display:none;">'+
                                 '<p><small>'+Time+'</small></p>' +
                                 '<input type="hidden" id="'+rid+'_saveidms" value="'+msgid+'">'+//luu id message de sau nay edit no
+                                '<input type="hidden" id="'+rid+'_savecontentms" value="'+content+'">'+//luu gia tri edit
                                 '<a href="#">' +
                                     '<span id = "'+rid+'_speditmsg" class="glyphicon glyphicon-edit" style="'+changecolor+'" onclick="Editmessage(event,'+rid+',\''+content+'\')"></span>' + 
                                     showeditmsg +
@@ -674,17 +681,18 @@
 			var TIME_TRANSLATE = 5000, TIME_MISSPE = 5000
 			function Translate(e, id, content, boxid)
 			{
-				e.preventDefault()
+				if(e) e.preventDefault()
 				var showtranslatep = document.getElementById(id+"_trans")
-
+            var realcontent = document.getElementById(id+"_savecontentms")
+         
 				if(showtranslatep.innerHTML == ""){
+
 					Translate_or_Misspelling("/languageex/user/translate", 
-				  		MYPRIOEX, MYPRIONAT, content, function(data){
-				  	
+				  		MYPRIOEX, MYPRIONAT, realcontent.value, function(data){
 				  		if(data.content.error == null){
 				  			showtranslatep.innerHTML = "trans:  <span style='color:blue;'>"+data.content.translated+"</span>"
 				  		}else
-				  			showtranslatep.innerHTML = "somes error with your msg."
+				  			showtranslatep.innerHTML = "somes error with your msg. Error translate."
 				  		
 				  		showtranslatep.style.display = "block"
 						setTimeout(function(){
@@ -702,14 +710,15 @@
 				//document.getElementById(boxid+"_scrollmsg").scrollTop = document.getElementById(boxid+"_scrollmsg").scrollHeight
 			}
 			
-
+         //check loi chinh ta
 			function Misspelling(id, content, cb)
 			{
 				var showcheckedmis = document.getElementById(id+"_missp")
+            var realcontent = document.getElementById(id+"_savecontentms")
 				if(showcheckedmis.innerHTML == "")
 				{
 					Translate_or_Misspelling("/languageex/user/checkmisspelling", 
-						MYPRIOEX , null, content, function(data){
+						MYPRIOEX , null, realcontent.value, function(data){
 
 	                    if(typeof cb == "function")
                             cb(data);//tra ve du lieu
@@ -717,9 +726,10 @@
 						if(data.content.error == null){
 							if(data.content.value == ""){
 								showcheckedmis.innerHTML = "your message ok."
+                        document.getElementById(id+"_check").style.color = "#337ab7"
 							}else{
 								if(data.content.language == MYPRIOEX){
-									showcheckedmis.innerHTML = "Did you mean: " + matchMisspelling(content, data.content.value)
+									showcheckedmis.innerHTML = "Did you mean: " + matchMisspelling(realcontent.value, data.content.value)
 									document.getElementById(id+"_check").style.color = "red"
 								}
 								else{
@@ -728,7 +738,7 @@
 								}
 							}
 						}else
-							showcheckedmis.innerHTML = "not match with your language."
+							showcheckedmis.innerHTML = "Not match with your language.  Error misspelling."
 					})
 				}
 			}
@@ -736,7 +746,7 @@
             //event show misspelling
 			function showMisspelling(e, id, boxid, state, content)
             {
-				e.preventDefault()
+				    if(e) e.preventDefault()
                 var showcheckedmis = document.getElementById(id+"_missp")
                 if(state == 0){
 				    showcheckedmis.style.display = "block"
@@ -769,11 +779,12 @@
 			
 			//ham sua tin nhan
 			function Editmessage(e, id, content){
-				e.preventDefault()
+				if(e) e.preventDefault()
 				var span_edit = document.getElementById(id+"_speditmsg")
 				var p_content = document.getElementById(id+"_contentmsg")
 				var input_fix_content = document.getElementById(id+"_fixcontmsg")
 				var input_fix_old_content = input_fix_content.value
+            var hiddent_content_msg = document.getElementById(id+"_savecontentms")
 
 				p_content.style.display = "none"
 				input_fix_content.style.display = "block"
@@ -796,6 +807,17 @@
 								span_edit.style.color = "green"
 								p_content.innerHTML = content
 								input_fix_content.style.display = "none"
+                        hiddent_content_msg.value = content//update new value
+
+                        var showtranslatep = document.getElementById(id+"_trans")
+                        showtranslatep.innerHTML = ""//reset value translate before
+
+                        var showcheckedmis = document.getElementById(id+"_missp")//reset value checkmiss
+                        showcheckedmis.innerHTML = ""
+
+                        if(sessionStorage.getItem("_checkmiss_"+id) == "false"){ //check lai loi chinh ta
+                           Misspelling(id, content, null);
+                        }
 								//console.log(data)
                              //   socket.emit('editmsg', {myid:MYID, pid: })
 							})
@@ -824,7 +846,7 @@
             	$.ajax({
                     type: "POST",
                     url: "/languageex/user/editmsg",
-                    data:{id: msgid, whoedit: MYID, content: content},
+                    data:{id: msgid, whoedit: MYID, content: content, myex: MYPRIOEX},
                     success: function(data)//hien thi message
                     {
                         if(typeof cb == "function")
@@ -851,10 +873,10 @@
 			}
 
 
-
+            //hien thi thong tin edit message
             function showInfoEditMsg(e, photo, message)//hien thi thong tin tin nhan da edit
             {
-                e.preventDefault()
+                if(e) e.preventDefault()
 
                 var messagetoOBJ = replaceAll(message, CONSTANTSTRING, '"')
                 message = JSON.parse(messagetoOBJ)
@@ -874,12 +896,12 @@
                 var anotheredit = ""
                 if(message.edit.length == 1){
                     if(message.edit[0].whoedit != MYID)
-                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox"></td></tr>' 
-                }else{
+                       anotheredit = '<tr><td><image src='+message.edit[0].id+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                }else{//length = 2
                     if(message.edit[0].whoedit != MYID)
-                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox"></td></tr>' 
+                       anotheredit = '<tr><td><image src='+message.edit[0].id+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
                     else if(message.edit[1].whoedit != MYID)
-                        anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[1].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox"></td></tr>' 
+                        anotheredit = '<tr><td><image src='+message.edit[0].id+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[1].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
                 }
 
                 var ele = '<table class="table table-hover"><thead><tr>'+

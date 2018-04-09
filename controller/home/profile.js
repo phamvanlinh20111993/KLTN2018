@@ -104,6 +104,46 @@ router.route('/user/unblockuser')
 	}
 })
 
+//get report content to profle user
+router.route('/user/loadrpprofile')
+.post(function(req, res){
+	if(req.session.user_id){
+		querysimple.selectTable("report_profile_content", ["id", "code", "content"],
+			null, null, null, null, function(result, fields, err){
+			if(err) throw err
+			else{
+			 	res.json({data: result})
+			}
+		})
+	}
+})
+
+//receive report of user
+router.route('/user/reportprofile')
+.post(function(req, res){
+	if(req.session.user_id){
+		console.log(req.body)
+		var whorp = req.body.data.whorppr
+		var rpwho = req.body.data.rpw
+		var code = req.body.data.code
+		var time = new Date(req.body.data.time)
+		if(code){
+			for(var ind = 0; ind < code.length; ind++){
+				var field = ["whoreport", "reportwho", "code", "state", "time"]
+				var value = [whorp, rpwho, code[ind], 0, time]//2 is type of post
+				querysimple.insertTable("report_profile", field, value, function(result, err){
+					if (err) {throw err}
+					else{
+						console.log("Inserted " + result.affectedRows + " rows")
+					}
+				})
+			}
+			res.json({notify: "Done"})
+		}
+	}
+})
+
+
 
 
 module.exports = router;

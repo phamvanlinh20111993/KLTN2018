@@ -180,11 +180,11 @@ CREATE TABLE IF NOT EXISTS `Blocklist_admin_content`(
 CREATE TABLE IF NOT EXISTS `Report_post_comment`( /* Report to admin */
 	`id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`whoreport` bigint(30) UNSIGNED NOT NULL,
-	`reportwho` bigint(30) UNSIGNED NOT NULL,
+	`post_id` bigint(30) UNSIGNED NOT NULL,
 	`code` int(8) UNSIGNED NOT NULL,
 	`type` int(8) UNSIGNED NOT NULL,/* report comment, post or user */
 	`state` BIT NOT NULL,/* Admin read or not */
- 	`ctime` DATETIME
+ 	`time` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -232,6 +232,23 @@ CREATE TABLE IF NOT EXISTS `post_title`(
 	`name` varchar(200) NOT NULL,
 	`code` varchar(10) NOT NULL,
 	`photo` varchar(1000)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `Report_profile`(
+	`id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`whoreport` bigint(30) UNSIGNED NOT NULL,
+	`reportwho` bigint(30) UNSIGNED NOT NULL,
+	`code` int(8) UNSIGNED NOT NULL,
+	`state` BIT NOT NULL,/* Admin read or not */
+ 	`time` DATETIME
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `Report_profile_content`(
+	`id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`code` varchar(20) NOT NULL,
+	`content` varchar(500) NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*################################################################################################## */
@@ -292,7 +309,7 @@ ALTER TABLE `Blocklist_admin`
 
 ALTER TABLE `Report_post_comment`
 	ADD CONSTRAINT `who want report` FOREIGN KEY (`whoreport`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-	ADD CONSTRAINT `who was report` FOREIGN KEY (`reportwho`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `report post id` FOREIGN KEY (`post_id`) REFERENCES `Post` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `type of report` FOREIGN KEY (`type`) REFERENCES `Type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `code report value` FOREIGN KEY (`code`) REFERENCES `Report_post_comment_content` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -304,6 +321,11 @@ ALTER TABLE `Report_user`
 ALTER TABLE `likes_post`
 	ADD CONSTRAINT `who like post` FOREIGN KEY (`id_user`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `which post` FOREIGN KEY (`id_post`) REFERENCES `post` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `Report_profile`
+	ADD CONSTRAINT `who want report profile` FOREIGN KEY (`whoreport`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `report who profile` FOREIGN KEY (`reportwho`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `code report profile value` FOREIGN KEY (`code`) REFERENCES `Report_profile_content` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 /* ############################################################################################### */
 
@@ -340,6 +362,15 @@ INSERT INTO `Report_user_content` (`code`, `content`) VALUES
 ('MN2GH', 'Sexual violence and exploitation'),/* Bạo lực và bóc lột tình dục*/
 ('GG2DC', 'Impolite human'),
 ('DF334', 'deliberately provocative'); /* cố tình khiêu khích */
+
+INSERT INTO `Report_profile_content` (`code`, `content`) VALUES 
+/* report user */
+('KKRGD', 'Description of an unruly culture'),/*Mô tả về bản thân đồi trụy vô văn hóa */
+('VVCD#', 'This avatar does not match culture'),/* Ảnh đại diện không hợp văn hóa*/
+('LL#$D', 'Representative images are hostile'), /* Ảnh đại diện mang tính chất thù địch */
+('FFGKD', 'Name is vulgar or racist vulgarity'),/*tên thô tục vô văn hóa hoặc mang tính đả kích*/
+('AAKFD', 'Describe yourself as reactionary'), /* Mô tả về bản thân mang tính chất phản động */
+('KKGOF', 'Somthing else');
 
 
 INSERT INTO `Level` (`level`, `score`) VALUES

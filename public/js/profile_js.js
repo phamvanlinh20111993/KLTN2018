@@ -81,16 +81,16 @@ var unFollow = function(id, name){
     })
 }
 
-//mai lam
+//gui report
+var _CHECKBOXREPORTPROFILE = []//mang luu tru cac gia tri
 var Report = function(id, name){
-	alert(id)
-    $('#reportPostUser').modal('show')
-    var reportp = document.getElementById("reportPostUser")
-    var reportpBody = reportp.getElementsByClassName("modal-body")[0]
-    var reportTitle = reportp.getElementsByClassName("modal-title")[0]
-    reportTitle.innerHTML = "Why report this post of "+name+" ?"
+    $('#ReportProfileUser').modal('show')
+    var reportpr = document.getElementById("ReportProfileUser")
+    var reportpBody = reportpr.getElementsByClassName("modal-body")[0]
+    var reportTitle = reportpr.getElementsByClassName("modal-title")[0]
+    reportTitle.innerHTML = "Why report this profile of "+name+" ?"
 
-    HTTP_REQUEST('/languageex/user/loadrppost', 'GET',{}, 0, function(err, data){
+    HTTP_REQUEST('/languageex/user/loadrpprofile', 'POST', {}, function(err, data){
         if(err) alert(err)
         else{
             var element = ""
@@ -100,9 +100,48 @@ var Report = function(id, name){
                     '<label><input type="checkbox" value="'+data.data[ind].code+'" name="'+data.data[ind].id+'">'+
                      data.data[ind].content+'</label></div>'
             }
+            element += '<div class="alert alert-warning">'+
+              '<strong>Warning!</strong> Do not abuse this feature, administrators will review and block who abuses this feature. Best regards'+
+            '</div>'
             reportpBody.innerHTML = element
         }
     })
+
+    var modelreportpr_footer = reportpr.getElementsByClassName("modal-footer")[0]
+    var modelreportpr_footer_button = modelreportpr_footer.getElementsByTagName("button")[0]
+
+    modelreportpr_footer_button.onclick = function(){
+
+        var index = 0, pos = 0;
+        var input_checkbox = reportpBody.getElementsByTagName("input")
+
+        for(index = 0; index < input_checkbox.length; index++){
+            if(input_checkbox[index].checked){
+                _CHECKBOXREPORTPROFILE[pos] = input_checkbox[index].name
+                pos++;
+            }
+        }
+
+        if(_CHECKBOXREPORTPROFILE.length > 0){
+            var data = {
+                whorppr: MYID,
+                rpw: id,
+                code: _CHECKBOXREPORTPROFILE,
+                time: new Date(), 
+            }
+
+            HTTP_REQUEST('/languageex/user/reportprofile', 'POST', data, function(err, data){
+                if(err) throw err
+               // console.log(data)
+                alert("Report successed!")
+                for(index = 0; index < input_checkbox.length; index++)
+                    input_checkbox[index].checked = false;
+                $('#ReportProfileUser').modal('hide');
+            })
+
+            _CHECKBOXREPORTPROFILE = []
+        }
+    }
 }
 
 

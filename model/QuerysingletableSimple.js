@@ -305,8 +305,8 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 
 	            		//select all message between idme and idB 
 							var sqlString2 = "SELECT me.id, me.userA, me.userB, CAST(me.data AS CHAR(100000) CHARACTER SET utf8) AS data, "+
-							" me.content, me.misspelling, " +
-						 	" me.ischeck, me.time, ed.whoedit as idedit, ed.newcontent as ncontent, ed.ctime as ntime "+
+							" me.content, me.misspelling, me.ischeck, me.time, ed.misspelling AS emissspell, " +
+						 	" ed.whoedit AS idedit, ed.newcontent AS ncontent, ed.ctime AS ntime "+
 						 	" FROM message me LEFT JOIN editmessage ed ON ed.message_id = me.id "+
 	 		    		 	" WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
 	 					 	" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
@@ -350,6 +350,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 											Listmessages.messages[ind].edit[pos].whoedit = result2[ind].idedit 
 											Listmessages.messages[ind].edit[pos].newcontent = result2[ind].ncontent
 											Listmessages.messages[ind].edit[pos].time = result2[ind].ntime
+											Listmessages.messages[ind].edit[pos].misspelling = result2[ind].emissspell
 											pos++;
 										}else	continue;
 							
@@ -361,6 +362,7 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	 											Listmessages.messages[ind].edit[pos].whoedit = result2[ind1].idedit 
 												Listmessages.messages[ind].edit[pos].newcontent = result2[ind1].ncontent
 												Listmessages.messages[ind].edit[pos].time = result2[ind1].ntime
+												Listmessages.messages[ind].edit[pos].misspelling = result2[ind1].emissspell
 	 											pos++;
 	 										}
 	 									}

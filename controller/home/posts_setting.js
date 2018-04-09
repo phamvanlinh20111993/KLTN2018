@@ -214,7 +214,25 @@ router.route('/user/loadrppost')
 router.route('/user/reportpost')
 .post(function(req, res){
 	if(req.session.user_id){
-
+		console.log(req.body)
+		var whorp = req.body.data.whorpp
+		var postid = req.body.data.postid
+		var code = req.body.data.code
+		var type = req.body.data.type
+		var time = new Date(req.body.data.time)
+		if(code){
+			for(var ind = 0; ind < code.length; ind++){
+				var field = ["whoreport", "post_id", "code", "type", "state", "time"]
+				var value = [whorp, postid, code[ind], type, 0, time]//2 is type of post
+				querysimple.insertTable("report_post_comment", field, value, function(result, err){
+					if (err) {throw err}
+					else{
+						console.log("Inserted " + result.affectedRows + " rows")
+					}
+				})
+			}
+			res.json({notify: "Done"})
+		}
 	}
 })
 

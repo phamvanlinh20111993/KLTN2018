@@ -48,7 +48,7 @@ router.route('/user/allreport')
 			null, null, null, null, function(result, fields, err){
 				if(err)	throw err
 				else{
-					console.log(result)
+				//	console.log(result)
 					res.send(JSON.stringify({report: result}))
 				}
 			})
@@ -81,7 +81,24 @@ router.route('/user/report')
 .post(function(req, res){
 
 	if(req.session.filter){
-		console.log(req.body)//update database
+		//update database
+		var whoreport = req.body.whid
+		var reportwho = req.body.rpw 
+		var time = new Date (req.body.time)
+		var code = req.body.code;
+		if(code){
+			for(var ind = 0; ind < code.length; ind++){
+				var field = ["whoreport", "reportwho", "code", "state", "time"]
+				var value = [whoreport, reportwho, code[ind], 0, time]
+				querysimple.insertTable("report_user", field, value, function(result, err){
+					if (err) {throw err}
+					else{
+						console.log("Inserted " + result.affectedRows + " rows")
+					}
+				})
+			}
+		}
+	
 		res.send(JSON.stringify({notify: "Done"}))
 	}
 })

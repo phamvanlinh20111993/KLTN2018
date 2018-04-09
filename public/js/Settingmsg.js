@@ -279,7 +279,7 @@ var reportUser = function(id, name){
 	var modelreport_body = modelreport.getElementsByClassName("modal-body")[0]
 	var modelreport_title = modelreport.getElementsByClassName("modal-title")[0]
 
-	modelreport_title.innerHTML = "Why report "+name+" ?"
+	modelreport_title.innerHTML = "Why report <b>"+name+"</b> ?"
 	if(modelreport_body.innerHTML.length < 30){
 		selectAllReport(function(data){
 			var Ele = ""
@@ -289,6 +289,11 @@ var reportUser = function(id, name){
             		 data.report[ind].content+'</label>'+
          		 	'</div>'
 			}
+			
+			Ele += '<div class="alert alert-warning">'+
+              '<strong>Warning!</strong> Do not abuse this feature, administrators will review and block who abuses this feature. Best regards'+
+            '</div>'
+
 			modelreport_body.innerHTML = Ele
 		})
 	}
@@ -309,11 +314,13 @@ var reportUser = function(id, name){
 
 		if(_CHECKBOXREPORT.length > 0){
 			choosereportUser(id, new Date(), _CHECKBOXREPORT, function(data){
-				console.log(data)
+				//console.log(data)
+				 alert("Report successed!")
 				for(index = 0; index < input_checkbox.length; index++)
 					input_checkbox[index].checked = false;
 				$('#ReportuserHome').modal('hide');
 			})
+			_CHECKBOXREPORT = []
 		}
 	}
 }

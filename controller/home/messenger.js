@@ -96,18 +96,52 @@ router.route('/user/editmsg')
 		var content = req.body.content
 		var messid = req.body.id
 		var whoedit = req.session.user_id
-
-		console.log(req.body.id)
+		var myex = req.body.myex
+		
 		if(messid){
-			anotherquery.editMessage(messid, whoedit, content, function(data, err){
-				if(err) throw err
-				else{
-					if(data.length > 0){
-						console.log(data)
-					}
-					res.send(JSON.stringify({content:content}))
-				} 
-			})
+			var ismisspelling = 0;
+
+			translate(content, {to: myex}).then(resp => {
+            	console.log(resp);
+            	console.log(resp.text);
+            	console.log(resp.from.text.autoCorrected);
+            	console.log(resp.from.text.value);
+            	console.log(resp.from.text.didYouMean);
+
+            	if(resp.from.text.value == "")//ok tin nhan khong có lỗi dịch
+            		ismisspelling = 0;
+            	else{
+                	if(resp.from.language.iso == resp.from.language.iso)//loi chinh ta
+                		ismisspelling = 1;
+                	else ismisspelling = 2;///khong phai ngon ngu dang trao doi
+                }
+
+            	anotherquery.editMessage(messid, whoedit, content, ismisspelling, function(data, err){
+					if(err) throw err
+					else{
+						if(data.length > 0){
+							console.log(data)
+						}
+						res.send(JSON.stringify({content:content}))
+					} 
+			    })
+            	
+        	}).catch(err => {
+         		console.error(err);
+         		ismisspelling = 3; //loi dich tin nhan
+
+         		anotherquery.editMessage(messid, whoedit, content, ismisspelling, function(data, err){
+					if(err) throw err
+					else{
+						if(data.length > 0){
+							console.log(data)
+						}
+						res.send(JSON.stringify({content:content}))
+					} 
+			    })
+         	   
+      		});
+
 		}else
 			res.send(JSON.stringify({content:null}))
 	}
@@ -222,6 +256,7 @@ router.route('/user/checkmisspelling')
             Misscontent.corrected = resp.from.text.didYouMean,
             Misscontent.language = resp.from.language.iso,
             Misscontent.value = resp.from.text.value
+            Misscontent.text = resp.text
             Misscontent.error = null
 
             res.send(JSON.stringify({content:Misscontent}))
