@@ -150,8 +150,9 @@ var delConversation = function(idme, iduser, cb){
 //tra ve so nguoi trong cong dong cua toi
 var selectListUsermyCommunityEx = function(id, cb){
 	//select my id, my exchangelanguage
-	var sqlstr = "SELECT exchangelg.language_id as exid FROM "+
-			  "exchangelg WHERE exchangelg.user_id = "+ parseInt(id)
+	var sqlstr = "SELECT exchangelg.language_id AS exid FROM "+
+			  "exchangelg WHERE exchangelg.user_id = "+ parseInt(id)+
+			  " AND prio = 1"
 
 	con.query(sqlstr, function(err, result, fields){
 		if(err)	throw err;
@@ -167,16 +168,18 @@ var selectListUsermyCommunityEx = function(id, cb){
 			}
 			if(result.length > 1) orcondi +=")"
 
-			var sqlString = "SELECT ex.user_id as id, u.state, ex.language_id FROM exchangelg ex "+
+			var sqlString = "SELECT ex.user_id AS id, u.state, ex.language_id FROM exchangelg ex "+
 							" JOIN user u ON ex.user_id = u.id "+
-							" WHERE ex.user_id != "+mysql.escape(id) +" AND "+
-							orcondi
+							" WHERE "+//"ex.user_id != "+mysql.escape(id) +" AND "+ //comment 12:56AM 13/4
+							orcondi+
+							" GROUP BY ex.user_id"//add 12:56AM 13/4
             
          //   console.log(sqlString)
 
 		    con.query(sqlString, function(err1, result1, fields1){
 		    	if(err1) throw err1;
 		    	else  cb(result1)
+		    	//console.log(result1)
 		    })
 		}
 	})
@@ -243,6 +246,82 @@ var selectMinfield = function(tbname, field, cb){
 	})
 }
 
+//tinh diem cho nguoi dung
+var calculateScore = function(id, score, cb)
+{
+	var sqlString = "UPDATE User SET score = score + "+parseInt(score)+
+	 				" WHERE id = "+mysql.escape(id)
+
+	con.beginTransaction(function(err){
+		if (err) { 
+			throw err; 
+			cb(null)
+		}
+
+		con.query(sqlString, function(err, result){
+			if(err){
+		 		con.rollback(function() {
+					throw err;
+       				cb(null)
+      			});
+			}
+
+			con.commit(function(err) {
+        		if (err) { 
+          			con.rollback(function() {
+            			throw err;
+            			cb(null)
+          			});
+        		}
+        		console.log('Transaction Complete.');
+
+        		var sqlString1 = "SELECT id, score, level_id FROM User "+
+		  				   " WHERE id =	" + mysql.escape(id)
+        		
+        		con.query(sqlString1, function(err1, result1, fields1){
+        			if(err1){
+        				throw err1
+        				cb(null)
+        			}else
+        			{
+        				var userscorenow = result1[0].score
+        				if(userscorenow > 99999){
+        					var sqlString2 = "SELECT id, level, score FROM level ";
+        					con.query(sqlString2, function(err2, result2, fields2){
+        						if (err2) {
+        							throw err2
+        							cb(null)
+        						}
+        						else{
+        							var levelid = 1//level 1
+        							for(var ind = 0; ind < result2.length; ind++){
+        								if(userscorenow >= result2[ind].score)
+        									levelid = result2[ind].level
+        								else break;
+        							}
+
+        							var sqlString3 = "UPDATE User SET level_id="+mysql.escape(levelid)+
+	 				                                 " WHERE id = "+mysql.escape(id)
+	 				                con.query(sqlString3, function(err3, result3, fields3){
+	 				                	if(err3){
+	 				                	    throw err3;
+	 				                	    cb(null)
+	 				                	}else
+	 				                		cb(result3)
+	 				                })
+        						}
+        					})
+
+        				}else
+        					cb(result1)
+        			}
+        		})
+
+      		});
+		})
+	})
+}
+
 
 module.exports = {
 	editMessage: editMessage,
@@ -252,5 +331,6 @@ module.exports = {
 	selectAllNativelg: selectAllNativelg,
 	selectAllExchangelg: selectAllExchangelg,
 	selectMaxfield: selectMaxfield,
-	selectMinfield: selectMinfield
+	selectMinfield: selectMinfield,
+	calculateScore: calculateScore
 }

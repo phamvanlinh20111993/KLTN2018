@@ -447,7 +447,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 
 			var sqlString1 = "SELECT ex.id, de.name as dename, la.symbol, la.name as laname FROM exchangelg  " +
 							 "ex INNER JOIN language la ON la.id = ex.language_id INNER JOIN degree de " +
-							 "ON de.id = ex.degree_id WHERE ex.user_id = " + mysql.escape(id) + " ORDER BY la.name DESC";
+							 "ON de.id = ex.degree_id WHERE ex.user_id = " + mysql.escape(id) + " ORDER BY ex.prio DESC";
 
 			con.query(sqlString1, function(err, result1, fields){
 				if(err) throw err
@@ -456,7 +456,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 					userInfor.exlang = {}
 
 					userInfor.exlang.learning = []
-					while(index < result.length)
+					while(index < result1.length)
 					{
 						userInfor.exlang.learning[index] = {}
 						userInfor.exlang.learning[index].exid = result1[index].id
@@ -468,7 +468,7 @@ var selectProfile = function(id, cb){//hien thi thong tin profile
 
 					var sqlString2 = "SELECT na.id, la.symbol, la.name as laname FROM nativelg na INNER JOIN " +
 									  "language la ON la.id = na.language_id WHERE na.user_id = " + mysql.escape(id) +
-									  " ORDER BY la.name DESC"	
+									  " ORDER BY na.prio DESC"	
 
 					con.query(sqlString2, function(err, result2, fields){
 						if(err)
@@ -645,7 +645,7 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+
 				 blockusers+
 				 searchcondition +
-				" ORDER BY u.state DESC, le.level ASC";
+				" ORDER BY u.state DESC, ex.prio DESC, le.level ASC";
 
 			console.log(sqlString)
 

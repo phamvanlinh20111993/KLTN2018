@@ -70,21 +70,6 @@ var selectAllReport = function(cb){
     })
 }
 
-
-var changeTranslate_Misspelling = function(url, idlg, cb){
-	$.ajax({
-        type: "PUT",
-        url: url,
-        data:{idlg: idlg},
-        success: function(data)//hien thi message
-        {
-            if(typeof cb == "function")
-                cb(JSON.parse(data));//tra ve du lieu
-        }
-    })
-}
-
-
 var choosereportUser = function(id, time, code, cb){//code is array
 	$.ajax({
         type: "POST",
@@ -124,7 +109,6 @@ var translatePrio = function()
 	var modeltranslate_title = modeltranslate.getElementsByClassName("modal-title")[0]
 	var modeltranslate_body = modeltranslate.getElementsByClassName("modal-body")[0]
 
-	console.log(modeltranslate_body.innerHTML.length)
 	if(modeltranslate_body.innerHTML.length < 60){ // co title  <h4>My Native Language</h4>
 		selectAllmyNative_Exchange("/languageex/user/allnat", MYID, function(data){
 		
@@ -140,7 +124,7 @@ var translatePrio = function()
 			for(var ind = 0; ind < data.allnat.length; ind ++){
 				if(data.allnat[ind].prio == 1){
 					Ele += '<div class="checkbox">'+
-            		 '<label><input type="radio" value="'+data.allnat[ind].id+'" name="natlanguage" '+isdisable+' checked> '+
+            		 '<label><input type="radio" value="'+data.allnat[ind].id+'" id="'+data.allnat[ind].natsy+'" name="natlanguage" '+isdisable+' checked> '+
             	 			data.allnat[ind].natname+'</label>'+
          		 		'</div>'
 				}else{
@@ -163,8 +147,8 @@ var translatePrio = function()
 	modeltranslate_footer_button.onclick = function()
 	{
 		var input_radio = modeltranslate_body.getElementsByTagName("input")
+		var flag = false, natsy = "", value = "";
 		if(input_radio.length > 1){
-			var flag = false, natsy = "", value = "";
 			for(var index = 0; index < input_radio.length; index++){
 				if(input_radio[index].checked){
 					flag = true;
@@ -177,9 +161,10 @@ var translatePrio = function()
 
 		if(flag && MYPRIONAT != natsy){
 
-			changeTranslate_Misspelling("/languageex/user/changetrasprio", value, function(data){
+			requestServer("/languageex/user/changetrasprio", 'PUT', {data:value}, function(data){
 				MYPRIONAT = natsy
-				console.log(data)
+				alert("Change successed.")
+				location.reload()
 			})
 		}
 
@@ -199,19 +184,19 @@ var misspellingPrio = function()
 	if(modelmisspelling_body.innerHTML.length < 60){//co title <h4>My Exchange Language</h4>
 
 		selectAllmyNative_Exchange("/languageex/user/allex", MYID, function(data){
-
+			console.log(data)
 			var Ele = "", isdisable = "", note = "";
 			if(data.allex.length == 1){
 				isdisable = "disabled"
 				note = '<div class="alert alert-info">'+
- 						'<strong>Info!</strong> Please add more your exchange language.'+
+ 						'<strong>Info!</strong> Please add more your exchange language before change.'+
 				 	'</div>'
 			}
 
 			for(var ind = 0; ind < data.allex.length; ind ++){
 				if(data.allex[ind].prio == 1){
 					Ele += '<div class="checkbox">'+
-            		 '<label><input type="radio" value="'+data.allex[ind].id+'" name="exlanguage" '+isdisable+' checked> '+
+            		 '<label><input type="radio" value="'+data.allex[ind].id+'" id="'+data.allex[ind].exsy+'" name="exlanguage" '+isdisable+' checked> '+
             	 			data.allex[ind].exname+'</label>'+
          		 		'</div>'
 				}else{
@@ -234,8 +219,8 @@ var misspellingPrio = function()
 	modelmisspelling_footer_button.onclick = function()
 	{
 		var input_radio = modelmisspelling_body.getElementsByTagName("input")
+		var flag = false, exsy = "", value = "";
 		if(input_radio.length > 1){
-			var flag = false, exsy = "", value = "";
 			for(var index = 0; index < input_radio.length; index++){
 				if(input_radio[index].checked){
 					flag = true;
@@ -245,11 +230,12 @@ var misspellingPrio = function()
 				}
 			}
 		}
-
+	
 		if(flag && MYPRIOEX != exsy){
-			changeTranslate_Misspelling("/languageex/user/changemissprio", value, function(data){
+			requestServer("/languageex/user/changemissprio", 'PUT', {data: value}, function(data){
 				MYPRIOEX = exsy
-				console.log(data)
+				alert("Change successed.")
+				location.reload()
 			})
 		}
 

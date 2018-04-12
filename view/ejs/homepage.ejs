@@ -100,6 +100,9 @@
      var _COUNT_ID_DOM = 0;
      var IDMESSAGEUSER = 0;
      var AUTOCHECKMISSPELLING = true
+      //su dung socket.io
+     var socket = io.connect();
+      //var socket = io();
 
   </script>
 </head>
@@ -371,7 +374,7 @@
 
       <div>
         <!-- http://taimienphi.vn/tmp/cf/aut/hinh-anh-dep-2.jpg -->
-        <img src="<%=user[0].photo %>"  data="tooltip" title="<%=user[0].email %>" class="img-circle" alt="Avatar" height="120" width="120">
+        <img src="<%=user[0].photo %>"  data="tooltip" title="<%=user[0].email %>" class="img-circle" alt="Avatar" height="120" width="120" onclick="Profile()" style="cursor: pointer;">
       </div>
 
       <div style="margin-top: 18%;">
@@ -488,11 +491,7 @@
    function Messenger(){
       location.href = '/languageex/messenger'
    }
-
-      //su dung socket.io
-      var socket = io.connect();
-      //   var socket = io();
-           
+      
       socket.on('connect', function(data) {
          //ban dau la khi nguoi dung ket noi         
          socket.emit('notifyOnline', MYID);//client bao voi server la t online roi
@@ -505,8 +504,10 @@
 
 
       socket.on('numofuseronline', function(signal){
-         if(signal < 0) signal = 0
-         document.getElementById("numofusersonline").innerHTML = " (" + signal + ")"
+       //  if(signal < 0) signal = 0                                         // comment 12:57am 13/4
+      //   document.getElementById("numofusersonline").innerHTML = " (" + signal + ")"//comment 12:57 13/4
+         if(signal < 1) signal = 0 //add 12:57am 13/4
+         document.getElementById("numofusersonline").innerHTML = " (" + (parseInt(signal)-1) + ")" //add 12:57 13/4
       })
 
 </script>

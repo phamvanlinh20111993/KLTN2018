@@ -2,6 +2,7 @@
 
            var INPUT_HIDDEN_SAVE_MSSID = "";//su dung bien nay de luu tru input hidden-luu msg id=>edit msg
            var CONSTANTSTRING = 38492124245347//random number
+           var SCORING = 0;//tinh diem cho moi tin nhan
 
            //this function can remove a array element.
             Array.remove = function(array, from, to) {
@@ -154,6 +155,42 @@
                   })
             }
 
+            //send data to server under json object
+            var REQUEST_AJAX_SERVER = function(url, type, data, cb){
+                var xhr = new XMLHttpRequest();
+                xhr.open(type, url, true);
+                var formData;
+
+                formData = JSON.stringify({data: data})
+                xhr.setRequestHeader("Content-type", "application/json");
+                xhr.onload = function () {
+                    if (xhr.status === 200){
+                        console.log("da chay thanh cong ham request")
+                    }
+                    else{
+                        cb("An unknown error. ", null)
+                        console.log("xay ra loi khong xac dinh. Sorry!!!")
+                    }
+                };
+
+                // Send the Data to server
+                xhr.send(formData);
+
+                //take data from server responsible
+                xhr.onreadystatechange = function(){
+                     //State = 4 is request finished and response is ready, xhr.status == 200 is 200: "OK"
+                    if(xhr.readyState == 4){
+                        if(xhr.status === 200){
+                            var data_response = JSON.parse(xhr.responseText);
+                            cb(null, data_response)
+                        }else{
+                            var err = "Status code err: " + xhr.status
+                            cb(err, null)
+                        }
+                    }
+                }
+            }       
+
             
             //creates markup for a new popup. Adds the id to popups array.
             function register_popup(event, id, name, photo)
@@ -281,7 +318,12 @@
                            }else
                                 ismisspelling = 3;//loi dich tin nhan(cam)
 
-                           console.log("gia tri la: " + ismisspelling)
+                            SCORING = 1;
+                            REQUEST_AJAX_SERVER('/languageex/user/score', 'POST', {score: SCORING}, 
+                                function(err, data){
+                                    if(err) alert(err)
+                            })
+                         //  console.log("gia tri la: " + ismisspelling)
                             message.misspelling = ismisspelling
 						    socket.emit('sendmsg', {
 							   content: message,
@@ -683,14 +725,19 @@
 			{
 				if(e) e.preventDefault()
 				var showtranslatep = document.getElementById(id+"_trans")
-            var realcontent = document.getElementById(id+"_savecontentms")
+                var realcontent = document.getElementById(id+"_savecontentms")
          
 				if(showtranslatep.innerHTML == ""){
 
 					Translate_or_Misspelling("/languageex/user/translate", 
 				  		MYPRIOEX, MYPRIONAT, realcontent.value, function(data){
 				  		if(data.content.error == null){
-				  			showtranslatep.innerHTML = "trans:  <span style='color:blue;'>"+data.content.translated+"</span>"
+                            if(data.content.from == MYPRIOEX)
+				  			   showtranslatep.innerHTML = "trans: <span style='color:blue;'>"+data.content.translated+"</span>"
+                            else{
+                                showtranslatep.innerHTML = "trans: <span style='color:blue;'>"+data.content.translated+". </span>"+
+                                                            "(from "+data.content.from+ " to " + MYPRIONAT + ")"
+                            }
 				  		}else
 				  			showtranslatep.innerHTML = "somes error with your msg. Error translate."
 				  		
@@ -714,7 +761,7 @@
 			function Misspelling(id, content, cb)
 			{
 				var showcheckedmis = document.getElementById(id+"_missp")
-            var realcontent = document.getElementById(id+"_savecontentms")
+                var realcontent = document.getElementById(id+"_savecontentms")
 				if(showcheckedmis.innerHTML == "")
 				{
 					Translate_or_Misspelling("/languageex/user/checkmisspelling", 
@@ -725,8 +772,11 @@
 
 						if(data.content.error == null){
 							if(data.content.value == ""){
-								showcheckedmis.innerHTML = "your message ok."
-                        document.getElementById(id+"_check").style.color = "#337ab7"
+								if(data.content.language == MYPRIOEX)
+                                    showcheckedmis.innerHTML = "your message ok."
+                                else
+                                    showcheckedmis.innerHTML = "your message ok. But not your exchange language."
+                                document.getElementById(id+"_check").style.color = "#337ab7"
 							}else{
 								if(data.content.language == MYPRIOEX){
 									showcheckedmis.innerHTML = "Did you mean: " + matchMisspelling(realcontent.value, data.content.value)
@@ -784,7 +834,7 @@
 				var p_content = document.getElementById(id+"_contentmsg")
 				var input_fix_content = document.getElementById(id+"_fixcontmsg")
 				var input_fix_old_content = input_fix_content.value
-            var hiddent_content_msg = document.getElementById(id+"_savecontentms")
+                var hiddent_content_msg = document.getElementById(id+"_savecontentms")
 
 				p_content.style.display = "none"
 				input_fix_content.style.display = "block"
@@ -807,17 +857,24 @@
 								span_edit.style.color = "green"
 								p_content.innerHTML = content
 								input_fix_content.style.display = "none"
-                        hiddent_content_msg.value = content//update new value
+                                hiddent_content_msg.value = content//update new value
 
-                        var showtranslatep = document.getElementById(id+"_trans")
-                        showtranslatep.innerHTML = ""//reset value translate before
+                                var showtranslatep = document.getElementById(id+"_trans")
+                                showtranslatep.innerHTML = ""//reset value translate before
 
-                        var showcheckedmis = document.getElementById(id+"_missp")//reset value checkmiss
-                        showcheckedmis.innerHTML = ""
+                                var showcheckedmis = document.getElementById(id+"_missp")//reset value checkmiss
+                                showcheckedmis.innerHTML = ""
 
-                        if(sessionStorage.getItem("_checkmiss_"+id) == "false"){ //check lai loi chinh ta
-                           Misspelling(id, content, null);
-                        }
+                                if(sessionStorage.getItem("_checkmiss_"+id) == "false"){ //check lai loi chinh ta
+                                    Misspelling(id, content, null);
+                                }
+
+                                SCORING = 1;
+                                REQUEST_AJAX_SERVER('/languageex/user/score', 'POST', {score: SCORING}, 
+                                function(err, data){
+                                    if(err) alert(err)
+                                })
+                               
 								//console.log(data)
                              //   socket.emit('editmsg', {myid:MYID, pid: })
 							})

@@ -1,6 +1,7 @@
 
 var USERCHATNOW = {};//tra ve object infor cua nguoi dung dang nhan tin hien tai(dang click)]
 var CONSTANTSTRING = 38492124245347//random number
+var SCORING = 0;
 
 //gui du lieu len server
 var Translate_or_Misspelling = function(url, myex, mynat, content, cb){
@@ -39,7 +40,7 @@ var HTTP_REQUEST = function(url, type, data, cb){
 
     var formData;
 
-      formData = JSON.stringify({data: data})
+    formData = JSON.stringify({data: data})
     xhr.setRequestHeader("Content-type", "application/json");
 
     // Set up a handler for when the request finishes.
@@ -374,7 +375,13 @@ var SendMessage = function(e){
          message.content = contentmsg
          message.data = null
          message.edit = []//khoi tao rong
+         //nhan tin thi diem tang len
+         SCORING = 1;
 
+         HTTP_REQUEST('/languageex/user/score', 'POST', {score: SCORING}, 
+            function(err, data){
+                if(err) alert(err)
+            })
          var myinfo = {
             id : USERCHATNOW.id,//id cua doi phuong
             photo : MYPHOTO,
@@ -460,7 +467,13 @@ var WriteMessage = function(){
    var time = formatAMPM(new Date());
    var contentmsg = document.getElementById("contentMessage").value
    if(contentmsg.length > 0){
-         //tao object
+      //nhan tin thi diem tang len
+      SCORING = 1;
+      HTTP_REQUEST('/languageex/user/score', 'POST', {score: SCORING}, 
+         function(err, data){
+            if(err) alert(err)
+         })
+      //tao object
       var message = {}
       message.content = contentmsg
       message.data = null

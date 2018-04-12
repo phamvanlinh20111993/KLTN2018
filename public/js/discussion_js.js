@@ -1,4 +1,4 @@
-
+var  SCORING = 0;
 //theo doi hoac bo theo doi nguoi dung
 var ajaxRequest = function(url, data, callback) {//data is a object
   // body...
@@ -296,7 +296,7 @@ var showPost = function(User, Posts, state)
                         '<td><img src="'+MYPHOTO+'" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;" data="tooltip" title="'+MYNAME+'"></td>'+
                         '<td style="width:94%;">'+
                            '<input type="text" placeholder="Write your comments...." class="divcmt2" '+
-                             isturnofcmt+' onkeypress="submitComment(event,'+id+')" id="'+id+'_writecmts" >'+
+                             isturnofcmt+' onkeypress="submitComment(event,'+id+','+User.id+')" id="'+id+'_writecmts" >'+
                         '</td>'+
                        '</tr>'+
                      '</table>'+
@@ -740,6 +740,12 @@ var submitPost = function(){
 			turnofcmt:0,
 		}
 
+		SCORING = 2 // moi lan dang bai duoc cong 2 diem
+		requestServer('/languageex/user/score', 'POST', {score: SCORING}, 0, 
+            function(err, data){
+                if(err) alert(err)
+            })
+	
 		requestServer('/languageex/user/createPost', 'POST', data, 0, function(err, data){
 			if(err) alert(err)
 			else{//tra du lieu ve thanh cong
@@ -759,8 +765,17 @@ var submitPost = function(){
 	@@e: check event press keyboard
 	@@ postid: user comment in specifix post
 **/
-var submitComment = function(e, postid){
+var submitComment = function(e, postid, ownpostid){
 	if(e.keyCode == 13){
+
+		if(ownpostid != MYID){ //day khong la bai dang cua toi
+			SCORING = 3;
+            requestServer('/languageex/user/score', 'POST', {score: SCORING}, 0, 
+                function(err, data){
+                    if(err) alert(err)
+                })
+		}
+
 		var contentcmt = document.getElementById(postid+"_writecmts")
 		if(contentcmt.value == "")
 			alert("Please dont enter empty characters.")

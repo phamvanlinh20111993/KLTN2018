@@ -61,8 +61,39 @@ router.route('/user/changetrasprio')
 .put(function(req, res){
 
 	if(req.session.filter){
-		console.log(req.body)//update database
-		res.send(JSON.stringify({notify: "Done"}))
+		var idlg = parseInt(req.body.data.data)
+		if(idlg){
+			var field = [{field: "prio", value: 0}]
+			var wherecondition = [{op: "", field: "user_id", value: req.session.user_id}]
+			//change prio to 0(no priority)
+			querysimple.updateTable("nativelg", field, wherecondition, function(result, err){
+				if (err) {throw err}
+				else{
+					var field1 = [{field: "prio", value: 1}]
+					var wherecond = [{op: "", field: "user_id", value: req.session.user_id}, 
+					{op: "AND", field: "language_id", value: idlg}]
+
+					querysimple.updateTable("nativelg", field1, wherecond, function(result1, err1){
+						if (err1) {throw err1}
+						else{
+
+							querysimple.selectTable("language", ["name", "symbol"], 
+							 [{op: "", field: "id", value: idlg}], null, null, null, 
+							 function(result3, fields3, err3){
+							 	if (err3) { throw err3}
+							 	else{
+									req.session.mynative = result3[0].symbol
+							        res.send(JSON.stringify({notify: "Done"}))
+								}
+							})
+						}
+					})
+
+					
+				}
+			})
+		}
+		
 	}
 })
 
@@ -71,8 +102,36 @@ router.route('/user/changemissprio')
 .put(function(req, res){
 
 	if(req.session.filter){
-		console.log(req.body)//update database
-		res.send(JSON.stringify({notify: "Done"}))
+		var idlg = parseInt(req.body.data.data)
+		if(idlg){
+			var field = [{field: "prio", value: 0}]
+			var wherecondition = [{op: "", field: "user_id", value: req.session.user_id}]
+			//change prio to 0(no priority)
+			querysimple.updateTable("exchangelg", field, wherecondition, function(result, err){
+				if (err) {throw err}
+				else{
+					var field1 = [{field: "prio", value: 1}]
+					var wherecond = [{op: "", field: "user_id", value: req.session.user_id}, 
+					{op: "AND", field: "language_id", value: idlg}]
+
+					querysimple.updateTable("exchangelg", field1, wherecond, function(result1, err1){
+						if (err1) {throw err1}
+						else{
+							querysimple.selectTable("language", ["name", "symbol"], 
+							 [{op: "", field: "id", value: idlg}], null, null, null, 
+							 function(result3, fields3, err3){
+							 	if (err3) { throw err3}
+							 	else{
+							 		req.session.myexchange = result3[0].symbol
+									res.send(JSON.stringify({notify: "Done"}))
+								}
+							})
+						}
+					})
+					
+				}
+			})
+		}
 	}
 })
 

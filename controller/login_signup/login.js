@@ -179,7 +179,6 @@ router.route('/user/login')
 
  		if(emailcode == req.session.verifyemail || req.session.automailcode){
  			//update database...
-
  			var password = CryptoJS.AES.encrypt(req.session.email, md5(newpass)).toString()
  			req.session.verifyemail = null
  			req.session.count_rspass = null

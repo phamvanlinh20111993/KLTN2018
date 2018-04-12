@@ -52,18 +52,16 @@ function formatAMPM(date)
 var showUserCommunity = function(User)
 {
   
-	var isOnline = '<h4 data="tooltip" title="'+User.infor.email+'"> <i class="fa fa-circle" style="color:red;"></i> '+User.infor.name+' </h4>'
+	var isOnline='<h4 ><i class="fa fa-circle" style="color:red;"></i><a href="#" style="text-decoration:none;color:black;" '+
+            ' data-toggle="popover" title="Des" data-content="'+User.infor.describe+'"> '+User.infor.name+'</a> </h4>'
 
 	var isFollow = "color:#3399FF;"
-  var tooltipFollow = "Follow "
-  var id = User.infor.id
+   var tooltipFollow = "Follow "
+   var id = User.infor.id
 
-  var isblockedmsg = '<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
+   var isblockedmsg = '<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
                             ' data-toggle="tooltip" title="Send message" class="icon">'+
                           '<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>'
-
-  var followstr = '<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="'+tooltipFollow+User.infor.name+
-                          '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
 
 	if(User.infor.state == 1){//dang online
 		isOnline = '<h4> <i class="fa fa-circle" style="color:green;"></i> '+
@@ -72,8 +70,11 @@ var showUserCommunity = function(User)
 
 	if(User.infor.follow.id > 0){
 		isFollow = "color:red;";
-    tooltipFollow = "Unfollow ";
+      tooltipFollow = "Unfollow ";
 	}
+
+   var followstr = '<a href="#" onclick="followUser('+id+',\''+User.infor.name+'\')" data-toggle="tooltip" title="'+tooltipFollow+User.infor.name+
+                          '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
 
   if(User.infor.iswasblocked.state){
     isblockedmsg = '<a href="#" onclick="wasBlock('+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\',\''+User.infor.iswasblocked.timeblock+'\' );" '+
@@ -102,7 +103,7 @@ var showUserCommunity = function(User)
 	var Interface = '<div id = "'+id+'_community" class="col-md-3" style="min-height: 360px;margin-top: 3%;margin-left: 2%;">'+
              			'<div class="card inf-content">' +
                				'<div style="width: 100%;height: 50%;" data-toggle="tooltip" title="View profile ">' +
-                  				'<img src="'+User.infor.photo+'"alt="'+User.infor.name+'" style="width:100%;max-height:100%;cursor:pointer; '+
+                  				'<img src="'+User.infor.photo+'" data="tooltip" title="'+User.infor.email+'" alt="'+User.infor.name+'" style="width:100%;max-height:100%;cursor:pointer; '+
             					     'border-radius:8px;border:1px solid #696969; " onclick="viewProfileByImage(\''+id+'\')">'+
               				'</div>'+
          					'<div style="line-height: 90%;">'+
@@ -298,3 +299,39 @@ function Change_date(Date_time)
 var wasBlock = function(id, name, photo, time){
   alert("you was blocked by " + name + " at " + Change_date(time))
 } 
+
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover(); 
+});
+
+
+//xu li su kien moi khi co nguoi online trong cong dong thi hien thi thong bao
+//show thong tin nguoi do
+var communityUser = []
+socket.on('whoonline', function(data){
+   var flagcm = false;
+   console.log("id of humman just online is " + data.id)
+   for(var ind = 0; ind < communityUser.length; ind++){
+      if(communityUser[ind].toString() == (data.id).toString()){
+         flagcm = true;
+         break;
+      }
+   }
+
+   if(flagcm == false){
+      communityUser[communityUser.length] = data.id 
+      var r = confirm("Some one is online. Reload page?")
+      if(r == true){
+         document.getElementById("MycommunityExchange").innerHTML = ""
+         getListUserCommnunity(MYID, function(data, err){
+            if(err) alert(err)
+            else{
+               var size = data.community.length;
+               var ind = 0;
+               for(ind = 0; ind < size; ind++)
+                  showUserCommunity(data.community[ind])
+            }
+         })
+      }
+   }
+})

@@ -71,6 +71,7 @@
      var MYPHOTO = "<%= session.photo %>"
      var MYPRIONAT = "<%= session.mynative %>"
      var MYPRIOEX = "<%= session.myexchange %>"
+     var myinformation = <%-JSON.stringify(User)%>
   </script>
   </head>
   <body>
@@ -103,6 +104,105 @@
     </div>
   </div>
   	
+
+
+   <div class="modal fade" id="EditinforUser" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <!-- Modal content-->
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit Profile</h4>
+        </div>
+
+        <div class="modal-body">
+            <div style="width: 80%;margin-left: 10%;height: auto;">
+
+               <form action="/languageex/user/edit" name="myForm" id="myform1" method="post" onsubmit="return validateForm()">
+                  <div class="form-group">
+                     <label for="name">Name:</label>
+                     <input type="text" class="form-control" id="name" name="name" value="<%=User.infor.name%>" minlength="6" maxlength="30" pattern="[A-Za-z0-9 ]{6,30}" required >
+                  </div>
+
+                  <div class="form-group">
+                     <label for="comment">Describe:</label>
+                     <textarea class="form-control" rows="5" name="describe" minlength="100" maxlength="2000" required><%=User.infor.describe%></textarea>
+                  </div>
+
+                  <div class="form-group">
+                     <label for="comment">Gender:</label></br>
+                     <%if(User.infor.gender == 'male'){%>
+                         <label class="radio-inline">
+                           <input type="radio" value="male" name="gender" checked>Male
+                        </label>
+                     <%}else{%>
+                        <label class="radio-inline">
+                           <input type="radio" value="male" name="gender">Male
+                        </label>
+                     <%}%>
+                     <%if(User.infor.gender == 'female'){%>
+                        <label class="radio-inline">
+                           <input type="radio" name="gender" value="female" checked>Female
+                        </label>
+                     <%}else{%>
+                        <label class="radio-inline">
+                           <input type="radio" name="gender" value="female">Female
+                        </label>
+                      <%}%>
+                      <%if(User.infor.gender == 'unknown'){%>
+                        <label class="radio-inline">
+                           <input type="radio" name="gender" value="unknown" checked>Unknown
+                        </label>
+                      <%}else{%>
+                           <label class="radio-inline">
+                              <input type="radio" name="gender" value="unknown">Unknown
+                           </label>
+                       <%}%>
+                  </div>
+
+                  <div class="form-group">
+                     <label for="birthday">Birthday:</label>
+                     <input type="date" name="bday" class="form-control" id="bday" value="<%=User.infor.dateofbirth1%>" max="2012-12-31" min="1900-12-31" required>
+                  </div>
+            </form>
+
+            <div style="display:none;" id="DivChangePassword">
+               <div class="form-group">
+                  <label for="pwd">Current Pass:</label>
+                  <input type="password" class="form-control" id="pwd" autocomplete="off">
+                  <p id="password" style="color: red;display: none;"></p>
+               </div>
+
+               <div class="form-group">
+                  <label for="pwd">New Pass:</label>
+                  <input type="password" class="form-control" id="npwd"  autocomplete="off">
+                  <p id="newpassword" style="color: red;display: none;"></p>
+               </div>
+
+               <div class="form-group">
+                  <label for="pwd">Confirm New Pass:</label>
+                  <input type="password" class="form-control" id="cpwd"  autocomplete="off">
+                  <p id="confirmpassword" style="color: red;display: none;"></p>
+               </div>
+            </div>
+
+            <button type="button" class="btn btn-warning" id="ChangePassword">Change password</button>
+         </div>
+           
+        </div>
+
+        <div class="modal-footer">
+         <input type="submit" class="btn btn-success" value="Done" form="myform1" id="submitform">
+         <input type="button" class="btn" value="Save changes"  id="changepassuser" style="display: none;margin-left: 20%;">
+       </div>
+
+      </div>
+   
+    </div>
+  </div>
+
+
    <!-- Modal -->
   <div class="modal fade" id="BoxUpdatePhoto" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -139,6 +239,48 @@
   </div>
 
 
+  <!-- Modal -->
+  <div class="modal fade" id="loadmoreExchangelanguage" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Your Exchange Languagues</h4>
+        </div>
+
+        <div class="modal-body">
+
+            
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Modal -->
+  <div class="modal fade" id="loadmoreNativelanguage" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Your Native Languagues</h4>
+        </div>
+
+        <div class="modal-body">
+
+            
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
    <!-- Modal -->
 <div id="InformationBox" class="modal fade" role="dialog">
@@ -305,7 +447,11 @@
 
                       <tr>
                         <td>Learning:</td>
-                        <td><%=User.exlang.learning[0].langname%></td>
+                        <td>
+                           <% User.exlang.learning.forEach(function(ex) { %>
+                              <li><%= ex.langname %> </li>
+                           <% }); %>
+                        </td>
                       </tr>
 
                       <tr>
@@ -330,7 +476,11 @@
                         </tr>
                         <tr>
                            <td>Native</td>
-                           <td><%=User.natlang.learning[0].langname%></td>
+                           <td>
+                              <% User.natlang.learning.forEach(function(nat) { %>
+                                 <li><%= nat.langname %> </li>
+                              <% }); %>
+                           </td>
                         </tr>
                      </tr>
 
@@ -372,11 +522,11 @@
                  <div style="height: 35px;">
                   <span class="pull-right">
 
-                     <a href="#" data-original-title="Add more exchange language" data-toggle="tooltip" type="button" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-font"></i></a>
+                     <a href="#" data-original-title="Add more exchange language" data-toggle="tooltip" type="button" onclick = "addMoreExchange('<%=User.infor.id%>')" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-font"></i></a>
 
-                     <a href="#" data-original-title="Add more native language" data-toggle="tooltip" type="button" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-bold"></i></a>
+                     <a href="#" data-original-title="Add more native language" data-toggle="tooltip" type="button"  onclick = "addMoreNative('<%=User.infor.id%>')" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-bold"></i></a>
 
-                    <a href="#" data-original-title="Edit info" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning"><i class="glyphicon glyphicon-edit"></i></a>
+                    <a href="#" data-original-title="Edit info" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning" onclick="editInformation('<%=User.infor.id%>')"><i class="glyphicon glyphicon-edit"></i></a>
 
                      <a data-original-title="My blocks list" data-toggle="tooltip" type="button" class="btn btn-sm btn-danger" onclick="myBlockList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-folder-open"></i></a>
 

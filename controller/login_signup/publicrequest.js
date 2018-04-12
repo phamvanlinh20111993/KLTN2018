@@ -66,6 +66,17 @@ var getDateTime = function(date){
                 '/' + date.getFullYear();
 }
 
+var getDateTime1 = function(date){
+	var Month = (parseInt(date.getMonth()) + 1)
+	var Day = date.getDate()
+
+	if(Month < 10) Month = "0" + Month
+	if(Day < 10) Day = "0"+ Day
+	return  (date.getFullYear())+
+                '-' + Month +
+                '-' + Day;
+}
+
 function createSession(req, res, emailuser, passuser)
 {
 	querysimple.selectTable("User", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
@@ -253,7 +264,9 @@ router.route('/')
  							var User = result1
  							if(userid == req.session.user_id){
  								User.state = "me"
+ 								User.infor.dateofbirth1 = getDateTime1(new Date(User.infor.dateofbirth))
  								User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
+ 								//console.log(User.exlang)
  							    res.render('ejs/Profile', {User: User})
  							}else{//toi xem thong tin cua nguoi dung khac:
  								//co follow nguoi nay khong, co dang block nguoi nay khong

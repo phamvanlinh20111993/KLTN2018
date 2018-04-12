@@ -34,7 +34,6 @@ router.route('/home')
 							req.session.email = result[0].email
 							req.session.password = result[0].password
 							req.session.photo = result[0].photo
-
 							anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
 								req.session.mynative = data[0].natsy
 								req.session.myexchange = data[0].exsy
@@ -108,6 +107,24 @@ router.route('/home')
 		res.redirect('/languageex/user/filter')
 	}else
 		res.redirect('/languageex/user/login')
+})
+
+
+//tinh diem cho nguoi dung
+router.route('/user/score')
+.post(function(req, res){
+	if(req.session.user_id){
+		var Score = req.body.data.score//tao 1 session luu tru diem cua nguoi dung
+		console.log("User's score: " + Score)
+		if(Score){
+			anotherquery.calculateScore(req.session.user_id, Score, function(data){
+				if(data)
+					res.json({result: "successed."})
+				else 
+					res.json({result: "error"})
+			})
+		}
+	}
 })
 
 module.exports = router;

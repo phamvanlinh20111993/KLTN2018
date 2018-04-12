@@ -144,6 +144,7 @@ io.on('connection', function(client)
     	for(index = 0; index < userOnorOffline_id.length; index ++){
         	if(userOnorOffline_id[index] == id){
 	     		io.to(client.handshake.session.community).emit('numofuseronline',  client.handshake.session.numOn)
+            client.in(client.handshake.session.community).emit('whoonline', {id: id})//ca 
           	flag = true;
           	break;
         	}
@@ -152,7 +153,8 @@ io.on('connection', function(client)
       if(!flag){
 
          client.handshake.session.numOn = 0;
-         client.handshake.session.community = client.handshake.session.uid;
+         //client.handshake.session.community = client.handshake.session.uid;//comment 12:56am 13/4/2018
+         client.handshake.session.community = client.handshake.session.uid;//add 12:56am 13/4/2018
          //add to array
          userOnorOffline_id[userOnorOffline_id.length] = client.handshake.session.id;
          client.handshake.session.save();
@@ -167,13 +169,14 @@ io.on('connection', function(client)
                   for(index = 0; index < data.length; index++){
                      if(data[index].state == 1)
                         client.handshake.session.numOn++;
-                     client.handshake.session.community += data[index].id
+                     client.handshake.session.community += data[index].id.toString() //add toString() 12:56am 13/4
                   }
                   client.handshake.session.save();
 
                   console.log("my community room " + client.handshake.session.community)
                   client.join(client.handshake.session.community)
                   io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+                  client.in(client.handshake.session.community).emit('whoonline', {id: id})
                })
             }
          })
@@ -228,8 +231,8 @@ io.on('connection', function(client)
                delete client.handshake.session.uid;
                client.handshake.session.save();
             }
-       })
-	  }
+         })
+	   }
 
    })
    
@@ -326,16 +329,17 @@ io.on('connection', function(client)
          client.room = pid + myid
 
       //save in database
-      anotherQuery.selectMaxfield("message", "id", function(res)
-      {
-         var idmessg = res[0].max
+    //  anotherQuery.selectMaxfield("message", "id", function(res)
+    //  {
+      //   var idmessg = res[0].max
+           idmessg = 0
          //chen du lieu vao bang
-         querysimple.insertTable("message", 
-            ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
-            [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
-            function(result, err){
-              if(err)  throw err;
-               else{
+     //    querysimple.insertTable("message", 
+     //       ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
+     //       [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
+     //      function(result, err){
+      //        if(err)  throw err;
+      //         else{
                   console.log("1 record inserted messages.");
                   console.log("nhan tin vao room " + client.room)
 
@@ -351,10 +355,10 @@ io.on('connection', function(client)
                      id_receive: data.pid,
                      time: data.time
                   })
-               }
-         })
+     //          }
+    //     })
 
-      })
+    //  })
    })
 
 
