@@ -318,20 +318,28 @@ socket.on('whoonline', function(data){
       }
    }
 
-   if(flagcm == false){
+   if(flagcm == false && data.state == false){//data.state = false chung to nguoi dung load trang
       communityUser[communityUser.length] = data.id 
-      var r = confirm("Some one is online. Reload page?")
-      if(r == true){
-         document.getElementById("MycommunityExchange").innerHTML = ""
-         getListUserCommnunity(MYID, function(data, err){
-            if(err) alert(err)
-            else{
-               var size = data.community.length;
-               var ind = 0;
-               for(ind = 0; ind < size; ind++)
-                  showUserCommunity(data.community[ind])
-            }
-         })
-      }
+      var popupDiv1 = document.getElementById("myPopupdiv")
+      popupDiv1.style.display = "block"
+      setTimeout(function() {
+          popupDiv1.style.display = "none"
+      }, 7000)
    }
 })
+
+document.getElementById("myPopupcommunity").onclick = function(e) {
+   // body...
+   var popupDiv1 = document.getElementById("myPopupdiv")
+   popupDiv1.style.display = "none"
+   document.getElementById("MycommunityExchange").innerHTML = ""
+   getListUserCommnunity(MYID, function(data, err){
+      if(err) alert(err)
+      else{
+         var size = data.community.length;
+         var ind = 0;
+         for(ind = 0; ind < size; ind++)
+            showUserCommunity(data.community[ind])
+      }
+   })
+}

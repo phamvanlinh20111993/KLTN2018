@@ -89,6 +89,42 @@
        box-shadow: 0 0 8px #828282;
    }  
 
+
+   .popup122 {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* The actual popup */
+.popup122 .popuptext {
+    width: 160px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: fixed;
+    z-index: 1;
+    margin-left:1140px;
+    margin-top: 120px;
+}
+
+/* Add animation (fade in the popup) */
+/*@-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+} */
+
   </style>
   <link rel="stylesheet" href="/css/processboxchat.css">
   <script type="text/javascript">
@@ -116,6 +152,10 @@
   </div>
 </noscript>
 
+   
+<div class="popup122" id="myPopupdiv" style="display:none;">
+  <span class="popuptext" id="myPopupcommunity"><span class="glyphicon glyphicon-refresh"></span> Someone is online, refresh page!</span>
+</div>
 
   <div class="modal fade" id="InformationEditMessage" role="dialog">
     <div class="modal-dialog">

@@ -144,7 +144,7 @@ io.on('connection', function(client)
     	for(index = 0; index < userOnorOffline_id.length; index ++){
         	if(userOnorOffline_id[index] == id){
 	     		io.to(client.handshake.session.community).emit('numofuseronline',  client.handshake.session.numOn)
-            client.in(client.handshake.session.community).emit('whoonline', {id: id})//ca 
+            client.in(client.handshake.session.community).emit('whoonline', {id: id, state:true})//ca 
           	flag = true;
           	break;
         	}
@@ -154,34 +154,52 @@ io.on('connection', function(client)
 
          client.handshake.session.numOn = 0;
          //client.handshake.session.community = client.handshake.session.uid;//comment 12:56am 13/4/2018
-         client.handshake.session.community = client.handshake.session.uid;//add 12:56am 13/4/2018
+         client.handshake.session.community = "";//add 12:56am 13/4/2018
          //add to array
          userOnorOffline_id[userOnorOffline_id.length] = client.handshake.session.id;
          client.handshake.session.save();
 
          var sqlString = "UPDATE User SET state = 1 WHERE id = " + mysql.escape(client.handshake.session.uid)
-         con.query(sqlString, function(err, result, fields){
-            if(err) throw err;
-            else{
-               console.log(result.affectedRows + " record(s) updated online.");
-               anotherQuery.selectListUsermyCommunityEx(client.handshake.session.uid, function(data){
-                  var index = 0
-                  for(index = 0; index < data.length; index++){
-                     if(data[index].state == 1)
-                        client.handshake.session.numOn++;
-                     client.handshake.session.community += data[index].id.toString() //add toString() 12:56am 13/4
-                  }
-                  client.handshake.session.save();
-
-                  console.log("my community room " + client.handshake.session.community)
-                  client.join(client.handshake.session.community)
-                  io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
-                  client.in(client.handshake.session.community).emit('whoonline', {id: id})
-               })
+         con.beginTransaction(function(err){
+            if (err) { 
+               throw err; 
             }
+            con.query(sqlString, function(err, result, fields){
+               if(err){
+                  con.rollback(function() {
+                     throw err;
+                  });
+               }
+               else{
+                  
+                  con.commit(function(err) {
+                     if (err) { 
+                        con.rollback(function() {
+                           throw err;
+                        });
+                     }
+                     console.log(result.affectedRows + " record(s) updated online.");
+                     anotherQuery.selectListUsermyCommunityEx(client.handshake.session.uid, function(data){
+                        var index = 0
+                        for(index = 0; index < data.length; index++){
+                           if(data[index].state == 1)
+                              client.handshake.session.numOn++;
+                           client.handshake.session.community += data[index].id.toString() //add toString() 12:56am 13/4
+                        }
+                        client.handshake.session.save();
+
+                        console.log("my community room " + client.handshake.session.community)
+                        console.log('Transaction Complete.');
+                        client.join(client.handshake.session.community)
+                        io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+                        client.in(client.handshake.session.community).emit('whoonline', {id: id, state:false})
+                     })
+                  })
+
+               }
+            })
          })
       }
-
    })
 
 
@@ -196,42 +214,60 @@ io.on('connection', function(client)
       }
 
       if(client.handshake.session.uid){
+
          var sqlString = "UPDATE User SET state = 0 WHERE id = " + mysql.escape(client.handshake.session.uid)
-         con.query(sqlString, function(err, result, fields){
-            if(err) throw err;
-            else{
-               client.handshake.session.numOn--;
-               io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
-               //io.sockets.in(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
-               console.log(result.affectedRows + " record(s) updated offline.");
+         con.beginTransaction(function(err){
 
-               client.leave(client.handshake.session.community);
-               client.leave(client.room);
-
-               var roomchatsLength = roomchats.length
-               while(index < roomchatsLength){
-                  if(roomchats[index].room == client.room)
-                  {
-                     if(roomchats[index].idM1 == client.handshake.session.uid)
-                        roomchats[index].idM1 = null
-                     if(roomchats[index].idM2 == client.handshake.session.uid)
-                        roomchats[index].idM2 = null
-
-                     if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
-                        roomchats[index].splice(index, 1)
-                        roomchatsLength--;
+            if(err) throw err
+            con.query(sqlString, function(err, result, fields){
+               if(err){
+                  con.rollback(function() {
+                     throw err;
+                  });
+               }else{
+                  con.commit(function(err) {
+                     if (err) { 
+                        con.rollback(function() {
+                           throw err;
+                        });
                      }
-                  }
 
-                  index++
+                     client.handshake.session.numOn--;
+                     io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+                     //io.sockets.in(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+                     console.log(result.affectedRows + " record(s) updated offline.");
+                     console.log('Transaction Complete.');
+
+                     client.leave(client.handshake.session.community);
+                     client.leave(client.room);
+
+                     var roomchatsLength = roomchats.length
+                     while(index < roomchatsLength){
+                        if(roomchats[index].room == client.room)
+                        {
+                           if(roomchats[index].idM1 == client.handshake.session.uid)
+                              roomchats[index].idM1 = null
+                           if(roomchats[index].idM2 == client.handshake.session.uid)
+                              roomchats[index].idM2 = null
+
+                           if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
+                              roomchats[index].splice(index, 1)
+                              roomchatsLength--;
+                           }
+                        }
+
+                        index++
+                     }
+
+                     delete client.handshake.session.community;
+                     delete client.handshake.session.numOn;
+                     delete client.handshake.session.uid;
+                     client.handshake.session.save();
+                  });
                }
-
-               delete client.handshake.session.community;
-               delete client.handshake.session.numOn;
-               delete client.handshake.session.uid;
-               client.handshake.session.save();
-            }
+            })
          })
+
 	   }
 
    })
