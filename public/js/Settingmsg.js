@@ -407,3 +407,5 @@ var Auto_check_miss = function(el, pid){
 		//get to server
 	}
 }
+
+//nhan thong bao tu server

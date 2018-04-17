@@ -242,6 +242,7 @@ io.on('connection', function(client)
                      client.leave(client.room);
 
                      var roomchatsLength = roomchats.length
+                     var index = 0;//add 8:55pm 14/4/2018
                      while(index < roomchatsLength){
                         if(roomchats[index].room == client.room)
                         {
@@ -251,7 +252,7 @@ io.on('connection', function(client)
                               roomchats[index].idM2 = null
 
                            if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
-                              roomchats[index].splice(index, 1)
+                              roomchats.splice(index, 1)
                               roomchatsLength--;
                            }
                         }
@@ -331,7 +332,7 @@ io.on('connection', function(client)
                roomchats[index].idM2 = null
 
             if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
-               roomchats[index].splice(index, 1);
+               roomchats.splice(index, 1);
                roomchatsLength--
             }
          }
@@ -395,6 +396,12 @@ io.on('connection', function(client)
     //     })
 
     //  })
+
+      client.in(client.handshake.session.community).emit('isturnonbox', { 
+         myphoto: data.photo,
+         id_send: data.myid,
+         id_receive: data.pid
+       })//ca 
    })
 
 

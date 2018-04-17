@@ -21,11 +21,13 @@ function existAccount(email, cb)
       [{ op:"", field: "email", value: email}], null, null, null, 
      function(result, fields, error)
      {
-         if (error)   throw error
-         if(result.length > 0)
-            cb(result, true)
-         else
-            cb(null, false)
+         if(error)   throw error
+         else{
+            if(result.length > 0)
+               cb(result, true)
+            else
+               cb(null, false)
+         }
      })
 }
 
@@ -112,6 +114,7 @@ router.route('/user/signup/api/auth/facebook/callback')
   function(req, res) {
       //check database set user login berofe..
       existAccount(req.user.emails[0].value, function(data, result){
+
          if(result){
             if(data[0].provider != "facebook")
                res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(5)))  
@@ -131,7 +134,7 @@ router.route('/user/signup/api/auth/facebook/callback')
 
          //    console.log(req.user)
             var value = encodeURIComponent(req.session.provider);
-            var id = encodeURIComponent(CryptoJS.AES.encrypt(req.user.id, md5(req.session.username)));
+            var id = encodeURIComponent(CryptoJS.AES.encrypt(req.user.id.toString(), md5(req.session.username)));
             res.redirect(307,'/languageex/user/signup/register?key=' + value + '&id=' + id);
          }
       })
@@ -187,6 +190,7 @@ router.route('/user/signup/api/auth/google/callback').get(
          }
       }
       else{
+       //  console.log(req.user)
          if(req.user.id > 18446744073709552000)
             req.user.id = req.user.id/100
 
@@ -196,14 +200,14 @@ router.route('/user/signup/api/auth/google/callback').get(
          req.session.photo = req.user.photos[0].value
          req.session.gender = req.user.gender
          req.session.provider = req.user.provider
-    
+
          var value = encodeURIComponent(req.session.provider);
-         var id = encodeURIComponent(CryptoJS.AES.encrypt(req.user.id, md5(req.session.username)));
+         var id = encodeURIComponent(CryptoJS.AES.encrypt(req.user.id.toString(), md5(req.session.username)));
+          console.log("fsdfdsf" + id)
          //307 in post router then redirect to url type post(not get)
          res.redirect(307, '/languageex/user/signup/register?key=' + value + '&id=' + id);//get redirect
       }
    })
-      // console.log(req.user)
       
   });
 

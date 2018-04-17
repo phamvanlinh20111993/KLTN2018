@@ -166,12 +166,18 @@ var selectUserCommunity = function(){
   })
 }
 
-
+//hien thi thong bao
 var showMyNotify = function(){
   $('#showNotifyHome').modal({backdrop: 'static', keyboard: false})  
   //dosomething 
+  var showNotifyHomeModal = document.getElementById("showNotifyHome")
+  var showNotifyModal_Title = showNotifyHomeModal.getElementsByClassName("modal-title")[0]
+  var showNotifyModal_Body = showNotifyHomeModal.getElementsByClassName("modal-body")[0]
+
+
 
 }
+
 
 $('#showNotifyHome').on('hidden.bs.modal', function () {
   $('#autoclicknot').removeClass();

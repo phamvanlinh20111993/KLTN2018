@@ -479,9 +479,9 @@
 								         '</div>' +
                               '</div>' +
 							
-                              '<div style="margin-top:5px;box-shadow: 1px 2px 5px #ccccff;height: 10%;">' + 
+                              '<div style="margin-top:5px;box-shadow:1px 2px 5px #ccccff;height: 10%;">' + 
                                  '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
-                                       ' style="width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
+                                       ' style="padding-left:10px;width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
 				                    '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px" onclick="msgRecord('+id+')"></i></a>' + 
 				                    '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\', \''+name+'\', \''+photo+'\')"></i></a>' + 
                               '<div style="clear: both;"></div>'+
@@ -972,3 +972,19 @@
 
                 modalEditMessage_body.innerHTML = ele
             }
+
+            //nhan tin nhan
+            var WAITESHOWCHATBOX = 2000
+            socket.on('isturnonbox', function(data){
+                if(parseInt(MYID) == parseInt(data.id_receive)){
+                    console.log(data)
+                    var chatboxid = document.getElementById(data.id_send)
+                    console.log(chatboxid)
+
+                    if(chatboxid == null){
+                        setTimeout(function(){
+                            register_popup(null, data.id_send, data.id_send, data.myphoto);
+                        }, WAITESHOWCHATBOX)
+                    }
+                }
+            })
