@@ -322,13 +322,12 @@
              * se xuat hien o Mark_pos_origin
              */
 			 
-			//sap xep lai cac gia tri tu mang chinh va mang phu
-			mergeSort(Mark_pos_origin, 0, Mark_pos_origin.length-1)
-			mergeSort(Mark_pos_origin, 0, Mark_pos_origin.length-1)
 			var AddArray = []
 			var DelArray = []
 			
             handleCollision(Mark_pos_origin, Mark_pos_new);
+            //sap xep lai cac gia tri tu mang chinh va mang phu
+            mergeSort(Mark_pos_origin, 0, Mark_pos_origin.length-1)
             j = 0;
             var replace_start = 0, replace_start1 = 0;
             var temp = "", temp1 = "";

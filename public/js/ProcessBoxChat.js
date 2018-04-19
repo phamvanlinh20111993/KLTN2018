@@ -615,7 +615,7 @@
 
 				document.getElementById(id+"_content").innerHTML +=  control;
 
-                if(state == 0 && message.content != null)
+                if(state == 0 && message.content != null && sessionStorage.getItem("_checkmiss_"+id) != "true")
 				    Misspelling(rid, content, null);
 
 				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
@@ -776,7 +776,7 @@
                                     showcheckedmis.innerHTML = "your message ok."
                                 else
                                     showcheckedmis.innerHTML = "your message ok. But not your exchange language."
-                                document.getElementById(id+"_check").style.color = "#337ab7"
+                                    document.getElementById(id+"_check").style.color = "#337ab7"
 							}else{
 								if(data.content.language == MYPRIOEX){
 									showcheckedmis.innerHTML = "Did you mean: " + matchMisspelling(realcontent.value, data.content.value)

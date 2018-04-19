@@ -40,12 +40,12 @@ router.route('/user/login')
 		&& req.session.filter)
 	{
 		//check database...., validate this do not trust user
-		querysimple.selectTable("User", ["id", "email", "password"], 
+		querysimple.selectTable("User", ["id", "email", "password", "provider"], 
 			[{op:"", field: "email", value: email}], null, null, null,
 			function(result, fields, err){
 				if(err)	throw err;
 
-				if(result.length > 0){//co ton tai tai khoan
+				if(result.length > 0 && result[0].provider == "custom"){//co ton tai tai khoan
 					var bytes  = CryptoJS.AES.decrypt(result[0].password, md5(pass));
 					var deemail = bytes.toString(CryptoJS.enc.Utf8);
 

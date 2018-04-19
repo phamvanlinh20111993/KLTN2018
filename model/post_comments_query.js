@@ -45,21 +45,20 @@ var selectMyposts = function(myid, cb){
                   " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc" +
                   " FROM post p "+
                   " JOIN post_title ti ON ti.id = p.title_id "+
-                  " JOIN exchangelg ex ON ex.user_id = p.user_id "+
+               ///   " JOIN exchangelg ex ON ex.user_id = p.user_id "+
                   " LEFT JOIN likes_post li ON li.id_post = p.id "+
                   " LEFT JOIN likes_post li1 "+
                   " ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
                   " WHERE p.user_id = " + mysql.escape(myid)+
-                  " GROUP BY p.id ORDER BY p.ctime DESC, ex.prio DESC"
+                  " GROUP BY p.id ORDER BY p.ctime DESC"//, ex.prio DESC"
 
-     // console.log(sqlString1)
+      console.log(sqlString1)
       con.query(sqlString1, function(err1, result1){
          if(err1) { 
             throw err1
             cb(ListMyPost)
          }else{
           //  console.log(result1)
-            var totalliked = 0
             for(var ind = 0; ind < result1.length; ind++){
                ListMyPost.posts[ind] = {
                   pid: result1[ind].pid,
@@ -70,17 +69,12 @@ var selectMyposts = function(myid, cb){
                   turnofcmt: result1[ind].turnof_cmt,
                   time: result1[ind].ptime,
                   meliked: false,
-                  totalcomment: result1[ind].totalc
+                  totalcomment: result1[ind].totalc,
+                  totalliked: result1[ind].total
                }
 
-               totalliked = result1[ind].total
-
-               if(result1[ind].melike){
-                  ListMyPost.posts[ind].meliked = true
-                  ListMyPost.posts[ind].totalliked = totalliked; 
-               }else
-                 ListMyPost.posts[ind].totalliked = parseInt(totalliked)-1; 
-               totalliked = 0;
+               if(result1[ind].melike)
+                  ListMyPost.posts[ind].meliked = true  
             }
             
             cb(ListMyPost)
@@ -171,7 +165,7 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
          " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
          " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
          " GROUP BY p.id"+
-         " ORDER BY timepostfl DESC, p.ctime DESC, ex.prio DESC"
+         " ORDER BY timepostfl DESC, p.ctime DESC"
 
    console.log(sqlString)
 
@@ -195,7 +189,6 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
                level: result[ind].level
             }
 
-            var totalliked = 0
             ListPosts[ind].posts = {
                pid: result[ind].pid,
                content: result[ind].content,
@@ -206,17 +199,12 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
                meliked: false,
                totalcomment: result[ind].totalc, 
                isedit: result[ind].isedit,
-               istracked: result[ind].istracked
-            }
-            totalliked = result[ind].totallike
+               istracked: result[ind].istracked,
+               totalliked : result[ind].totallike
+            } 
 
-            if(result[ind].melike){
-               ListPosts[ind].posts.meliked = true
-               ListPosts[ind].posts.totalliked = totalliked; 
-            }else
-               ListPosts[ind].posts.totalliked = totalliked - 1; 
-            totalliked = 0;
-
+            if(result[ind].melike)
+               ListPosts[ind].posts.meliked = true    
          }
 
          cb(ListPosts)
@@ -332,17 +320,12 @@ var selectRecentPost = function(myid, limit, cb)
                meliked: false,
                totalcomment: result[ind].totalc, 
                isedit: result[ind].isedit,
-               istracked: result[ind].istracked
+               istracked: result[ind].istracked,
+               totalliked :result[ind].totallike
             }
-            totalliked = result[ind].totallike
 
-            if(result[ind].melike){
+            if(result[ind].melike)
                ListPosts[ind].posts.meliked = true
-               ListPosts[ind].posts.totalliked = totalliked; 
-            }else
-               ListPosts[ind].posts.totalliked = totalliked - 1; 
-            totalliked = 0;
-
          }
 
          cb(ListPosts)

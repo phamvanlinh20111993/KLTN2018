@@ -137,7 +137,8 @@ CREATE TABLE IF NOT EXISTS `Post`(
 	`file` varchar(1000), /* dinh kem file luu dia chi url*/
 	`nameoffile` varchar(500),
 	`ctime` DATETIME NOT NULL,
-	`isedit` int(1), NOT NULL,
+	`isedit` int(1) NOT NULL,
+	`language_id` int(4) UNSIGNED NOT NULL,/* mo rong */
 	`turnof_cmt` int(1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -251,6 +252,37 @@ CREATE TABLE IF NOT EXISTS `Report_profile_content`(
 	`content` varchar(500) NOT NULL
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE IF NOT EXISTS `Notify_admin`(
+	`id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`touser` bigint(30) UNSIGNED NOT NULL,
+	`whonotify` bigint(30) UNSIGNED NOT NULL,
+	`content` varchar(2000) NOT NULL,
+	`title` varchar(500),
+	`type_id` int(8) UNSIGNED NOT NULL,
+	`state` int(1) NOT NULL,
+	`ctime` DATETIME
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `Notify_post`(
+	`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`who` bigint(30) UNSIGNED NOT NULL,
+	`post_id` bigint(20) UNSIGNED NOT NULL,
+	`state` int(1) NOT NULL,
+	`ctime` DATETIME
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE IF NOT EXISTS `Notify_comment`(
+	`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`who` bigint(30) UNSIGNED NOT NULL,
+	`comment_id` bigint(30) UNSIGNED NOT NULL,
+	`state` int(1) NOT NULL,
+	`ctime` DATETIME
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 /*################################################################################################## */
 
 ALTER TABLE `User`
@@ -294,6 +326,7 @@ ALTER TABLE `Setting`
 
 ALTER TABLE `Post`
 	ADD CONSTRAINT `iduserpost` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `language id onpost` FOREIGN KEY (`language_id`) REFERENCES `Language` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `title of post` FOREIGN KEY (`title_id`) REFERENCES `post_title` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `Comment`
@@ -327,6 +360,18 @@ ALTER TABLE `Report_profile`
 	ADD CONSTRAINT `report who profile` FOREIGN KEY (`reportwho`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
 	ADD CONSTRAINT `code report profile value` FOREIGN KEY (`code`) REFERENCES `Report_profile_content` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE `Notify_admin`
+	ADD CONSTRAINT `who create nofity` FOREIGN KEY (`whonotify`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `Nofity to who` FOREIGN KEY (`touser`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `type of notify` FOREIGN KEY (`type_id`) REFERENCES `Type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `Notify_post`
+	ADD CONSTRAINT `who create post` FOREIGN KEY (`who`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `what is the post id?` FOREIGN KEY (`post_id`) REFERENCES `Post` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `Notify_comment`
+	ADD CONSTRAINT `who create comment` FOREIGN KEY (`who`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+	ADD CONSTRAINT `what is the comment id?` FOREIGN KEY (`comment_id`) REFERENCES `Comment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 /* ############################################################################################### */
 
 INSERT INTO `Language` (`name`, `symbol`) VALUES
@@ -343,6 +388,8 @@ INSERT INTO `Type` (`code`, `content`) VALUES
 ('1000A', 'comment'),
 ('2000V', 'post'),
 ('5000F', 'message'),
+('dsfAD', 'profile'),
+('55lAD', 'block'),
 ('3001D', 'user');
 
 

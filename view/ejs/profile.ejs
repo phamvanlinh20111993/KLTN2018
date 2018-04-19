@@ -75,7 +75,7 @@
   </script>
   </head>
   <body>
-
+  <% var index = 0; %>
   <div class="modal fade" id="blockUserModal" role="dialog">
     <div class="modal-dialog">
       <!-- Modal content-->
@@ -449,7 +449,12 @@
                         <td>Learning:</td>
                         <td>
                            <% User.exlang.learning.forEach(function(ex) { %>
-                              <li><%= ex.langname %> </li>
+                              <%index++; %>
+                              <% if(index == 1){%>
+                                 <li><span style="color: red;"><%= ex.langname %> </span></li>
+                              <% }else{ %>
+                                 <li><%= ex.langname %> </li>
+                              <%} %>
                            <% }); %>
                         </td>
                       </tr>
@@ -477,8 +482,14 @@
                         <tr>
                            <td>Native</td>
                            <td>
+                              <%index = 0; %>
                               <% User.natlang.learning.forEach(function(nat) { %>
-                                 <li><%= nat.langname %> </li>
+                                 <%index++; %>
+                                 <%if(index == 1){%>
+                                    <li><span style="color: blue;"><%= nat.langname %></span> </li>
+                                 <%}else{%>
+                                    <li><%= nat.langname %> </li>
+                                 <%}%>
                               <% }); %>
                            </td>
                         </tr>

@@ -231,7 +231,7 @@ var showPost = function(User, Posts, state)
 	if(Posts.meliked)
 		contenlikepost='<span id="'+id+'_stringnumlike">You and </span><span>'+(Posts.totalliked-1)+'</span> people liked post.</a></div>'
 	else
-		contenlikepost='<span id="'+id+'_stringnumlike"></span><span>'+Posts.totalliked+'</span> people likes post.</a></div>'
+		contenlikepost='<span id="'+id+'_stringnumlike"></span><span>'+Posts.totalliked+'</span> people liked post.</a></div>'
 
     element = '<div class="popup-box4" id="'+id+'_posts">'+
 

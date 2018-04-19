@@ -110,7 +110,7 @@ var showUserCommunity = function(User)
        							isOnline +
         						'<p class="title">Leanrning: '+User.infor.exlanguage[0].laname+'</p>'+
          						'<p class="title">Degree: <span style="color:orange;">'+User.infor.exlanguage[0].dename+'</span></p>'+
-        						'<p class="title">Level: '+User.infor.level+'</p>'+
+        						'<p class="title" data-toggle="tooltip" title="score: '+User.infor.score+'">Level: '+User.infor.level+'</p>'+
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
