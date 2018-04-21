@@ -23,9 +23,9 @@ router.route('/user/createPost')
 .post(function(req, res){
 
 	if(req.session.user_id){
-		var field = ["user_id", "content", "title_id", "turnof_cmt" , "ctime"]
+		var field = ["user_id", "content", "title_id", "turnof_cmt" , "ctime", "language_id"]
 		var resobj = req.body.data
-		var value = [req.session.user_id, resobj.content, resobj.title, 0, getDateTime(new Date(resobj.time))]
+		var value = [req.session.user_id, resobj.content, resobj.title, 0, getDateTime(new Date(resobj.time)), 7]
 		querysimple.insertTable("post", field, value, function(result, fields, err){
 			if(err) throw err
 			else{

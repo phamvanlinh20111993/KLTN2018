@@ -1,18 +1,6 @@
+var con = require('./mysqlconn')
 var mysql = require('mysql');
 
-var con = mysql.createConnection({
-  connectionLimit : 20,
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "KLTN_ExLanguage",
-  charset: "utf8_general_ci"
-});
-
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Mysql Connected Querysingle table simple Successful!");
-});
 
 /**
   lay danh sach block list cua nguoi dung

@@ -203,29 +203,48 @@
 		var index = 0;
 		var Str = "";
 
-		for(var ind = 0; ind < words1.length;){
-			if(index < AddArray.length && ind > AddArray[index].getStart()){
-				while(ind > AddArray[index].getStart()){
-					index++;
-					if(index > AddArray.length-1) break;
-				}
-			}
+        if(AddArray.length == 0){
+            for(var ind = 0; ind < words1.length; ind++)
+                Str += words1[ind] + " ";
+        }else{
+
+		    for(var ind = 0; ind < words1.length;){
+			    if(index < AddArray.length && ind > AddArray[index].getStart()){
+				    while(ind > AddArray[index].getStart()){
+					   index++;
+					   if(index > AddArray.length-1) break;
+				    }
+			    }
 			
-			if( index < AddArray.length && ind == AddArray[index].getStart()){
-				Str += '<span style="color:'+color+';">';
-				while(ind < AddArray[index].getEnd()){
-					Str += words1[ind] + " ";
-					ind++
-				}
-				Str += '</span>';
-			}else{
-				Str += words1[ind] + " ";
-				ind++;
-			}
-		}
+			     if( index < AddArray.length && ind == AddArray[index].getStart()){
+				    Str += '<span style="color:'+color+';">';
+				    while(ind < AddArray[index].getEnd()){
+					   Str += words1[ind] + " ";
+					   ind++
+				    }
+				    Str += '</span>';
+			     }else{
+				    Str += words1[ind] + " ";
+				    ind++;
+			     }
+		    }
+        }
 		
 		return Str;
 	}
+
+
+    //return a string 
+    function innerHTMLString1(words1, AddArray, color){
+        var Str = "";
+
+        Str += '<span style="color:'+color+';">';
+        for(var ind = 0; ind < words1.length; ind++)
+            Str += words1[ind] + " ";
+        Str += '</span>';
+        
+        return Str;
+    }
 
     /**
      * check content of two string
@@ -354,16 +373,18 @@
 
                 j++;
             }
+
+            return {
+                add: innerHTMLString(words1, AddArray, "red"),
+                del: innerHTMLString(words, DelArray, "blue")
+            }
+
+        }else{
+           return {
+                add: innerHTMLString1(words1, [], "red"),
+                del:innerHTMLString1(words, [], "blue")
+            } 
         }
-		
-		console.log(AddArray)
-		console.log(DelArray)
-		
-		return {
-			add: innerHTMLString(words1, AddArray, "red"),
-			del: innerHTMLString(words, DelArray, "blue")
-		}
-		
     }
 
     /**
@@ -398,13 +419,13 @@
         return lower;
     }
 
-	//var contentcopy = standardizeString("member something only thing")
+//	var contentcopy = standardizeString("member something only thing")
 //	var contentupdatecopy = standardizeString("something member thing only");
- //   var contentcopy = standardizeString("t mac ke m biet hay k thi t cung eo quan tam dau")
-//	var contentupdatecopy = standardizeString("t cung dau dinh cho m biet gi dau ma doi hoi lam hu the thoi");
-	
+    //var contentcopy = standardizeString("t mac ke m biet hay k thi t cung eo quan tam dau")
+	//var contentupdatecopy = standardizeString("t cung dau dinh cho m biet gi dau ma doi hoi lam hu the thoi");
+//	console.log(check(contentcopy, contentupdatecopy))
 	function doTask(s1, s2){
-		var contentcopy = standardizeString(s1)
+		var contentcopy = standardizeString(s1);
 		var contentupdatecopy = standardizeString(s2);
 		return check(contentcopy, contentupdatecopy)
 	}

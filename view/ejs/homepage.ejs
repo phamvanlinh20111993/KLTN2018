@@ -114,6 +114,19 @@
     margin-top: 120px;
 }
 
+ .notifymessage td{
+    padding: 2%;
+    cursor: pointer;
+ }
+
+ .notifymessage tr{
+    border-top: 2px solid brown;
+ }
+
+ .notifymessage tr:hover { 
+   background-color: #ccc;
+}
+
 /* Add animation (fade in the popup) */
 /*@-webkit-keyframes fadeIn {
     from {opacity: 0;} 
@@ -187,7 +200,34 @@
 
         <div class="modal-body">
          
-         
+          <table class="notifymessage">
+            <tr style="border-top: 0px;">
+              <td style="padding: 2%;"><img src="<%= user[0].photo %>" class="img-circle" alt="Avatar" height="45" width="45"></td>
+              <td style="width: 80%;">
+                <div style="height: auto;width: auto;margin-left: 2%;">
+                  <span style="font-style: italic;font-size: 120%;font-weight: bold;">Linh van</span></br>
+                  <span style="font-size: 95%;"> t cung k biet nua</span>
+                </div>
+              </td>
+              <td>
+                <div style="float: right;"> 17:45pm</div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 2%;"><img src="<%= user[0].photo %>" class="img-circle" alt="Avatar" height="45" width="45"></td>
+              <td style="width: 80%;">
+                <div style="height: auto;width: auto;margin-left: 2%;">
+                  <span style="font-style: italic;font-size: 120%;font-weight: bold;">Linh van</span></br>
+                  <span style="font-size: 95%;"> t cung k biet nua</span>
+                </div>
+              </td>
+              <td>
+                <div style="float: right;"> 17:45pm</div>
+              </td>
+            </tr>
+
+          </table>
 
          
         </div>
@@ -445,7 +485,7 @@
                </span></a></li>
 
                <li style="text-align: left;margin-top:4%;" id="autoclicknot"><a href="#" onclick="showMyNotify()"><span style="font-size: 130%;">
-                  <span class="glyphicon glyphicon-bullhorn"></span><span style="margin-left: 10%;"> Notification </span><span style="color: red;"> (0)</span>
+                  <span class="glyphicon glyphicon-bullhorn"></span><span style="margin-left: 10%;"> Notification </span><span style="color: red;" id="numofusermessagetoyou"> (0)</span>
                </span></a></li>
 
                <li style="text-align: left;margin-top:4%;"><a href="/languageex/messenger" onclick="Messenger()"><span style="font-size: 130%;">

@@ -1,3 +1,9 @@
+
+ //thay the tat ca string 'search' trong 'string' bang string 'replacement'
+var replaceAll = function(string, search, replacement) {
+   return string.replace(new RegExp(search, 'g'), replacement);
+}
+
 var getListUserCommnunity = function(id, callback) {
 	// body...
 	$.ajax({
@@ -17,10 +23,10 @@ var getListUserCommnunity = function(id, callback) {
 }
 
 //theo doi hoac bo theo doi nguoi dung
-var ajaxRequest = function(url, data, callback) {//data is a object
+var ajaxRequest = function(url, type, data, callback) {//data is a object
   // body...
   $.ajax({
-        type: "POST",
+        type: type,
         url: url,
         data:{ data: JSON.stringify(data) },
         error: function(xhr, status, error){
@@ -108,7 +114,7 @@ var showUserCommunity = function(User)
               				'</div>'+
          					'<div style="line-height: 90%;">'+
        							isOnline +
-        						'<p class="title">Leanrning: '+User.infor.exlanguage[0].laname+'</p>'+
+        						'<p class="title">Leanrning: <span style="color:blue;">'+User.infor.exlanguage[0].laname+'</span></p>'+
          						'<p class="title">Degree: <span style="color:orange;">'+User.infor.exlanguage[0].dename+'</span></p>'+
         						'<p class="title" data-toggle="tooltip" title="score: '+User.infor.score+'">Level: '+User.infor.level+'</p>'+
         						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
@@ -133,16 +139,21 @@ Object.size = function(obj) {
 };
 
 //tu dong hoi ham nay
+var INFORCOMMUNITY = []//global array
 getListUserCommnunity(MYID, function(data, err)
 {
    console.log(data)
   if(err) alert(err)
   else{
-    var size = data.community.length;
-    var ind = 0;
-  //  console.log(data)
-    for(ind = 0; ind < size; ind++)
-    	showUserCommunity(data.community[ind])
+      var size = data.community.length;
+      var ind = 0;
+      //  console.log(data)
+      for(ind = 0; ind < size; ind++){
+    	   showUserCommunity(data.community[ind])
+         //khoi tao thong tin nguoi dung
+         INFORCOMMUNITY[ind] = {}
+         INFORCOMMUNITY[ind] = data.community[ind]
+      }
   }
 })
 
@@ -151,31 +162,110 @@ function viewProfileByImage(uid){
   location.href = "/languageex/user/profile?uid="+encodeURIComponent(uid)
 }
 
-
-var selectUserCommunity = function(){
-  document.getElementById("MycommunityExchange").innerHTML = ""
-  getListUserCommnunity(MYID, function(data, err){
-    if(err) alert(err)
-    else{
-      var size = data.community.length;
-      var ind = 0;
-      //  console.log(data)
-      for(ind = 0; ind < size; ind++)
-        showUserCommunity(data.community[ind])
-     }
+var showTotalNoftify = function(){
+   ajaxRequest('/languageex/home/notifymsg', 'GET', {}, function(data, err){
+      if(err) alert(err)
+      else{
+         if(data.data > 0)
+            document.getElementById("numofusermessagetoyou").innerHTML = "("+data.data+")"
+      }
   })
+}
+
+//kiem tra xem co ai nhan tin cho khong
+showTotalNoftify()
+
+//nhan thong bao tu server
+var CONSTANTSTRING = 4566456456//random number
+var showContentNotifyMsg = function(DOMelement, data){
+   var ele = ""
+   var ischeckmsg = ""
+   for(ind = 0; ind < data.data.length; ind++)
+   {
+      var Userinfor = {
+         id: data.data[ind].uid,
+         name: data.data[ind].name,
+         photo: data.data[ind].photo,
+         ischeck: data.data[ind].ischeck
+      }
+
+      var replacementJSON = replaceAll(JSON.stringify(Userinfor), '"', CONSTANTSTRING)
+
+      if(ind > 0){
+         ele += '<tr onclick="messageToUser(\''+replacementJSON+'\')">'
+      }else
+         ele += '<tr style="border-top: 0px;" onclick="messageToUser(\''+replacementJSON+'\')">'
+
+      if(parseInt(data.data[ind].ischeck) < 2)
+         ischeckmsg = " ("+data.data[ind].totalmsg+")"
+
+      ele += '<td style="padding: 2%;"><img src="'+data.data[ind].photo+'" '+
+                'class="img-circle" alt="Avatar" height="45" width="45"></td>'+
+              '<td style="width: 70%;">'+
+                '<div style="height: auto;width: auto;margin-left: 2%;">'+
+                  '<span style="font-style: italic;font-size: 120%;font-weight: bold;">'+data.data[ind].name+ischeckmsg+'</span></br>'+
+                  '<span style="font-size: 95%;">'+data.data[ind].msgcontent+'</span>'+
+                '</div>'+
+              '</td>'+
+              '<td style="width:25%;">'+
+                '<div style="float: right;">'+formatAMPM(new Date(data.data[ind].time))+'</div>'+
+              '</td>'+
+            '</tr>'
+
+      ischeckmsg = ""
+   }
+
+   DOMelement.innerHTML = ele
+}
+
+var messageToUser = function(Userinfor)
+{
+   var UserinfortoOBJ = JSON.parse(replaceAll(Userinfor, CONSTANTSTRING, '"'))
+   $('#showNotifyHome').modal('hide')
+
+   register_popup(null, UserinfortoOBJ.id, UserinfortoOBJ.name, UserinfortoOBJ.photo);
+
+   if(parseInt(UserinfortoOBJ.ischeck) < 2){
+      ajaxRequest('/languageex/home/seenmsgnotify', 'PUT', 
+         { userA: UserinfortoOBJ.id }, function(data, err){
+         if(err) alert(err)
+         else{
+            var str = document.getElementById("numofusermessagetoyou").innerHTML
+            var Totalnotify = parseInt(str.substring(1, str.length -1))-1;
+            document.getElementById("numofusermessagetoyou").innerHTML = "("+Totalnotify+")"
+         }
+      })
+   }
 }
 
 //hien thi thong bao
 var showMyNotify = function(){
-  $('#showNotifyHome').modal({backdrop: 'static', keyboard: false})  
+   $('#showNotifyHome').modal({backdrop: 'static', keyboard: false})  
   //dosomething 
-  var showNotifyHomeModal = document.getElementById("showNotifyHome")
-  var showNotifyModal_Title = showNotifyHomeModal.getElementsByClassName("modal-title")[0]
-  var showNotifyModal_Body = showNotifyHomeModal.getElementsByClassName("modal-body")[0]
+   var showNotifyHomeModal = document.getElementById("showNotifyHome")
+   var showNotifyModal_Title = showNotifyHomeModal.getElementsByClassName("modal-title")[0]
+   var showNotifyModal_Body = showNotifyHomeModal.getElementsByClassName("modal-body")[0]
 
+   ajaxRequest('/languageex/home/ntfcontentmsg', 'POST', {}, function(data, err){
+      if(err) alert(err)
+      else{
+         var tablemodal = showNotifyModal_Body.getElementsByClassName("notifymessage")[0]
+         showContentNotifyMsg(tablemodal, data)
+      }
+   })
+}
 
-
+var selectUserCommunity = function(){
+   document.getElementById("MycommunityExchange").innerHTML = ""
+   getListUserCommnunity(MYID, function(data, err){
+      if(err) alert(err)
+      else{
+         var size = data.community.length;
+         var ind = 0;
+         for(ind = 0; ind < size; ind++)
+            showUserCommunity(data.community[ind])
+      }
+   })
 }
 
 
@@ -191,7 +281,7 @@ var followUser = function(uid, name)
  
   if(idfollow.style.color == "red"){//da theo doi, bay gio bo theo doi
       var data = {id: uid, follow: false} 
-      ajaxRequest('/languageex/home/unfollow', data, function(data, err){
+      ajaxRequest('/languageex/home/unfollow', 'POST', data, function(data, err){
           if(err) alert(err)
           else{ 
              idfollow.style.color = "#3399FF"
@@ -200,7 +290,7 @@ var followUser = function(uid, name)
       })
   }else{
     var data = {id: uid, follow: true, time: new Date()} 
-    ajaxRequest('/languageex/home/follow', data, function(data, err){
+    ajaxRequest('/languageex/home/follow', 'POST',data, function(data, err){
         if(err) alert(err)
         else{
          idfollow.style.color = "red"
@@ -233,7 +323,7 @@ var SearchUsersClick = function(id){
             for(ind = 0; ind <  data.community.length; ind++){
                showUserCommunity(data.community[ind])
             }
-             MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
          }
       })
     }

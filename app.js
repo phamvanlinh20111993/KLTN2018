@@ -366,17 +366,18 @@ io.on('connection', function(client)
          client.room = pid + myid
 
       //save in database
-    //  anotherQuery.selectMaxfield("message", "id", function(res)
-    //  {
-      //   var idmessg = res[0].max
+      anotherQuery.selectMaxfield("message", "id", function(res)
+      {
+         var idmessg = res[0].max
            idmessg = 0
+       //    console.log(data)
          //chen du lieu vao bang
-     //    querysimple.insertTable("message", 
-     //       ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
-     //       [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
-     //      function(result, err){
-      //        if(err)  throw err;
-      //         else{
+         querysimple.insertTable("message", 
+            ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
+            [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
+           function(result, err){
+              if(err)  throw err;
+               else{
                   console.log("1 record inserted messages.");
                   console.log("nhan tin vao room " + client.room)
 
@@ -392,10 +393,10 @@ io.on('connection', function(client)
                      id_receive: data.pid,
                      time: data.time
                   })
-     //          }
-    //     })
+               }
+         })
 
-    //  })
+      })
 
       client.in(client.handshake.session.community).emit('isturnonbox', { 
          myphoto: data.photo,

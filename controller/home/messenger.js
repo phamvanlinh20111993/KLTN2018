@@ -49,6 +49,15 @@ router.route('/user/loasdusermsg')
 .get(function(req, res){
 	//khoi tao session
 	var uid = req.body.uid
+	if(req.session.user_id){
+		querysimple.selectListUserMessenger(req.session.user_id, function(data, err){
+			if(err) throw err;
+			else{
+			//	console.log(data)
+				res.send(JSON.stringify({listuser: data}))
+			}
+		})
+	}
 })
 .post(function(req, res)
 {
@@ -65,6 +74,23 @@ router.route('/user/loasdusermsg')
 	}else
 		res.redirect('/languageex/user/login', {state: 1})
 })
+
+router.route('/user/loasdspecuser')
+.post(function(req, res)
+{
+	var pid = parseInt(req.body.data.pid)
+	if(req.session.filter && pid)
+	{
+		querysimple.selectSpecificUserMessenger(req.session.user_id, pid, function(data, err){
+			if(err) throw err;
+			else{
+				res.send(JSON.stringify({listuser: data}))
+			}
+		})
+		
+	}
+})
+
 
 
 

@@ -1,19 +1,5 @@
 var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  connectionLimit : 20,
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "KLTN_ExLanguage",
-  charset: "utf8_general_ci"
-});
-
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Mysql Connected Querysingle table simple Successful!");
-});
-
+var con = require('./mysqlconn')
 
 //return sql string date format
 var getDateTime = function(date){
@@ -548,56 +534,79 @@ var selectWatchUser = function(idA, idB, cb)
 
 //tra ve cong dong nguoi dung su dung native language voi nguoi dung id
 var selectUserCommunityNative = function(id, cb){
-	//select my id, my nativelanguage
-	var sqlstr = "SELECT user.id, nativelg.language_id as natid FROM user "+
-			  "JOIN exchangelg ON nativelg.user_id = user.id WHERE user.id = "+id
+			//select my id, my exchangelanguage
+	var sqlstr = "SELECT user.id, nativelg.language_id as exid FROM user "+
+			  " JOIN nativelg ON nativelg.user_id = user.id WHERE user.id = "+ parseInt(id)+
+			  " AND nativelg.prio = 1"//co do uu tien cao nhat
 
 	con.query(sqlstr, function(err, resu, fields){
 		if(err)	throw err;
 		else if(resu.length > 0)
 		{
-		//	console.log(resu)
+			//console.log(resu)
 			var ind = 0, orcondi = "";
 
 			if(resu.length > 1) orcondi +="("
 			while(ind < resu.length){
-				orcondi += "nat.language_id != "+ resu[ind].natid;
+				orcondi += "nat.language_id = "+ resu[ind].exid;
 				if(ind < parseInt(resu.length) - 1)
 					orcondi += " OR "
 				ind++
 			}
 			if(resu.length > 1) orcondi +=")"
 
+			var searchcondition = ""
+		    var morefield = "bll.blockwho AS blockuser1, bll.reason, bll.ctime AS timebluser, ",
+		    morejoin = " LEFT JOIN blocklist_user bll ON (bll.whoblock= u.id "+
+							" AND bll.blockwho = "+mysql.escape(id)+") "
+
+			var blockusers = " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock="+mysql.escape(id)+")"
+
+			if(searchcd){
+				searchcondition = " AND ( u.email LIKE '%" + searchcd+ 
+								  "%' OR u.name LIKE '%"+searchcd+"%')"
+				blockusers = ""//cho phep tim kiem ca nhung nguoi da blocked
+				morefield = "bll.blockwho AS blockuser, bll.reason, bll.ctime AS timebluser, "
+				morejoin = " LEFT JOIN blocklist_user bll ON (bll.whoblock="+mysql.escape(id)+
+							" AND bll.blockwho = u.id) "
+			}
+
 			//all user online and have max lever sorted, max level
 			var sqlString = "SELECT u.id, u.name AS uname, u.email, u.des, u.state, bm.whoblock, "+
-				" bm.ctime AS timeblock, "+
-				" u.photo, u.gender, u.score, la.name AS lname, le.level FROM user u " +
-				" JOIN level le ON u.level_id = le.id"+
+				" bm.ctime AS timeblock, "+ morefield +
+				" u.photo, u.gender, u.score, u.dateofbirth, de.name AS dename, " +
+				" la.name AS lname, le.level FROM user u " +
+				" JOIN level le ON u.level_id = le.id "+
 				" JOIN nativelg nat ON u.id = nat.user_id "+
-				" JOIN language la ON la.id = nat.language_id " +
-				" LEFT JOIN blockmessages bm ON (bm.blockwho="+mysql.escape(id)+" AND bm.whoblock=u.id ) "+
-				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+" AND "+
-				" u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+mysql.escape(id)+")"+
+				" JOIN language la ON la.id = nat.language_id "+
+				" JOIN degree de ON ex.degree_id = de.id" +
+				" LEFT JOIN blockmessages bm ON (bm.blockwho = "+mysql.escape(id)+" AND bm.whoblock = u.id ) "+
+				 morejoin+
+				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+" AND ex.prio = 1"+
+				 blockusers+
+				 searchcondition +
 				" ORDER BY u.state DESC, le.level ASC";
-			
+
 			console.log(sqlString)
-			con.query(sqlString, function(error, res, fields)
-			{
+
+			con.query(sqlString, function(error, res, fields){
 				if(error)	cb(null, error)
 				else if(res.length > 0)
 					cb(res, null)
+				else 
+					cb({}, null)
 			})
 		}
 	})
-	
 }
 
 
 //tra ve cong dong nguoi dung su dung exchange language voi nguoi dung id
 var selectUserCommunityEx = function(id, searchcd, cb){
 	//select my id, my exchangelanguage
-	var sqlstr = "SELECT user.id, exchangelg.language_id as exid FROM user "+
-			  "JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(id)
+	var sqlstr = "SELECT user.id, exchangelg.language_id AS exid FROM user "+
+			  " JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(id)+
+			  " AND exchangelg.prio = 1"
 
 	con.query(sqlstr, function(err, resu, fields){
 		if(err)	throw err;
@@ -642,10 +651,10 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 				" JOIN degree de ON ex.degree_id = de.id" +
 				" LEFT JOIN blockmessages bm ON (bm.blockwho = "+mysql.escape(id)+" AND bm.whoblock = u.id ) "+
 				 morejoin+
-				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+
+				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+" AND ex.prio = 1"+
 				 blockusers+
 				 searchcondition +
-				" ORDER BY u.state DESC, ex.prio DESC, le.level ASC";
+				" ORDER BY u.state DESC, le.level ASC";
 
 			console.log(sqlString)
 
@@ -702,6 +711,30 @@ var selectListUserMessenger = function(id, cb)
 	})
 }
 
+//load nguoi dung voi ma id cu the
+var selectSpecificUserMessenger = function(id, pid, cb)
+{
+	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, u.state, MAX(me.time) AS max, "+
+	        " fo.tracked "+
+	        " FROM user u JOIN message me ON (me.userA="+mysql.escape(pid)+" AND me.userB="+mysql.escape(id)+") "+
+	        " OR (me.userA="+mysql.escape(id)+" AND me.userB="+mysql.escape(pid)+") "+
+	        " LEFT JOIN follow fo ON (fo.followers="+mysql.escape(id)+" AND tracked="+mysql.escape(pid)+")"+
+	        " WHERE u.id = "+mysql.escape(pid)+
+	        " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock="+mysql.escape(id)+")"+
+	        " ORDER BY max DESC, u.state DESC"
+
+	console.log(sqlString)
+
+    con.query(sqlString, function(error, res, fields){
+		if(error){
+			throw error
+			cb(null)
+		}
+		else if(res.length > 0)
+			cb(res)
+	})
+}
+
 
 //tra ve danh sach nguoi dung voi userid dung dau
 var selectUserMessenger = function(myid, userid, cb)
@@ -748,6 +781,62 @@ var selectStateBlockOrFollow = function(myid, userA, cb){
 	var sqlString = "SELECT timeblock, ctime"
 }
 
+//lay noi dung tin nhan chua doc
+var takeMessageContent = function(myid, cb)
+{
+	var sqlString = "SELECT u.id, u.name AS uname, u.photo, "+//msg.ischeck
+						"(SELECT ischeck from message WHERE time = max(msg.time)) AS ischeck, "+
+	               " (SELECT content from message WHERE time = max(msg.time)) AS content,"+
+	               " max(msg.time) AS maxtime, msg.data, "+//"COUNT(msg.userA) AS totalmsg "+
+	               " (SELECT count(userA) from message WHERE time = max(msg.time) AND ischeck < 2) AS totalmsg"+
+	               " FROM message msg "+
+	               " JOIN User u ON msg.userA = u.id "+
+	               " WHERE msg.userB = "+mysql.escape(myid)+
+	             //  " WHERE (msg.userB = "+mysql.escape(myid)+" AND msg.userA = u.id)"+
+	            //   " OR (msg.userA = "+mysql.escape(myid)+" AND msg.userB = u.id)"+
+	               " GROUP BY msg.userA "+
+	               " ORDER BY msg.time ASC, msg.ischeck ASC"
+
+	console.log(sqlString)
+	con.query(sqlString, function(err, result, field){
+		if(err){
+			throw err
+			cb(null)
+		}else{
+			var contentmsgnotseen = []
+			for(var ind = 0; ind < result.length; ind++){
+				contentmsgnotseen[ind] = {
+					uid: result[ind].id,
+					name: result[ind].uname,
+					photo: result[ind].photo,
+					msgcontent:  result[ind].content,
+					ischeck: result[ind].ischeck,
+					time:  result[ind].maxtime,
+					totalmsg:  result[ind].totalmsg
+				}
+			}
+
+			cb(contentmsgnotseen)
+		}
+	})
+}
+
+//lay so luong tin nhan chua doc
+var getNotifyMessage = function(myid, cb){
+	var sqlString = " SELECT msg.userA AS num FROM message msg"+
+				       " WHERE msg.userB = "+mysql.escape(myid)+" AND msg.ischeck < 2 "+
+	                " GROUP BY msg.userA "
+
+	con.query(sqlString, function(err, result, field){
+		if(err){
+			throw err
+			cb(null)
+		}else{
+			cb(result.length)
+		}
+	})
+}
+
 
 module.exports = {
 	insertTable: insertString,
@@ -763,5 +852,9 @@ module.exports = {
 	selectMessage: selectMessage,
 	selectListUserMessenger: selectListUserMessenger,
 	loadMessageSetting: loadMessageSetting,
-	selectWatchUser: selectWatchUser
+	selectWatchUser: selectWatchUser,
+	selectSpecificUserMessenger: selectSpecificUserMessenger,
+
+	takeMessageContent: takeMessageContent,
+	getNotifyMessage: getNotifyMessage
 }

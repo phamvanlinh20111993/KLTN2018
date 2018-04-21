@@ -1,19 +1,6 @@
+
+var con = require('./mysqlconn')
 var mysql = require('mysql');
-
-var con = mysql.createConnection({
-  connectionLimit : 20,
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "KLTN_ExLanguage",
-  charset: "utf8_general_ci"
-});
-
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Mysql Connected Another query Successful!");
-});
-
 
 //return sql string date format
 var getDateTime = function(date){
@@ -321,7 +308,6 @@ var calculateScore = function(id, score, cb)
 		})
 	})
 }
-
 
 module.exports = {
 	editMessage: editMessage,

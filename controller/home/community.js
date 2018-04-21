@@ -282,5 +282,43 @@ router.route('/home/search')
 	}
 })
 
+router.route('/home/notifymsg')
+.get(function(req, res){
+	if(req.session.user_id){
+		querysimple.getNotifyMessage(req.session.user_id, function(data){
+			res.json({data: data})
+		})
+	}
+})
+
+router.route('/home/ntfcontentmsg')
+.post(function(req, res){
+	if(req.session.user_id){
+		querysimple.takeMessageContent(req.session.user_id, function(data){
+			res.json({data: data})
+		})
+	}
+})
+
+router.route('/home/seenmsgnotify')
+.put(function(req, res){
+	if(req.session.user_id){
+		var data = JSON.parse(req.body.data)
+		var userA = parseInt(data.userA)
+
+		if(userA){
+			querysimple.updateTable('message', [{field: 'ischeck', value: 2}], 
+		  		[{op: "", field: "userB", value: req.session.user_id}, 
+		    		{op: "AND", field: "userA", value: userA}], function(result, err){
+		  		if(err){ 
+		  			throw err
+		  			res.json({data: "Error when query database."})
+		  		}else{
+		  			res.json({data: result})
+		  		}
+		 	})
+	    }
+	}
+})
 
 module.exports = router;

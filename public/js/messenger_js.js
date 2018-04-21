@@ -72,6 +72,18 @@ var HTTP_REQUEST = function(url, type, data, cb){
     }
 }
 
+//take query string in url js
+//tham khao https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
 function makerandomid(){
    var text = "";
    var possible = "0123456789";
@@ -168,7 +180,35 @@ var loadUser = function(){
 				showUsers(data.listuser[index], null)
 			}
 
-         messageUser(data.listuser[0].id)//tra ve nguoi dau tien trong danh sach
+         var userid = getParameterByName("uid", location.href)
+         var finduser = false;
+         if(userid){
+            for(index = 0; index < data.listuser.length; index++){
+               if(data.listuser[index].id == userid){
+                  messageUser(data.listuser[index].id)
+                  finduser = true
+                  break;
+               }
+            }
+
+            if(!finduser){// neu khong tim thay nguoi dung trong danh sach hien tai, load tu server
+                HTTP_REQUEST('/languageex/user/loasdspecuser', 'POST', {pid: userid}, 
+                function(err, data){
+                  if(err) alert(err)
+                  else{
+                     if(data.listuser.length > 0){
+                        showUsers(data.listuser[0], null)
+                        messageUser(data.listuser[0].id)
+                     }
+                     else{
+                        alert("Do not exist this user.Please try again.")
+                        location.href = "/languageex/messenger"
+                     }
+                  }
+               })
+            }
+         }else
+            messageUser(data.listuser[0].id)//tra ve nguoi dau tien trong danh sach
 		}
 		
 	})
@@ -328,33 +368,33 @@ var messageUser = function(uid)
 
 	loadMessage(uid, function(data){
 	//	console.log(data)
-      var listLength = data.listmessage.messages.length
       var message = document.getElementById("messagesbox")
       var message_ul = message.getElementsByTagName("ul")[0]
       message_ul.innerHTML = ""
+      if(data.listmessage){
+         var listLength = data.listmessage.messages.length
+         if(listLength > 0)
+         {
+            var userSend = {}
+            var userReceive = {}         
 
-      if(listLength > 0)
-      {
-         var userSend = {}
-         var userReceive = {}         
-
-         if(MYID == data.listmessage.userA.id){
-            userSend = data.listmessage.userA
-            userReceive = data.listmessage.userB
-         }else{
-           userSend = data.listmessage.userB
-           userReceive = data.listmessage.userA
-         }
-
-         for(var index = listLength-1; index >= 0; index--){
-            if(parseInt(MYID) == parseInt(data.listmessage.messages[index].idA)){//toi la nguoi gui tin nhan
-               showMessageuserSend(userSend, data.listmessage.messages[index], null, 1)
+            if(MYID == data.listmessage.userA.id){
+               userSend = data.listmessage.userA
+               userReceive = data.listmessage.userB
             }else{
-               showMessageuserReceive(userReceive, data.listmessage.messages[index], null, 1)
+               userSend = data.listmessage.userB
+            userReceive = data.listmessage.userA
+            }
+
+            for(var index = listLength-1; index >= 0; index--){
+               if(parseInt(MYID) == parseInt(data.listmessage.messages[index].idA)){//toi la nguoi gui tin nhan
+                  showMessageuserSend(userSend, data.listmessage.messages[index], null, 1)
+               }else{
+                  showMessageuserReceive(userReceive, data.listmessage.messages[index], null, 1)
+               }
             }
          }
       }
-
 	})
 }
 
@@ -369,6 +409,7 @@ var SendMessage = function(e){
    {
       var time = formatAMPM(new Date());
       var contentmsg = document.getElementById("contentMessage").value
+   
       if(contentmsg.length > 0){
          //tao object
          var message = {}
@@ -380,8 +421,9 @@ var SendMessage = function(e){
 
          HTTP_REQUEST('/languageex/user/score', 'POST', {score: SCORING}, 
             function(err, data){
-                if(err) alert(err)
-            })
+               if(err) alert(err)
+         })
+
          var myinfo = {
             id : USERCHATNOW.id,//id cua doi phuong
             photo : MYPHOTO,
@@ -393,7 +435,7 @@ var SendMessage = function(e){
 
          var ismisspelling = 0;//khong co loi dich, tin nhan ok
          Translate_or_Misspelling("/languageex/user/translate", 
-            MYPRIOEX, MYPRIONAT, contentmsg.value, function(data){
+            MYPRIOEX, MYPRIONAT, contentmsg, function(data){
 
             if(data.content.error == null){
                if(data.content.value==""){
@@ -408,6 +450,7 @@ var SendMessage = function(e){
                   ismisspelling = 3;//loi dich tin nhan
 
             message.misspelling = ismisspelling
+            
             socket.emit('sendmsg', {
                content: message,
                time: new Date(),
@@ -418,8 +461,8 @@ var SendMessage = function(e){
          })
 
          document.getElementById("contentMessage").value = ""//reset hop thoai
-         message = document.getElementById("messagesbox")
-         message.scrollTop =  message.scrollHeight
+         var message1 = document.getElementById("messagesbox")
+         message1.scrollTop =  message1.scrollHeight
       }
 
 
@@ -515,8 +558,8 @@ var WriteMessage = function(){
       })
 
       document.getElementById("contentMessage").value = ""//reset hop thoai
-      message = document.getElementById("messagesbox")
-      message.scrollTop =  message.scrollHeight
+      var message1 = document.getElementById("messagesbox")
+      message1.scrollTop =  message1.scrollHeight
    }
 
 }

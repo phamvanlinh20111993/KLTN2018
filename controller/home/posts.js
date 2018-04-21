@@ -138,7 +138,8 @@ router.route('/user/post/filter')
 .post(function(req, res){
 	if(req.session.user_id){
 		var valuefilter = req.body.data.value
-		postcomment.selectNotMyposts(req.session.user_id, null, valuefilter, function(data){
+		postcomment.selectNotMyposts(req.session.user_id, null, valuefilter, 
+		 function(data){
 			res.json({data: data})
 		})
 	}

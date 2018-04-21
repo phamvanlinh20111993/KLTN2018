@@ -33,11 +33,14 @@
             
             function formatTime(date)
             {
-                var hours = date.getHours() + 7;
-                if(hours > 23) hours = hours - 24
+                var days = date.getDate();
+                var hours = date.getHours() - 7;
+                if(hours < 0){
+                    hours = hours + 24
+                    days = days-1;
+                }
 
                 var minutes = date.getMinutes();
-                var days = date.getDate();
                 var months = date.getMonth() + 1;//getMonth() return 0-11
                 var years = date.getFullYear();
 
@@ -226,12 +229,12 @@
                     }
                     
                 	takecontentMessage(id, function(content)
-                    {
+                  {
                			document.getElementsByTagName("nav")[0].innerHTML += 
                				Show_pop_up_message(id, name, photo, setting); 
                         var myMessages = {}
 
-                    //    console.log(content)
+                        console.log(content)
                         if(content.listmessage)
                             myMessages = content.listmessage.messages
 
@@ -239,7 +242,7 @@
                             var myInfo = {}, 
                             pInfo = {}
 
-                            if(content.listmessage.userA == MYID){
+                            if(content.listmessage.userA.id == MYID){
                                 myInfo = content.listmessage.userA
                                 pInfo = content.listmessage.userB
                             }else{
@@ -266,7 +269,7 @@
                             }
                         }
 
-						popups.unshift(id);
+						      popups.unshift(id);
                         calculate_popups();
 
                         var scrollEventBoxChat = document.getElementById(id+"_scrollmsg")
@@ -292,14 +295,14 @@
 					var val = document.getElementById(id + "_mymsg").value;
 
 					if(val.length > 0)
-                    {
+               {
                         //tao object
                         var message = {}
                         message.content = val
                         message.data = null
                         message.edit = []//khoi tao rong
 
-						Message_send(id, time, MYPHOTO, message, 0)
+						      Message_send(id, time, MYPHOTO, message, 0)
 
                      //   console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
                         var ismisspelling = 0;//khong co loi dich, tin nhan ok
@@ -934,7 +937,6 @@
             function showInfoEditMsg(e, photo, message)//hien thi thong tin tin nhan da edit
             {
                 if(e) e.preventDefault()
-
                 var messagetoOBJ = replaceAll(message, CONSTANTSTRING, '"')
                 message = JSON.parse(messagetoOBJ)
 
@@ -942,23 +944,61 @@
                 var modalEditMessage = document.getElementById('InformationEditMessage')
                 var modalEditMessage_body = modalEditMessage.getElementsByClassName('modal-body')[0]
 
-                var oldcontent = ""
-                if(message.userA == MYID)
-                    var oldcontent = '<tr><td>Me</td><td>'+message.content +' (old)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
-                else{
-                    var oldcontent = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.content +' (old)</td><td>'+
-                       getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+
+                var anotheredit = "",  avatar = "", avatar1 = "", data
+                if(message.edit.length == 1){
+                   
+                    for(var posi = 0; posi < INFORCOMMUNITY.length; posi++){
+                        if(INFORCOMMUNITY[posi].infor.id == message.edit[0].whoedit){
+                            avatar = INFORCOMMUNITY[posi].infor.photo
+                            break;
+                        }
+                    }
+                    data = doTask(message.content, message.edit[0].newcontent)
+                    if(message.edit[0].whoedit != MYID)
+                       anotheredit = '<tr><td><image src='+avatar+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                    if(message.edit[0].whoedit == MYID)
+                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                }else{//length = 2
+                    
+                    if(message.edit[0].whoedit != MYID){
+                        for(var posi = 0; posi < INFORCOMMUNITY.length; posi++){
+                            if(INFORCOMMUNITY[posi].infor.id == message.edit[0].whoedit){
+                                avatar = INFORCOMMUNITY[posi].infor.photo
+                                break;
+                            }
+                        }
+                       data = doTask(message.content, message.edit[0].newcontent)
+                       anotheredit = '<tr><td><image src='+avatar+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                    }
+                    else if(message.edit[1].whoedit != MYID){
+                        for(var posi = 0; posi < INFORCOMMUNITY.length; posi++){
+                            if(INFORCOMMUNITY[posi].infor.id == message.edit[1].whoedit){
+                                avatar1 = INFORCOMMUNITY[posi].infor.photo
+                                break;
+                            }
+                        }
+                        data = doTask(message.content, message.edit[0].newcontent)
+                        anotheredit = '<tr><td><image src='+avatar1+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                    }
+                
+                    if(message.edit[0].whoedit == MYID){
+                        data = doTask(message.content, message.edit[0].newcontent)
+                        anotheredit += '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td>none</td></tr>' 
+                    }
+                    if(message.edit[1].whoedit == MYID){
+                        data = doTask(message.content, message.edit[1].newcontent)
+                        anotheredit += '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td>none</td></tr>' 
+                    }
+                    
                 }
 
-                var anotheredit = ""
-                if(message.edit.length == 1){
-                    if(message.edit[0].whoedit != MYID)
-                       anotheredit = '<tr><td><image src='+message.edit[0].id+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
-                }else{//length = 2
-                    if(message.edit[0].whoedit != MYID)
-                       anotheredit = '<tr><td><image src='+message.edit[0].id+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[0].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
-                    else if(message.edit[1].whoedit != MYID)
-                        anotheredit = '<tr><td><image src='+message.edit[0].id+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+message.edit[1].newcontent+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                var oldcontent = ""
+                if(message.userA == MYID)
+                    var oldcontent = '<tr><td>Me</td><td>'+data.del +' (old)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+                else{
+                    var oldcontent = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.del +' (old)</td><td>'+
+                       getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
                 }
 
                 var ele = '<table class="table table-hover"><thead><tr>'+
@@ -979,11 +1019,15 @@
                 if(parseInt(MYID) == parseInt(data.id_receive)){
                     console.log(data)
                     var chatboxid = document.getElementById(data.id_send)
-                    console.log(chatboxid)
 
                     if(chatboxid == null){
                         setTimeout(function(){
-                            register_popup(null, data.id_send, data.id_send, data.myphoto);
+                            for(var ind = 0; ind < INFORCOMMUNITY.length; ind++){
+                                if(INFORCOMMUNITY[ind].infor.id == data.id_send){
+                                    register_popup(null, data.id_send, INFORCOMMUNITY[ind].infor.name, data.myphoto);
+                                }
+                                
+                            }
                         }, WAITESHOWCHATBOX)
                     }
                 }
