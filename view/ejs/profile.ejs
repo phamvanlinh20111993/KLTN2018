@@ -82,22 +82,22 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Block  </h4>
+          <h4 class="modal-title">Khóa  </h4>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="reasonblock">Reason(option):</label>
+            <label for="reasonblock">Lí do(không bắt buộc):</label>
             <textarea class="form-control" rows="4" id="reasonblock" placeholder="Write your reason..."></textarea>
           </div>
           <div class="alert alert-success">
-            <strong>Info!</strong> You never see this user in community and disscusion.
+            <strong>Info!</strong> Bạn sẽ không thấy người dùng này trong cộng đồng và các thảo luận.
           </div>
           <div class="alert alert-danger">
-            <strong>Danger!</strong> Auto block this user 1 years.
+            <strong>Danger!</strong> Tự động khóa người này 1 năm.
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-success">Done</button>
+          <button type="button" class="btn btn-success">Xong</button>
         </div>
       </div>
       
@@ -113,7 +113,7 @@
 
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Edit Profile</h4>
+          <h4 class="modal-title">Chỉnh sửa thông tin</h4>
         </div>
 
         <div class="modal-body">
@@ -121,73 +121,73 @@
 
                <form action="/languageex/user/edit" name="myForm" id="myform1" method="post" onsubmit="return validateForm()">
                   <div class="form-group">
-                     <label for="name">Name:</label>
+                     <label for="name">Tên:</label>
                      <input type="text" class="form-control" id="name" name="name" value="<%=User.infor.name%>" minlength="6" maxlength="30" pattern="[A-Za-z0-9 ]{6,30}" required >
                   </div>
 
                   <div class="form-group">
-                     <label for="comment">Describe:</label>
+                     <label for="comment">Mô tả:</label>
                      <textarea class="form-control" rows="5" name="describe" minlength="100" maxlength="2000" required><%=User.infor.describe%></textarea>
                   </div>
 
                   <div class="form-group">
-                     <label for="comment">Gender:</label></br>
+                     <label for="comment">Giới tính:</label></br>
                      <%if(User.infor.gender == 'male'){%>
                          <label class="radio-inline">
-                           <input type="radio" value="male" name="gender" checked>Male
+                           <input type="radio" value="male" name="gender" checked>Nam
                         </label>
                      <%}else{%>
                         <label class="radio-inline">
-                           <input type="radio" value="male" name="gender">Male
+                           <input type="radio" value="male" name="gender">Nam
                         </label>
                      <%}%>
                      <%if(User.infor.gender == 'female'){%>
                         <label class="radio-inline">
-                           <input type="radio" name="gender" value="female" checked>Female
+                           <input type="radio" name="gender" value="female" checked>Nữ
                         </label>
                      <%}else{%>
                         <label class="radio-inline">
-                           <input type="radio" name="gender" value="female">Female
+                           <input type="radio" name="gender" value="female">Nữ
                         </label>
                       <%}%>
                       <%if(User.infor.gender == 'unknown'){%>
                         <label class="radio-inline">
-                           <input type="radio" name="gender" value="unknown" checked>Unknown
+                           <input type="radio" name="gender" value="unknown" checked>Không xác định
                         </label>
                       <%}else{%>
                            <label class="radio-inline">
-                              <input type="radio" name="gender" value="unknown">Unknown
+                              <input type="radio" name="gender" value="unknown">Không xác định
                            </label>
                        <%}%>
                   </div>
 
                   <div class="form-group">
-                     <label for="birthday">Birthday:</label>
+                     <label for="birthday">Sinh nhật:</label>
                      <input type="date" name="bday" class="form-control" id="bday" value="<%=User.infor.dateofbirth1%>" max="2012-12-31" min="1900-12-31" required>
                   </div>
             </form>
 
             <div style="display:none;" id="DivChangePassword">
                <div class="form-group">
-                  <label for="pwd">Current Pass:</label>
+                  <label for="pwd">Mật khẩu hiện tại:</label>
                   <input type="password" class="form-control" id="pwd" autocomplete="off">
                   <p id="password" style="color: red;display: none;"></p>
                </div>
 
                <div class="form-group">
-                  <label for="pwd">New Pass:</label>
+                  <label for="pwd">Mật khẩu mới:</label>
                   <input type="password" class="form-control" id="npwd"  autocomplete="off">
                   <p id="newpassword" style="color: red;display: none;"></p>
                </div>
 
                <div class="form-group">
-                  <label for="pwd">Confirm New Pass:</label>
+                  <label for="pwd">Xác nhận mật khẩu mới:</label>
                   <input type="password" class="form-control" id="cpwd"  autocomplete="off">
                   <p id="confirmpassword" style="color: red;display: none;"></p>
                </div>
             </div>
 
-            <button type="button" class="btn btn-warning" id="ChangePassword">Change password</button>
+            <button type="button" class="btn btn-warning" id="ChangePassword">Đổi mật khẩu</button>
          </div>
            
         </div>
@@ -208,7 +208,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Your photo</h4>
+          <h4 class="modal-title">Ảnh đại diện của bạn</h4>
         </div>
 
         <div class="modal-body">
@@ -221,7 +221,7 @@
                   </div>
                </div>
                <img class="resize-image" src="" alt="image for resizing">
-               <button class="btn-crop js-crop">Crop<img class="icon-crop"></button>
+               <button class="btn-crop js-crop">Cắt<img class="icon-crop"></button>
             </div>
 
             <div style="margin-top: 5px;margin-left: 30%;">
@@ -232,7 +232,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Done</button>
+          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Xong</button>
         </div>
       </div>
     </div>
@@ -245,7 +245,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Your Exchange Languagues</h4>
+          <h4 class="modal-title">Ngôn ngữ thực hành của bạn</h4>
         </div>
 
         <div class="modal-body">
@@ -254,7 +254,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Done</button>
+          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Xong</button>
         </div>
       </div>
     </div>
@@ -267,7 +267,7 @@
       <div class="modal-content">
         <div class="modal-header">
            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Your Native Languagues</h4>
+          <h4 class="modal-title">Ngôn ngữ mẹ đẻ của bạn</h4>
         </div>
 
         <div class="modal-body">
@@ -276,7 +276,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Done</button>
+          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Xong</button>
         </div>
       </div>
     </div>
@@ -372,17 +372,17 @@
   <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
-      <a class="navbar-brand" href="#">User's profile</a>
+      <a class="navbar-brand" href="#">Thông tin người dùng</a>
     </div>
     <ul class="nav navbar-nav">
-      <li class="active"><a href="/languageex/home">Home</a></li>
+      <li class="active"><a href="/languageex/home">Trang chủ</a></li>
        <li><a href="/languageex/messenger">Messenger</a></li>
-       <li><a href="/languageex/user/post">Discussion</a></li>
+       <li><a href="/languageex/user/post">Thảo luận</a></li>
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="#" data-toggle="modal" data-target="#BoxUpdatePhoto"><span class="glyphicon glyphicon-globe" ></span> Information</a></li>
-      <li><a href="/languageex/user/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+      <li><a href="#" data-toggle="modal" data-target="#BoxUpdatePhoto"><span class="glyphicon glyphicon-globe" ></span> Thông in</a></li>
+      <li><a href="/languageex/user/logout"><span class="glyphicon glyphicon-log-out"></span> Đăng xuất</a></li>
     </ul>
   </div>
 </nav>
@@ -420,7 +420,7 @@
                      <img alt="User Pic" src="<%=User.infor.photo%>" class="img-circle img-responsive" width="400">
                      <div class="form-group" style="margin-top: 5%;"> 
                        <%if(User.state == 'me'){%>
-                        <button type="button" class="btn btn-link" onclick="Showmodalbox()">Update photo</button>
+                        <button type="button" class="btn btn-link" onclick="Showmodalbox()">Cập nhật ảnh</button>
                         <%}%>
                      </div>
                 </div>
@@ -446,7 +446,7 @@
                       </tr>
 
                       <tr>
-                        <td>Learning:</td>
+                        <td>Đang học:</td>
                         <td>
                            <% User.exlang.learning.forEach(function(ex) { %>
                               <%index++; %>
@@ -460,27 +460,27 @@
                       </tr>
 
                       <tr>
-                        <td>Level:</td>
+                        <td>Cấp độ:</td>
                         <td><%=User.infor.level%></td>
                       </tr>
 
                       <tr>
-                        <td>Score:</td>
+                        <td>Điểm:</td>
                         <td><%=User.infor.score%></td>
                       </tr>
 
                       <tr>
-                        <td style="width: 20%;">Date of Birth</td>
+                        <td style="width: 20%;">Sinh nhật</td>
                         <td><%=User.infor.dateofbirth %></td>
                       </tr>
                    
                      <tr>
                         <tr>
-                           <td>Gender</td>
+                           <td>Giới tính</td>
                            <td><%=User.infor.gender%></td>
                         </tr>
                         <tr>
-                           <td>Native</td>
+                           <td>Ngôn ngữ mẹ đẻ</td>
                            <td>
                               <%index = 0; %>
                               <% User.natlang.learning.forEach(function(nat) { %>
@@ -496,7 +496,7 @@
                      </tr>
 
                      <tr>
-                        <td>Describe</td>
+                        <td>Mô tả</td>
                         <td style="word-break: break-word;"><%=User.infor.describe%></td>
                      </tr>
                      

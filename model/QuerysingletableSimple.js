@@ -706,7 +706,31 @@ var selectListUserMessenger = function(id, cb)
 
     con.query(sqlString, function(error, res, fields){
 		if(error)	cb(null, error)
-		else if(res.length > 0)
+		else
+			cb(res, null)
+	})
+}
+
+//tim kiem nguoi dung voi dieu kien email hoac ten nguoi dung
+var selectListUserMessengerCondition = function(id, condi, cb)
+{
+
+	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, u.state, MAX(me.time) AS max, "+
+	        " fo.tracked "+
+	        " FROM user u JOIN message me ON (me.userA = u.id AND me.userB = "+mysql.escape(id)+") "+
+	        " OR (me.userA = "+mysql.escape(id)+" AND me.userB = u.id) "+
+	        " LEFT JOIN follow fo ON (fo.followers = "+mysql.escape(id)+" AND tracked = u.id)"+
+	        " WHERE u.id != "+mysql.escape(id)+
+	        " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+mysql.escape(id)+")"+
+	        " AND ( u.email LIKE '%"+condi+"%' OR u.name LIKE '%"+condi+"%')"+
+	        " GROUP BY u.id"+
+	        " ORDER BY max DESC, u.state DESC"
+
+	console.log(sqlString)
+
+    con.query(sqlString, function(error, res, fields){
+		if(error)	cb(null, error)
+		else
 			cb(res, null)
 	})
 }
@@ -823,7 +847,7 @@ var takeMessageContent = function(myid, cb)
 
 //lay so luong tin nhan chua doc
 var getNotifyMessage = function(myid, cb){
-	var sqlString = " SELECT msg.userA AS num FROM message msg"+
+	var sqlString = " SELECT msg.userA AS id FROM message msg"+
 				       " WHERE msg.userB = "+mysql.escape(myid)+" AND msg.ischeck < 2 "+
 	                " GROUP BY msg.userA "
 
@@ -832,7 +856,7 @@ var getNotifyMessage = function(myid, cb){
 			throw err
 			cb(null)
 		}else{
-			cb(result.length)
+			cb(result)
 		}
 	})
 }
@@ -854,6 +878,7 @@ module.exports = {
 	loadMessageSetting: loadMessageSetting,
 	selectWatchUser: selectWatchUser,
 	selectSpecificUserMessenger: selectSpecificUserMessenger,
+	selectListUserMessengerCondition: selectListUserMessengerCondition,
 
 	takeMessageContent: takeMessageContent,
 	getNotifyMessage: getNotifyMessage

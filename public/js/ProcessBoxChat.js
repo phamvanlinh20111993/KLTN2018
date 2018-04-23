@@ -1,3 +1,27 @@
+            
+            //clear all session when refresh page
+         //   window.onload = function(){
+         //      sessionStorage.clear();
+         //   }
+
+           //tu dong bat cac chatbox khi nguoi dung load lai trang
+           function autoTurnOnChatBox(){
+               if(sessionStorage.stateturnonchatbox){
+                  var listUserChatTurnOn = sessionStorage.stateturnonchatbox.split("/"), ind
+                  for(ind = 0; ind < listUserChatTurnOn.length; ind++){
+                     if(parseInt(listUserChatTurnOn[ind])){
+                        //console.log(listUserChatTurnOn[ind]+'_turnoncb')
+                        var autoclick = document.getElementById(listUserChatTurnOn[ind]+'_turnoncb')
+                        if(autoclick)
+                           autoclick.click()
+                     }
+                  }
+               }
+           }
+
+           //dung ham settimeout vi ben file Commnunity.js chua kip load giao dien-showUserCommunity()
+           setTimeout(function(){autoTurnOnChatBox()}, 2000);
+
 
 
            var INPUT_HIDDEN_SAVE_MSSID = "";//su dung bien nay de luu tru input hidden-luu msg id=>edit msg
@@ -18,27 +42,27 @@
             //arrays of popups ids
             var popups = [];
 			
-			function formatAMPM(date)
-			{
-				var hours = date.getHours();
-				var minutes = date.getMinutes();
-				var ampm = hours >= 12 ? 'PM' : 'AM';
-				hours = hours % 12;
-				hours = hours ? hours : 12; // the hour '0' should be '12'
-				minutes = minutes < 10 ? '0'+minutes : minutes;
-				var strTime = hours + ':' + minutes + ' ' + ampm;
+			   function formatAMPM(date)
+			   {
+				  var hours = date.getHours();
+				  var minutes = date.getMinutes();
+				  var ampm = hours >= 12 ? 'PM' : 'AM';
+				  hours = hours % 12;
+				  hours = hours ? hours : 12; // the hour '0' should be '12'
+				  minutes = minutes < 10 ? '0'+minutes : minutes;
+				  var strTime = hours + ':' + minutes + ' ' + ampm;
 
-				return strTime;
-			}          
+				  return strTime;
+			   }          
             
             function formatTime(date)
             {
                 var days = date.getDate();
-                var hours = date.getHours() - 7;
-                if(hours < 0){
-                    hours = hours + 24
-                    days = days-1;
-                }
+                var hours = date.getHours() //- 7;
+              //  if(hours < 0){
+              //      hours = hours + 24
+              //      days = days-1;
+             //  }
 
                 var minutes = date.getMinutes();
                 var months = date.getMonth() + 1;//getMonth() return 0-11
@@ -92,6 +116,21 @@
                     if(id == popups[iii]){
                         Array.remove(popups, iii); 
                         document.getElementById(id).style.display = "none";
+                        //remove item session
+                        sessionStorage.removeItem("_block_"+id);
+                        sessionStorage.removeItem("_checkmiss_"+id);
+                        //xoa hien thi popbox
+                        var listUserChatTurnOn = sessionStorage.stateturnonchatbox.split("/")
+                        sessionStorage.stateturnonchatbox = ""
+                        for(var ind = 0; ind < listUserChatTurnOn.length; ind++){
+                           if(parseInt(listUserChatTurnOn[ind]) != parseInt(id))
+                              sessionStorage.stateturnonchatbox += listUserChatTurnOn[ind]
+
+                           if(ind+1 < listUserChatTurnOn.length)
+                              if(parseInt(listUserChatTurnOn[ind+1]) != parseInt(id))
+                                 sessionStorage.stateturnonchatbox += "/"
+                        }
+
                         calculate_popups();  
                         return;
                     }
@@ -229,12 +268,12 @@
                     }
                     
                 	takecontentMessage(id, function(content)
-                  {
+                    {
                			document.getElementsByTagName("nav")[0].innerHTML += 
                				Show_pop_up_message(id, name, photo, setting); 
                         var myMessages = {}
 
-                        console.log(content)
+                      //  console.log(content)
                         if(content.listmessage)
                             myMessages = content.listmessage.messages
 
@@ -297,64 +336,64 @@
 					if(val.length > 0)
                {
                         //tao object
-                        var message = {}
-                        message.content = val
-                        message.data = null
-                        message.edit = []//khoi tao rong
+                  var message = {}
+                  message.content = val
+                  message.data = null
+                  message.edit = []//khoi tao rong
 
-						      Message_send(id, time, MYPHOTO, message, 0)
+						Message_send(id, time, MYPHOTO, message, 0)
 
                      //   console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
-                        var ismisspelling = 0;//khong co loi dich, tin nhan ok
-                        Translate_or_Misspelling("/languageex/user/checkmisspelling", 
-                         MYPRIOEX, MYPRIONAT, val, function(data){
+                  var ismisspelling = 0;//khong co loi dich, tin nhan ok
+                  Translate_or_Misspelling("/languageex/user/checkmisspelling", 
+                     MYPRIOEX, MYPRIONAT, val, function(data){
 
-                           if(data.content.error == null){
-                                if(data.content.value==""){
-                                    ismisspelling = 0;//tin nhan ok
-                                }else{
-                                    if(data.content.language == MYPRIOEX)
-                                        ismisspelling = 1;//co loi chinh ta(đỏ)
-                                    else
-                                        ismisspelling = 2//khong phai ngon ngu dang trao doi(vàng)
-                                }
-                           }else
-                                ismisspelling = 3;//loi dich tin nhan(cam)
+                     if(data.content.error == null){
+                        if(data.content.value==""){
+                           ismisspelling = 0;//tin nhan ok
+                        }else{
+                           if(data.content.language == MYPRIOEX)
+                              ismisspelling = 1;//co loi chinh ta(đỏ)
+                           else
+                              ismisspelling = 2//khong phai ngon ngu dang trao doi(vàng)
+                        }
+                     }else
+                        ismisspelling = 3;//loi dich tin nhan(cam)
 
-                            SCORING = 1;
-                            REQUEST_AJAX_SERVER('/languageex/user/score', 'POST', {score: SCORING}, 
-                                function(err, data){
-                                    if(err) alert(err)
-                            })
-                         //  console.log("gia tri la: " + ismisspelling)
-                            message.misspelling = ismisspelling
-						    socket.emit('sendmsg', {
-							   content: message,
-							   time: new Date(),
-                        	   myid: MYID,
-                        	   photo: MYPHOTO,
-                        	   pid: id
-						    }) 
-                        })
+                     SCORING = 1;
+                     REQUEST_AJAX_SERVER('/languageex/user/score', 'POST', {score: SCORING}, 
+                        function(err, data){
+                           if(err) alert(err)
+                     })
+                     //  console.log("gia tri la: " + ismisspelling)
+                     message.misspelling = ismisspelling
+						   socket.emit('sendmsg', {
+							content: message,
+							time: new Date(),
+                        myid: MYID,
+                        photo: MYPHOTO,
+                        pid: id
+						   }) 
+                  })
 						//reset input box
 						document.getElementById(id + "_mymsg").value = "";
 
-					    }
-			  	    }else{//nguoi dung dang nhap ban phim
-			  		socket.emit('chatting', {
-                     	myid: MYID,
-                     	pid: id
+					}
+			  	   }else{//nguoi dung dang nhap ban phim
+			  		   socket.emit('chatting', {
+                     myid: MYID,
+                     pid: id
                   })  
 			  	   }
             }
 
             //luu ma tin nhan vua gui di trong input hidden
             socket.on('sendmsgid', function(data){
-                if(data.myid == MYID){
-                    var savemsgid = document.getElementById(INPUT_HIDDEN_SAVE_MSSID+"_saveidms")
-                    savemsgid.value = data.msgid
-                    console.log("messageid " + savemsgid.value)
-                }
+               if(data.myid == MYID){
+                  var savemsgid = document.getElementById(INPUT_HIDDEN_SAVE_MSSID+"_saveidms")
+                  savemsgid.value = data.msgid
+                  console.log("messageid " + savemsgid.value)
+               }
             })
 
             //nhan tin nhan cua nguoi gui
@@ -374,16 +413,58 @@
           				//console.log("check event focus")
           				//if($(this).is(':focus')){}//if focus
           				socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
-          				
           			})
+
+                  /**
+                     Khi nhận tin nhắn từ ai đó gửi đến, bên người nhận sẽ kiểm tra các hộp thoại boxchat
+                     đang bật, và kiểm tra chúng có được focus không(chỉ focus 1 boxchat tại một thời điểm)
+                     nếu được focus trùng với người gửi thì không có thông báo nhân tin, ngược lại nhận được
+                     thông báo nhận tin nhắn.
+                  **/
+
+                  setTimeout(function(){
+                     //lấy các hộp thoại chatbox đang được bật
+                     var listUserChatTurnOn = sessionStorage.stateturnonchatbox.split("/"), state = false
+                     //kiểm tra một trong số các hộp thoại này có được focus
+                     for(var ind = 0; ind < listUserChatTurnOn.length; ind++){
+                        var inputboxchat = document.getElementById(listUserChatTurnOn[ind]+"_mymsg")
+                        if(inputboxchat){
+                           if(document.activeElement === inputboxchat //co focus
+                                 && listUserChatTurnOn[ind]==parseInt(data.id_send)){
+                              state = true
+                              break;
+                           }
+                        }
+                     }
+
+                     if(!state){
+                        var state1 = false;
+                        //global array SAVE_ID_HAVE_NOTIFY co chua cac id thong bao nguoi dung
+                        //neu da co ton tai thong bao thi khong tang gia tri, con lai thi tang
+                        for(var ind = 0; ind < SAVE_ID_HAVE_NOTIFY.length; ind++){
+                           if(SAVE_ID_HAVE_NOTIFY[ind] == parseInt(data.id_send)){
+                              state1 = true
+                              break;
+                           }
+                        }
+
+                        if(!state1){
+                           SAVE_ID_HAVE_NOTIFY[SAVE_ID_HAVE_NOTIFY.length] = parseInt(data.id_send)
+                           var str = document.getElementById("numofusermessagetoyou").innerHTML
+                           var Totalnotify = parseInt(str.substring(1, str.length-1))+1;
+                           document.getElementById("numofusermessagetoyou").innerHTML = "("+Totalnotify+")"
+                        }
+                     }
+
+                  }, 1200)
             	}
             })
 
             socket.on('seen', function(data){
-				var seenmsg = document.getElementsByClassName(data.myid+"_seen")
-				if(seenmsg.length > 0)
-					seenmsg[seenmsg.length-1].style.display = "block"
-		    })	
+				   var seenmsg = document.getElementsByClassName(data.myid+"_seen")
+				   if(seenmsg.length > 0)
+					   seenmsg[seenmsg.length-1].style.display = "block"
+		       })	
             
             var TIME_TYPING = 4500;
             //nguoi dung dang nhap tin nhan
@@ -405,16 +486,16 @@
             //calculate the total number of popups suitable and then populate the toatal_popups variable.
             function calculate_popups()
             {
-                var width = window.innerWidth;
-                if(width < 540){
-                    total_popups = 0;
-                }
-                else{
-                    width = width - 200;
-                    //320 is width of a single popup box
-                    total_popups = parseInt(width/320);
-                }
-                display_popups();
+               var width = window.innerWidth;
+               if(width < 540){
+                  total_popups = 0;
+               }
+               else{
+                  width = width - 200;
+                  //320 is width of a single popup box
+                  total_popups = parseInt(width/320);
+               }
+               display_popups();
             }
             
             //recalculate when window is loaded and also when window is resized.
@@ -424,6 +505,22 @@
 			
 			function Show_pop_up_message(id, name, photo, setting)
 			{
+
+            if(!sessionStorage.stateturnonchatbox){
+               sessionStorage.setItem("stateturnonchatbox", id);
+            }
+            else{
+               var listUserChatTurnOn = (sessionStorage.stateturnonchatbox).split("/"), 
+               state = false, ind;
+               for(ind = 0; ind < listUserChatTurnOn.length; ind++){
+                  if(id == parseInt(listUserChatTurnOn[ind]))
+                     state = true
+               }
+
+               if(!state)
+                  sessionStorage.stateturnonchatbox += "/"+id
+            }
+
 				var misspellings = ""//tu dong check loi chinh ta
             var checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')"> Block messages</label>'//check co bi block message khong
                
@@ -449,15 +546,15 @@
 													   '</a>' + 
 				                              '<ul class="dropdown-menu" style="z-index:999;">' + 
 													     '<li><div class="checkbox" style="margin-left:10%;">' +
-      														'<label><input type="checkbox" '+misspellings+' onclick="Auto_check_miss(this,'+id+')"> Auto misspellings</label>'+
+      														'<label><input type="checkbox" '+misspellings+' onclick="Auto_check_miss(this,'+id+')"> Tự động check lỗi chính tả</label>'+
    														'</div></li>' + 
-   														'<li><a href="/languageex/messenger?uid='+id+'">Open in messenger</a></li>' + 
+   														'<li><a href="/languageex/messenger?uid='+id+'">Mở trong messenger</a></li>' + 
 														   '<li><div class="checkbox" style="margin-left:10%;">' +
       															checkblockmsg+
    														 '</div></li>' +
-   														'<li><a href="#" onclick="translatePrio()">Translations priority</a></li>' + 
-   														'<li><a href="#" onclick="misspellingPrio()">Misspellings priority</a></li>' + 
-														   '<li><a href="#" onclick="delConversation('+id+',\''+name+'\')">Delete Conversation</a></li>' + 
+   														'<li><a href="#" onclick="translatePrio()">Thay đổi ngôn ngữ tự nhiên</a></li>' + 
+   														'<li><a href="#" onclick="misspellingPrio()">Thay đổi ngôn ngữ trao đổi</a></li>' + 
+														   '<li><a href="#" onclick="delConversation('+id+',\''+name+'\')">Xóa hội thoại</a></li>' + 
 														   '<li><a href="#" onclick="reportUser('+id+',\''+name+'\')">Report <span style="color:orange;">'+name+'</span></a></li>' +
 														'</ul>' + 
 				                           '</div>' + 
@@ -471,7 +568,7 @@
 								      '</div>' + 
 				
                               '<div style="height:80%;width:100%;background-color:#CCCCCC;overflow:auto;" id="'+id+'_scrollmsg">' + //#bcd1c6
-                                 '<div style="text-align: center; margin-top:3%;">Welcome to talk with <span style="color:red;">'+ name +'</span></div>'+
+                                 '<div style="text-align: center; margin-top:3%;">Bắt đầu hội thoại cùng <span style="color:red;">'+ name +'</span></div>'+
                                  '<div><ul id="'+id+'_content" class="ulclass"></ul></div>' + //content message
 									   
 										   '<div style="background-color:#CCCCCC;z-index:1;display:none;bottom: 0;" id="'+id+'_typing">' +
@@ -483,7 +580,7 @@
                               '</div>' +
 							
                               '<div style="margin-top:5px;box-shadow:1px 2px 5px #ccccff;height: 10%;">' + 
-                                 '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg"'+
+                                 '<input type = "text" placeholder= "Viết tin nhắn..." id = "'+id+'_mymsg" onfocus="seenMessage(\''+id+'\')"'+
                                        ' style="padding-left:10px;width:85%;height:88%;border:0px;outline-width:0;" autofocus onkeypress="writeMessage(event,\''+id+'\')">'+ 
 				                    '<a style = "margin-left: 2px;"><i class="fa fa-microphone" style="font-size:20px" onclick="msgRecord('+id+')"></i></a>' + 
 				                    '<a style = "margin-left: 5px;"><i class="fa fa-video-camera" style="font-size:22px" onclick="callVideoOneToOne(\''+id+'\', \''+name+'\', \''+photo+'\')"></i></a>' + 
@@ -493,6 +590,32 @@
 				return element;
 				
 			}
+
+         //check da xem tin nhan, gia tri thong bao giam di 1
+         function seenMessage(id)//id nguoi dung dang nt vs MYID
+         {
+            var hashdata = false;
+            for(var ind = 0; ind < SAVE_ID_HAVE_NOTIFY.length; ind++){
+               if(SAVE_ID_HAVE_NOTIFY[ind] == parseInt(id)){
+                  var str = document.getElementById("numofusermessagetoyou").innerHTML
+                  var Totalnotify = parseInt(str.substring(1, str.length -1))-1;
+                  document.getElementById("numofusermessagetoyou").innerHTML = "("+Totalnotify+")"
+                  hashdata = true;
+                  SAVE_ID_HAVE_NOTIFY.splice(ind, 1)//xoa trong mang
+                  break;
+               }
+            }
+
+            if(hashdata == true){
+               REQUEST_AJAX_SERVER('/languageex/user/seenmessage', 'POST', {pid: id}, 
+                  function(err, data){
+                     if(err) alert(err)
+                     else console.log(data)
+               })
+
+               hashdata = false;
+            }
+         }
 			
 
 			function makerandomid(){
@@ -519,10 +642,10 @@
             return changeclmisspell;
          }
 
-            //thay the tat ca string 'search' trong 'string' bang string 'replacement'
-            var replaceAll = function(string, search, replacement) {
-                return string.replace(new RegExp(search, 'g'), replacement);
-            }
+         //thay the tat ca string 'search' trong 'string' bang string 'replacement'
+         var replaceAll = function(string, search, replacement) {
+            return string.replace(new RegExp(search, 'g'), replacement);
+         }
 
          //   var replaceAll1 = function(string, search, replacement) {
         //        return target.split(search).join(replacement);
@@ -1014,20 +1137,20 @@
             }
 
             //nhan tin nhan
-            var WAITESHOWCHATBOX = 2000
+            var WAITESHOWCHATBOX = 1000
             socket.on('isturnonbox', function(data){
                 if(parseInt(MYID) == parseInt(data.id_receive)){
-                    console.log(data)
+                   // console.log(data)
                     var chatboxid = document.getElementById(data.id_send)
 
                     if(chatboxid == null){
                         setTimeout(function(){
                             for(var ind = 0; ind < INFORCOMMUNITY.length; ind++){
-                                if(INFORCOMMUNITY[ind].infor.id == data.id_send){
-                                    register_popup(null, data.id_send, INFORCOMMUNITY[ind].infor.name, data.myphoto);
-                                }
-                                
+                              if(INFORCOMMUNITY[ind].infor.id == data.id_send){
+                                 register_popup(null, data.id_send, INFORCOMMUNITY[ind].infor.name, data.myphoto);
+                              }
                             }
+
                         }, WAITESHOWCHATBOX)
                     }
                 }

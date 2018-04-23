@@ -65,8 +65,8 @@ var showUserCommunity = function(User)
    var tooltipFollow = "Follow "
    var id = User.infor.id
 
-   var isblockedmsg = '<a href="#" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
-                            ' data-toggle="tooltip" title="Send message" class="icon">'+
+   var isblockedmsg = '<a href="#" id="'+id+'_turnoncb" onclick="register_popup(event,'+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\');" '+
+                            ' data-toggle="tooltip" title="Send message" class="icon" >'+
                           '<i class="fa fa-comment" style="font-size:36px;color:#3399FF;"></i></a>'
 
 	if(User.infor.state == 1){//dang online
@@ -83,7 +83,7 @@ var showUserCommunity = function(User)
                           '"class="icon"><i class="fa fa-eye" id="'+id+'_follow" style="font-size:36px;'+isFollow+'"></i></a>'
 
   if(User.infor.iswasblocked.state){
-    isblockedmsg = '<a href="#" onclick="wasBlock('+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\',\''+User.infor.iswasblocked.timeblock+'\' );" '+
+    isblockedmsg = '<a href="#" id="'+id+'_turnoncb" onclick="wasBlock('+id+',\''+User.infor.name+'\''+", "+'\''+User.infor.photo+'\',\''+User.infor.iswasblocked.timeblock+'\' );" '+
                             ' data-toggle="tooltip" title="Message blocked" class="icon">'+
                           '<i class="fa fa-comment" style="font-size:36px;color:black;"></i></a>'
   }
@@ -91,7 +91,7 @@ var showUserCommunity = function(User)
   if(User.youblocked){//trong truong hop tim kiem nguoi dung,se tim kiem ca nhung nguoi da block
     isblockedmsg = ""
     followstr = '<div class="alert alert-info"'+
-         '<strong>Info!</strong> You blocked '+User.infor.name +
+         '<strong>Info!</strong> Bạn đã khóa '+User.infor.name +
          ' At '+formatAMPM(new Date(User.youblocked.time))+
     '</div>'
   }
@@ -99,9 +99,9 @@ var showUserCommunity = function(User)
   if(User.youwasblocked){
     isblockedmsg = ""
     followstr = '<div class="alert alert-info"'+
-         '<strong>Info!</strong> You was blocked by '+User.infor.name +
-         ' At '+formatAMPM(new Date(User.youwasblocked.time))+
-         ' with Reason: ' + User.youwasblocked.reason
+         '<strong>Info!</strong> Bạn bị khóa bởi '+User.infor.name +
+         ' lúc '+formatAMPM(new Date(User.youwasblocked.time))+
+         ' với Lý do: ' + User.youwasblocked.reason
     '</div>'
   }
 
@@ -114,10 +114,10 @@ var showUserCommunity = function(User)
               				'</div>'+
          					'<div style="line-height: 90%;">'+
        							isOnline +
-        						'<p class="title">Leanrning: <span style="color:blue;">'+User.infor.exlanguage[0].laname+'</span></p>'+
-         						'<p class="title">Degree: <span style="color:orange;">'+User.infor.exlanguage[0].dename+'</span></p>'+
-        						'<p class="title" data-toggle="tooltip" title="score: '+User.infor.score+'">Level: '+User.infor.level+'</p>'+
-        						'<p>Age: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
+        						'<p class="title">Đang học: <span style="color:blue;">'+User.infor.exlanguage[0].laname+'</span></p>'+
+         						'<p class="title">Trình độ: <span style="color:orange;">'+User.infor.exlanguage[0].dename+'</span></p>'+
+        						'<p class="title" data-toggle="tooltip" title="score: '+User.infor.score+'">Cấp độ: '+User.infor.level+'</p>'+
+        						'<p>Tuổi: '+(new Date().getYear() - new Date(User.infor.dateofbirth).getYear())+'</p>'+
         					'</div>'+
                				'<div style="margin: 24px 0;">'+
                   				isblockedmsg +
@@ -162,12 +162,16 @@ function viewProfileByImage(uid){
   location.href = "/languageex/user/profile?uid="+encodeURIComponent(uid)
 }
 
+var SAVE_ID_HAVE_NOTIFY = []
 var showTotalNoftify = function(){
    ajaxRequest('/languageex/home/notifymsg', 'GET', {}, function(data, err){
       if(err) alert(err)
       else{
-         if(data.data > 0)
-            document.getElementById("numofusermessagetoyou").innerHTML = "("+data.data+")"
+         for(var ind = 0; ind < data.data.length; ind++)
+            SAVE_ID_HAVE_NOTIFY[ind] = data.data[ind].id
+         
+         if(data.data.length > 0)
+            document.getElementById("numofusermessagetoyou").innerHTML = "("+data.data.length+")"
       }
   })
 }
@@ -218,10 +222,23 @@ var showContentNotifyMsg = function(DOMelement, data){
    DOMelement.innerHTML = ele
 }
 
+
 var messageToUser = function(Userinfor)
 {
    var UserinfortoOBJ = JSON.parse(replaceAll(Userinfor, CONSTANTSTRING, '"'))
    $('#showNotifyHome').modal('hide')
+
+   /**
+      khi có thông báo và nhận được thông báo, người dùng kick vào thông báo để hiển thị các thông
+      báo nhắn tin từ người dùng, nếu kick vào 1 trong những người gửi thông báo thì Thông báo giảm 
+      đi 1, đồng thời mảng SAVE_ID_HAVE_NOTIFY này-chứa các id thông báo cũng giảm đi 1
+   **/
+   for(var ind = 0; ind < SAVE_ID_HAVE_NOTIFY.length; ind++){
+      if(SAVE_ID_HAVE_NOTIFY[ind] == UserinfortoOBJ.id){
+         SAVE_ID_HAVE_NOTIFY.splice(ind, 1)
+         break;
+      }
+   }
 
    register_popup(null, UserinfortoOBJ.id, UserinfortoOBJ.name, UserinfortoOBJ.photo);
 
@@ -245,7 +262,6 @@ var showMyNotify = function(){
    var showNotifyHomeModal = document.getElementById("showNotifyHome")
    var showNotifyModal_Title = showNotifyHomeModal.getElementsByClassName("modal-title")[0]
    var showNotifyModal_Body = showNotifyHomeModal.getElementsByClassName("modal-body")[0]
-
    ajaxRequest('/languageex/home/ntfcontentmsg', 'POST', {}, function(data, err){
       if(err) alert(err)
       else{

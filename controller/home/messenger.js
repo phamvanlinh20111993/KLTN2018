@@ -92,6 +92,22 @@ router.route('/user/loasdspecuser')
 })
 
 
+router.route('/user/loadusercondi')
+.post(function(req, res)
+{
+	var searchcondi = req.body.data.search
+	if(req.session.filter && searchcondi)
+	{
+		querysimple.selectListUserMessengerCondition(req.session.user_id, searchcondi, 
+		 function(data, err){
+			if(err) throw err;
+			else{
+				res.send(JSON.stringify({listuser: data}))
+			}
+		})
+		
+	}
+})
 
 
 router.route('/user/loadmsgsetting')

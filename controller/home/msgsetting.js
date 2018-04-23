@@ -297,4 +297,23 @@ router.route('/user/unblockmsg')
 })
 
 
+router.route('/user/seenmessage')
+.post(function(req, res){
+
+	var pid = req.body.data.pid
+	if(req.session.user_id && pid)
+	{
+		querysimple.updateTable("message", [{field: "ischeck", value: 2}], 
+         [{op: "", field: "userA", value: parseInt(pid)}, 
+          {op:"AND", field: "userB", value: req.session.user_id}],
+         function(result, err){
+            if(err)   throw err
+            else{
+               console.log(result.affectedRows + " record(s) updated seen message in server");
+               res.json({data: result})
+            }
+         })
+	}
+})
+
 module.exports = router;

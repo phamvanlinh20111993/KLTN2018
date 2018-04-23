@@ -369,7 +369,7 @@ io.on('connection', function(client)
       anotherQuery.selectMaxfield("message", "id", function(res)
       {
          var idmessg = res[0].max
-           idmessg = 0
+             idmessg = 0
        //    console.log(data)
          //chen du lieu vao bang
          querysimple.insertTable("message", 
@@ -419,7 +419,7 @@ io.on('connection', function(client)
          function(result, err){
             if(err)   throw err
             else{
-              console.log(result.affectedRows + " record(s) updated seen message");
+              console.log(result.affectedRows + " record(s) updated seen message in socket");
                client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
                io.sockets.in(client.room)//ca 2 ben deu thay tin nhan-io.sockets se gui tin nhan cho het cac ben
             }

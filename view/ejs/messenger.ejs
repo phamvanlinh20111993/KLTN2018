@@ -14,6 +14,7 @@
   <script>try{Typekit.load({ async: true });}catch(e){}</script>
   <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
   <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <style type="text/css">
     body {
@@ -155,12 +156,12 @@
         </div>
 
         <div id="expanded">
-          <label for="twitter"><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></label>
-          <input name="twitter" type="text" value="mikeross" />
+          <label for="twitter"><i class="fa fa-google-plus-circle" aria-hidden="true"></i></label>
+          <input type ="text" value="<%= session.email %>" disabled style="width:auto;">
           <label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
-          <input name="twitter" type="text" value="ross81" />
+          <input type ="text" value="exchange: <%= session.myexchange %>" disabled>
           <label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
-          <input name="twitter" type="text" value="mike.ross" />
+         <input type ="text" value="native: <%= session.mynative %>" disabled>
         </div>
 
       </div>
@@ -168,8 +169,8 @@
     </div>
 
     <div id="search">
-      <label for=""><i class="fa fa-search" aria-hidden="true"></i></label>
-      <input type="text" placeholder="Search contacts..." />
+      <label for=""><i class="fa fa-search" aria-hidden="true" onclick="searchContactClick()"></i></label>
+      <input type="text" id="contactvalue" placeholder="Search contacts..." onkeypress="searchContactPress(event)" />
     </div>
 
 

@@ -619,3 +619,49 @@ var AutoTranslate = function(id, rid, content){
       } 
    })
 }
+
+//search contact khi nhan nut search
+var searchContactClick = function(){
+   var contactvl = document.getElementById("contactvalue")
+   if(contactvl.value != ""){
+      HTTP_REQUEST('/languageex/user/loadusercondi', 'POST', {search: contactvl.value}, 
+         function(err, data){
+            if(err) alert(err)
+            else{
+               if(data.listuser.length > 0){
+                  var contact = document.getElementById("contacts")
+                  var contact_ul = contact.getElementsByTagName("ul")[0]
+                  contact_ul.innerHTML = ""
+
+                  for(index = 0; index < data.listuser.length; index++){
+                     showUsers(data.listuser[index], null)
+                  }
+               }
+            }
+      })
+   }
+}
+
+//search contact khi an enter
+var searchContactPress = function(e){
+   var contactvl = document.getElementById("contactvalue")
+   if(e.keyCode == 13){
+      if(contactvl.value != ""){
+         HTTP_REQUEST('/languageex/user/loadusercondi', 'POST', {search: contactvl.value}, 
+            function(err, data){
+               if(err) alert(err)
+               else{
+                  if(data.listuser.length > 0){
+                     var contact = document.getElementById("contacts")
+                     var contact_ul = contact.getElementsByTagName("ul")[0]
+                     contact_ul.innerHTML = ""
+
+                     for(index = 0; index < data.listuser.length; index++){
+                        showUsers(data.listuser[index], null)
+                     }
+                  }
+               }
+         })
+      }
+   }
+}

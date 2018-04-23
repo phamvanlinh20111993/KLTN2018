@@ -21,8 +21,9 @@ git push -u origin master
 git remote set-url --add name https://github.com/phamvanlinh20111993/KLTN2018_AFTER.git
 - name: origin or upstream
 
-##, push to specigfix remote repository
+##, push to specific remote repository
 git push -u https://github.com/phamvanlinh20111993/KLTN2018_AFTER.git master
+git push -u https://github.com/phamvanlinh20111993/KLTN2018_ByREQUEST.git master(doi theo yeu cau)
 
 
 ##, Call video choose one in three total
