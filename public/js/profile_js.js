@@ -88,7 +88,7 @@ var Report = function(id, name){
     var reportpr = document.getElementById("ReportProfileUser")
     var reportpBody = reportpr.getElementsByClassName("modal-body")[0]
     var reportTitle = reportpr.getElementsByClassName("modal-title")[0]
-    reportTitle.innerHTML = "Why report this profile of "+name+" ?"
+    reportTitle.innerHTML = "Tại sao report thông tin của "+name+" ?"
 
     HTTP_REQUEST('/languageex/user/loadrpprofile', 'POST', {}, function(err, data){
         if(err) alert(err)
@@ -101,7 +101,7 @@ var Report = function(id, name){
                      data.data[ind].content+'</label></div>'
             }
             element += '<div class="alert alert-warning">'+
-              '<strong>Warning!</strong> Do not abuse this feature, administrators will review and block who abuses this feature. Best regards'+
+              '<strong>Cảnh báo! </strong> Không lạm dụng tính năng này, quản trị viên sẽ xem xét và chặn những người lạm dụng tính năng này. Trân trọng'+
             '</div>'
             reportpBody.innerHTML = element
         }
@@ -194,7 +194,7 @@ var myBlockList = function(id)
         if(err) alert(err)
         else{
             var Length = data.data.length
-            myblocklistsTitle.innerHTML = 'Your black lists ('+Length+')'
+            myblocklistsTitle.innerHTML = 'Danh sách đen ('+Length+')'
             var element = '<table class="table table-condensed"><tbody>'
             if(Length > 0){
                 for(var ind = 0; ind < Length; ind++){
@@ -238,7 +238,7 @@ var myFollowList = function(id)
         if(err) alert(err)
         else{
              var Length = data.data.length
-             myfollowlistsTitle.innerHTML = 'Your follow lists ('+Length+')'
+             myfollowlistsTitle.innerHTML = 'Danh sách theo dõi ('+Length+')'
              var element = '<table class="table table-condensed"><tbody>'
             if(Length > 0){
                 for(var ind = 0; ind < Length; ind++){
@@ -247,7 +247,7 @@ var myFollowList = function(id)
                         isfollow = ' (blocked)'
                      element += '<tr id="'+data.data[ind].id+'_follow"><td><img src="'+data.data[ind].photo+'" class="img-rounded" alt="Avatar" height="40"></td>'+
                          '<td><b>'+data.data[ind].name+'</b>'+isfollow+'</td>'+
-                         '<td><button type="button" class="btn btn-info" onclick="unFollowList('+data.data[ind].id+',\''+data.data[ind].name+'\')">Unfollow</button></td></tr>'
+                         '<td><button type="button" class="btn btn-info" onclick="unFollowList('+data.data[ind].id+',\''+data.data[ind].name+'\')">Bỏ theo dõi</button></td></tr>'
                 }
                 element += '</tbody></table>'
 
@@ -299,7 +299,7 @@ var addMoreExchange = function(id){
             Ele += '</table>'
             
             if(data.result.ex.length < 4){
-                Ele +='<div id="selectmoreexchangehd"><label for="sel1">Add more exchange language:(maximum = 3)</label>'+
+                Ele +='<div id="selectmoreexchangehd"><label for="sel1">Thêm ngôn ngữ thực hành:(tối đa 4)</label>'+
                 '<select class="form-control" id="selectmoreexchange">'
                 for(var i = 0; i < data.result.language.length; i++){
                     var flag = true;
@@ -315,7 +315,7 @@ var addMoreExchange = function(id){
                 Ele += '</select></div>'
 
                
-                Ele +='<div id="chooseDegreehidden" style="display:none;"><label for="sel4">Choose your degree: </label>'+
+                Ele +='<div id="chooseDegreehidden" style="display:none;"><label for="sel4">Chọn trình độ: </label>'+
                     '<select class="form-control" id="chooseDegree">'
                 for(var ind = 0; ind < data1.result.length; ind++){
                     Ele+='<option value="'+data1.result[ind].id+'">'+data1.result[ind].name+'</option>'
@@ -323,8 +323,8 @@ var addMoreExchange = function(id){
                 Ele +='</select></div>'
             }else{
                 Ele += '<div class="alert alert-danger">'+
-                    '<strong>Danger!</strong>Can not add more exchange language.'+
-                    ' We only allow max exchange languages are 4 languages.'+
+                    '<strong>Cảnh báo! </strong> Bạn không thể thêm ngôn ngữ thực hành.'+
+                    ' Chúng tôi chỉ cho phép 4 ngôn ngữ trao đổi.'+
                 '</div>'
             }
 
@@ -393,7 +393,7 @@ var addMoreNative = function(id){
             Ele += '</table>'
 
             if(data.result.nat.length < 3){
-                Ele +='<label for="sel1">Add more native language:(maximum = 3)</label>'+
+                Ele +='<label for="sel1">Thêm ngôn ngữ tự nhiên:(tối đa 3)</label>'+
                 '<select class="form-control" id="selectmorenative">'
                 for(var i = 0; i < data.result.language.length; i++){
                     var flag = true;
@@ -409,8 +409,8 @@ var addMoreNative = function(id){
                 Ele += '</select>'
             }else{
                 Ele += '<div class="alert alert-danger">'+
-                    '<strong>Danger!</strong>Can not add more exchange language.'+
-                    ' We only allow max native languages are 3 languages.'+
+                    '<strong>Danger!</strong>Bạn không thể thêm ngôn ngữ tự nhiên.'+
+                    ' Chúng tôi chỉ cho phép 3 ngôn ngữ tự nhiên.'+
                 '</div>'
             }
 

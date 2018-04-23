@@ -332,14 +332,14 @@ var SearchUsersClick = function(id){
           MycommunityExchange.innerHTML = ""
           if(data.community.length == 0){
             MycommunityExchange.innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
-               "<strong>Danger!</strong>No results match.</div>"+
-               "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+               "<strong>Danger!</strong>Không tìm thấy kết quả nào phù hợp.</div>"+
+               "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
           }else{
-            MycommunityExchange.innerHTML = "("+data.community.length+") Results match."
+            MycommunityExchange.innerHTML = "("+data.community.length+") Kết quả phù hợp."
             for(ind = 0; ind <  data.community.length; ind++){
                showUserCommunity(data.community[ind])
             }
-            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
          }
       })
     }
@@ -358,15 +358,15 @@ var SearchUsersEnter = function(e, id){
           MycommunityExchange.innerHTML = ""
           if(data.community.length == 0){
             MycommunityExchange.innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
-                     "<strong>Danger!</strong>No results match.</div>"+
-                     "<button type='button' onclick='backToStart()' class='btn btn-link'>Back to the start</button"
+                     "<strong>Danger!</strong>Không tìm thấy kết quả nào phù hợp.</div>"+
+                     "<button type='button' onclick='backToStart()' class='btn btn-link'>Quay lại</button"
 
           }else{
-             MycommunityExchange.innerHTML = "("+data.community.length+") Results match."
+             MycommunityExchange.innerHTML = "("+data.community.length+") Kết quả phù hợp."
             for(ind = 0; ind <  data.community.length; ind++){
                showUserCommunity(data.community[ind])
             }
-            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
          }
       })
     }

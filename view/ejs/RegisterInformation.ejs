@@ -77,7 +77,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Your photo</h4>
+          <h4 class="modal-title">Ảnh của bạn</h4>
         </div>
 
         <div class="modal-body">
@@ -88,7 +88,7 @@
                   </div>
                </div>
                <img class="resize-image" src="" alt="image for resizing">
-               <button class="btn-crop js-crop">Crop<img class="icon-crop"></button>
+               <button class="btn-crop js-crop">Cắt<img class="icon-crop"></button>
             </div>
 
             <div style="margin-top: 5px;margin-left: 30%;">
@@ -99,7 +99,7 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Done</button>
+          <button type="button" class="btn btn-default" id = "closemodal_crop" style="display: none;" >Xong</button>
         </div>
       </div>
     </div>
@@ -112,7 +112,7 @@
    <nav class="navbar navbar-inverse">
       <div class="container-fluid">
          <div class="navbar-header">
-            <a class="navbar-brand" href="#">Exchange Language</a>
+            <a class="navbar-brand" href="#">Dịch vụ thực hành ngôn ngữ</a>
          </div>
          <div class="navbar-header">
             <img src="http://inperugia.com/wp-content/uploads/2011/08/language-exchange-perugia.png" alt="Logo" style="width:40px;margin-top:10px;">
@@ -124,18 +124,18 @@
    <div class="row">
     <div class="col-md-8">
       <section>      
-        <h1 class="entry-title"><span>One step to join with us !!!</span> </h1>
+        <h1 class="entry-title"><span>Tham gia với chúng tôi !!!</span> </h1>
         <hr>
          <form class="form-horizontal" method="post" name="signup" id="registerinformationforapp" enctype="multipart/form-data" action="/languageex/user/signup/register"> 
 
          <% if(User.provider == 'custom'){ %>  
                <div class="alert alert-success" id="notifyauthemail">
-                  <strong>Success!</strong> Your email was authenticate successfull.
+                  <strong>Thành công!</strong> Địa chỉ email của bạn đã xác thực thành công.
                </div>
                <script type="text/javascript">
                   setTimeout(function(){
                      document.getElementById("notifyauthemail").style.display = "none"
-                  }, 2345)
+                  }, 4345)
                </script>
          <%}%>
 
@@ -147,7 +147,7 @@
          </div> -->
 
          <div class="form-group" id="language_exchange">
-            <label class="control-label col-sm-3">Language Exchange</label>
+            <label class="control-label col-sm-3">Ngôn ngữ thực hành</label>
             <div class="col-md-8 col-sm-9">
                <select class="form-control" style="width:30%;color: #3366ff;" name="languageexchange">
                   <%Lang.forEach(function(el, ind){%>
@@ -158,25 +158,25 @@
          </div>
 
         <div class="form-group" id="dateofbirth">
-          <label class="control-label col-sm-3">Date of Birth <span class="text-danger">*</span></label>
+          <label class="control-label col-sm-3">Ngày sinh <span class="text-danger">*</span></label>
           <div class="col-xs-8">
             <div class="form-inline">
 
               <div class="form-group" id="date">
                 <select name="selectday" class="form-control">
-                  <option value="">Date</option>
+                  <option value="">Ngày</option>
                 <!--  <option value="1" >1 </option><option value="2" >2 </option><option value="3" >3 </option><option value="4" >4 </option><option value="5" >5 </option><option value="6" >6 </option><option value="7" >7 </option><option value="8" >8 </option><option value="9" >9 </option><option value="10" >10 </option><option value="11" >11 </option><option value="12" >12 </option><option value="13" >13 </option><option value="14" >14 </option><option value="15" >15 </option><option value="16" >16 </option><option value="17" >17 </option><option value="18" >18 </option><option value="19" >19 </option><option value="20" >20 </option><option value="21" >21 </option><option value="22" >22 </option><option value="23" >23 </option><option value="24" >24 </option><option value="25" >25 </option><option value="26" >26 </option><option value="27" >27 </option><option value="28" >28 </option><option value="29" >29 </option><option value="30" >30 </option><option value="31" >31 </option>           -->     </select>
               </div>
 
               <div class="form-group" id="month">
                 <select name="selectmonth" class="form-control">
-                  <option value="">Month</option>
+                  <option value="">Tháng</option>
                   <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option><option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option><option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option><option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>                </select>
               </div>
 
               <div class="form-group" id="year">
                 <select name="selectyear" class="form-control">
-                  <option value="">Year</option>
+                  <option value="">Năm</option>
                 </select>
               </div>
             </div>
@@ -191,29 +191,29 @@
       <%if(User.provider != 'custom'){ %>
 
         <div class="form-group" id= "form_gender">
-          <label class="control-label col-sm-3">Gender <span class="text-danger">*</span></label>
+          <label class="control-label col-sm-3">Giới tính <span class="text-danger">*</span></label>
           <div class="col-md-8 col-sm-9">
            <label>
             <%if(User.gender == 'male'){%>
-               <input name="gender" type="radio" value="male" checked> Male
+               <input name="gender" type="radio" value="male" checked> Nam
             <%}else{%>
-               <input name="gender" type="radio" value="male" > Male
+               <input name="gender" type="radio" value="male" > Nam
              <%}%>
             </label>
 
             <label>
                <%if(User.gender == 'female'){%>
-                  <input name="gender" type="radio" value="female" checked>Female
+                  <input name="gender" type="radio" value="female" checked> Nữ
                <%}else{%>
-                  <input name="gender" type="radio" value="female" > Female
+                  <input name="gender" type="radio" value="female" > Nữ
                <%}%>
             </label>
 
             <label>
                <%if(User.gender != 'female' && User.gender != 'male'){%>
-                  <input name="gender" type="radio" value="unknown" checked>Unknown
+                  <input name="gender" type="radio" value="unknown" checked>Không xác định
                <%}else{%>
-                  <input name="gender" type="radio" value="unknown">Unknown
+                  <input name="gender" type="radio" value="unknown">Không xác định
                 <%}%>
             </label>
             <p id = "gender" style="color: red;font-style: italic;"></p>
@@ -223,19 +223,19 @@
         <%}else{%>
 
          <div class="form-group" id= "form_gender">
-          <label class="control-label col-sm-3">Gender <span class="text-danger">*</span></label>
+          <label class="control-label col-sm-3">Giới tính <span class="text-danger">*</span></label>
           <div class="col-md-8 col-sm-9">
             <label>
             <input name="gender" type="radio" value="male">
-            Male</label>
+            Nam</label>
                
             <label>
             <input name="gender" type="radio" value="female" >
-            Female</label>
+            Nữ</label>
 
             <label>
             <input name="gender" type="radio" value="unknown">
-            Unknown</label>
+            Không xác định</label>
             <p id = "gender" style="color: red;font-style: italic;"></p>
           </div> 
         </div>
@@ -243,7 +243,7 @@
         <%}%>
 
         <div class="form-group" id="country">
-            <label class="control-label col-sm-3">Native Language</label>
+            <label class="control-label col-sm-3">Ngôn ngữ tự nhiên</label>
             <div class="col-md-8 col-sm-9">
                <select class="form-control" style="width:30%;color: #3366ff;" name="selectnative">
                   <%Lang.forEach(function(el, ind){%>
@@ -254,7 +254,7 @@
         </div>
 
         <div class="form-group" id="level">
-            <label class="control-label col-sm-3">Level</label>
+            <label class="control-label col-sm-3">Trình độ</label>
             <div class="col-md-8 col-sm-9">
                <select class="form-control" name="selectlevel" style="width:30%;color: #3366ff;">
                   <%De.forEach(function(el, ind){%>
@@ -282,10 +282,10 @@
           </div>
         </div>  -->
         <div class="form-group">
-          <label class="control-label col-sm-3">Describe<br>
+          <label class="control-label col-sm-3">Mô tả<br>
           <small></small></label>
           <div class="col-md-5 col-sm-8">
-             <textarea class="form-control" rows="3" id="describe_textarea" placeholder="Describe about yourself " style="height: 100px;min-width: 290px;" name="describeuser"></textarea>
+             <textarea class="form-control" rows="3" id="describe_textarea" placeholder="Viết mô tả về bản thân ở đây " style="height: 100px;min-width: 290px;" name="describeuser"></textarea>
 
              <div class="form-inline" >
                <p id = "describe_notify" style="color: red;font-style: italic;"></p>
@@ -296,7 +296,7 @@
 
       <% if(User.provider == 'custom'){ %>     
         <div class="form-group">
-          <label class="control-label col-sm-3">Profile Photo <br>
+          <label class="control-label col-sm-3">Ảnh đại diện <br>
           <small>(oblige)</small></label>
           <div class="col-md-5 col-sm-8">
             <div class="input-group"> <span class="input-group-addon" id="file_upload"><i class="glyphicon glyphicon-upload"></i></span>
@@ -370,11 +370,11 @@
       <%}%>
 
         <div class="form-group">
-          <div class="col-xs-offset-3 col-md-8 col-sm-9"><span class="text-muted"><span class="label label-danger">Note:-</span> By clicking Next step, you agree to our <a href="#">Terms</a> and that you have read our <a href="#">Policy</a>, including our <a href="#">Cookie Use</a>.</span> </div>
+          <div class="col-xs-offset-3 col-md-8 col-sm-9"><span class="text-muted"><span class="label label-danger">Chú ý:-</span> Khi nhấp vào nút Xong, bạn đồng ý với chúng tôi <a href="#">Điều khoản</a> và bạn đã đọc <a href="#">Chính sách</a>, bảo gồm chính sử dụng <a href="#">Cookie</a>.</span> </div>
         </div>
         <div class="form-group">
           <div class="col-xs-offset-3 col-xs-10">
-            <input name="Submit" type="button" value="Done !!!" class="btn btn-success" id="submitregisterinformation">
+            <input name="Submit" type="button" value="Xong !!!" class="btn btn-success" id="submitregisterinformation">
           </div>
         </div>
 

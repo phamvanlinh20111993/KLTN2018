@@ -84,22 +84,22 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Your setting</h4>
+          <h4 class="modal-title">Cài đặt của bạn</h4>
         </div>
         <div class="modal-body">
 
         <ul class="list-group"> 
-           <li  class="list-group-item" style="border: 0px;"> <label><input type="checkbox" value="" checked> Auto misspellings</label></li>
-            <li  class="list-group-item" style="border: 0px;"><label><input type="checkbox" value=""> Block messages</label></li>
-            <li  class="list-group-item" style="border: 0px;"><a href="#">Translations priority</a></li>
-           <li  class="list-group-item" style="border: 0px;"> <a href="#">Misspellings priority</a></li>
-           <li  class="list-group-item" style="border: 0px;"> <a href="#" >Delete Conversation</a></li>
+           <li  class="list-group-item" style="border: 0px;"> <label><input type="checkbox" value="" checked> Tự động kiểm tra lỗi chính tả</label></li>
+            <li  class="list-group-item" style="border: 0px;"><label><input type="checkbox" value=""> Khóa hội thoại</label></li>
+            <li  class="list-group-item" style="border: 0px;"><a href="#">Thay đổi ngôn ngữ tự nhiên</a></li>
+           <li  class="list-group-item" style="border: 0px;"> <a href="#">Thay đổi ngôn ngữ trao đổi</a></li>
+           <li  class="list-group-item" style="border: 0px;"> <a href="#" >Xóa hội thoại</a></li>
             <li  class="list-group-item" style="border: 0px;"><a href="#">Report</a></li>
          </ul>
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
         </div>
       </div>
     </div>
@@ -109,7 +109,7 @@
   <nav class="navbar navbar-inverse navbar-fixed-top">
   <div class="container-fluid">
     <div class="navbar-header">
-       <a class="navbar-brand" href="#">Exchange Language</a>
+       <a class="navbar-brand" href="#">Dịch vụ thực hành ngôn ngữ</a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -120,14 +120,14 @@
 
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul id="nav_ul" class="nav navbar-nav">
-        <li class="active"><a href="/languageex/home">Home</a></li>
-        <li><a href="/languageex/user/profile?uid=<%=session.user_id %>">Profile</a></li>
-        <li><a href="/languageex/user/post">Discussion</a></li>
-        <li><a href="#">Group</a></li>
-        <li><a href="#">Courses</a></li>
+        <li class="active"><a href="/languageex/home">Trang chủ</a></li>
+        <li><a href="/languageex/user/profile?uid=<%=session.user_id %>">Cá nhân</a></li>
+        <li><a href="/languageex/user/post">Thảo luận</a></li>
+        <li><a href="#">Nhóm</a></li>
+        <li><a href="#">Khóa học</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="/languageex/user/logout" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+        <li><a href="/languageex/user/logout" onclick="Logout()"><span class="glyphicon glyphicon-log-out"></span> Đăng xuất</a></li>
       </ul>
     </div>
   </div>
@@ -149,19 +149,19 @@
         <div id="status-options">
           <ul>
             <li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
-            <li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
-            <li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
+            <li id="status-away"><span class="status-circle"></span> <p>Đi xa</p></li>
+            <li id="status-busy"><span class="status-circle"></span> <p>Bận</p></li>
             <li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>
           </ul>
         </div>
 
         <div id="expanded">
           <label for="twitter"><i class="fa fa-google-plus-circle" aria-hidden="true"></i></label>
-          <input type ="text" value="<%= session.email %>" disabled style="width:auto;">
+          <input type ="text" value="<%= session.email %>" disabled style="min-width:100px;">
           <label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
-          <input type ="text" value="exchange: <%= session.myexchange %>" disabled>
+          <input type ="text" value="trao đổi: <%= session.myexchange %>" disabled>
           <label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
-         <input type ="text" value="native: <%= session.mynative %>" disabled>
+         <input type ="text" value="tự nhiên: <%= session.mynative %>" disabled>
         </div>
 
       </div>
@@ -170,7 +170,7 @@
 
     <div id="search">
       <label for=""><i class="fa fa-search" aria-hidden="true" onclick="searchContactClick()"></i></label>
-      <input type="text" id="contactvalue" placeholder="Search contacts..." onkeypress="searchContactPress(event)" />
+      <input type="text" id="contactvalue" placeholder="Tìm kiếm liên lạc..." onkeypress="searchContactPress(event)" />
     </div>
 
 
@@ -228,8 +228,8 @@
     </div>
 
     <div id="bottom-bar">
-      <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Add contact</span></button>
-      <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Settings</span></button>
+      <button id="addcontact"><i class="fa fa-user-plus fa-fw" aria-hidden="true"></i> <span>Thêm liên lạc</span></button>
+      <button id="settings"><i class="fa fa-cog fa-fw" aria-hidden="true"></i> <span>Cài đặt</span></button>
     </div>
   </div>
  
@@ -356,7 +356,7 @@
       </li>
 
       <div class="wrap">
-      <input type="text" id="contentMessage" placeholder="Write your message..."  onkeypress="SendMessage(event)" />
+      <input type="text" id="contentMessage" placeholder="Viết tin nhắn ở đây..."  onkeypress="SendMessage(event)" />
       <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
       <button class="submit" onclick="WriteMessage()"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
       </div>

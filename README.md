@@ -25,6 +25,11 @@ git remote set-url --add name https://github.com/phamvanlinh20111993/KLTN2018_AF
 git push -u https://github.com/phamvanlinh20111993/KLTN2018_AFTER.git master
 git push -u https://github.com/phamvanlinh20111993/KLTN2018_ByREQUEST.git master(doi theo yeu cau)
 
+##, see all git remote repository:
+    - git remote show origin
+	- See remote current: git config --get remote.origin.url
+		ket qua lenh tren: https://github.com/phamvanlinh20111993/KLTN2018_ByREQUEST.git
+
 
 ##, Call video choose one in three total
 simple-peer

@@ -522,10 +522,10 @@
             }
 
 				var misspellings = ""//tu dong check loi chinh ta
-            var checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')"> Block messages</label>'//check co bi block message khong
+            var checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')"> Khóa hội thoại</label>'//check co bi block message khong
                
             if(sessionStorage.getItem("_block_"+id) == "true"){
-               checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')" checked> Block messages</label>'
+               checkblockmsg = '<label><input type="checkbox" onclick="Blockmessages(this,'+id+',\''+name+'\')" checked> Khóa hội thoại</label>'
             }
 
             if(sessionStorage.getItem("_checkmiss_"+id) == "false")
@@ -859,10 +859,10 @@
 				  		MYPRIOEX, MYPRIONAT, realcontent.value, function(data){
 				  		if(data.content.error == null){
                             if(data.content.from == MYPRIOEX)
-				  			   showtranslatep.innerHTML = "trans: <span style='color:blue;'>"+data.content.translated+"</span>"
+				  			   showtranslatep.innerHTML = "dịch: <span style='color:blue;'>"+data.content.translated+"</span>"
                             else{
-                                showtranslatep.innerHTML = "trans: <span style='color:blue;'>"+data.content.translated+". </span>"+
-                                                            "(from "+data.content.from+ " to " + MYPRIONAT + ")"
+                                showtranslatep.innerHTML = "dịch: <span style='color:blue;'>"+data.content.translated+". </span>"+
+                                                            "(từ "+data.content.from+ " sang " + MYPRIONAT + ")"
                             }
 				  		}else
 				  			showtranslatep.innerHTML = "somes error with your msg. Error translate."
@@ -905,7 +905,7 @@
                                     document.getElementById(id+"_check").style.color = "#337ab7"
 							}else{
 								if(data.content.language == MYPRIOEX){
-									showcheckedmis.innerHTML = "Did you mean: " + matchMisspelling(realcontent.value, data.content.value)
+									showcheckedmis.innerHTML = "Ý bạn là: " + matchMisspelling(realcontent.value, data.content.value)
 									document.getElementById(id+"_check").style.color = "red"
 								}
 								else{
@@ -1079,9 +1079,9 @@
                     }
                     data = doTask(message.content, message.edit[0].newcontent)
                     if(message.edit[0].whoedit != MYID)
-                       anotheredit = '<tr><td><image src='+avatar+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                       anotheredit = '<tr><td><image src='+avatar+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
                     if(message.edit[0].whoedit == MYID)
-                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                       anotheredit = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
                 }else{//length = 2
                     
                     if(message.edit[0].whoedit != MYID){
@@ -1092,7 +1092,7 @@
                             }
                         }
                        data = doTask(message.content, message.edit[0].newcontent)
-                       anotheredit = '<tr><td><image src='+avatar+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                       anotheredit = '<tr><td><image src='+avatar+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
                     }
                     else if(message.edit[1].whoedit != MYID){
                         for(var posi = 0; posi < INFORCOMMUNITY.length; posi++){
@@ -1102,30 +1102,30 @@
                             }
                         }
                         data = doTask(message.content, message.edit[0].newcontent)
-                        anotheredit = '<tr><td><image src='+avatar1+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
+                        anotheredit = '<tr><td><image src='+avatar1+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
                     }
                 
                     if(message.edit[0].whoedit == MYID){
                         data = doTask(message.content, message.edit[0].newcontent)
-                        anotheredit += '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td>none</td></tr>' 
+                        anotheredit += '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[0].time))+'</td><td>none</td></tr>' 
                     }
                     if(message.edit[1].whoedit == MYID){
                         data = doTask(message.content, message.edit[1].newcontent)
-                        anotheredit += '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (new)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td>none</td></tr>' 
+                        anotheredit += '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td>none</td></tr>' 
                     }
                     
                 }
 
                 var oldcontent = ""
                 if(message.userA == MYID)
-                    var oldcontent = '<tr><td>Me</td><td>'+data.del +' (old)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
+                    var oldcontent = '<tr><td>Me</td><td>'+data.del +' (cũ)</td><td>'+getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
                 else{
-                    var oldcontent = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.del +' (old)</td><td>'+
+                    var oldcontent = '<tr><td><image src='+photo+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.del +' (cũ)</td><td>'+
                        getDateTime(new Date(message.time))+'</td><td>none</td></tr>'
                 }
 
                 var ele = '<table class="table table-hover"><thead><tr>'+
-                          '<th>photo</th><th>content</th><th>time</th><th>Agree</th>'+
+                          '<th>ảnh</th><th>nội dung</th><th>thời gian</th><th>đồng ý</th>'+
                           '</tr></thead>'+
                           '<tbody>' +
                                 oldcontent+

@@ -193,7 +193,7 @@
         </div>
 
         <div class="modal-footer">
-         <input type="submit" class="btn btn-success" value="Done" form="myform1" id="submitform">
+         <input type="submit" class="btn btn-success" value="Xong" form="myform1" id="submitform">
          <input type="button" class="btn" value="Save changes"  id="changepassuser" style="display: none;margin-left: 20%;">
        </div>
 
@@ -319,7 +319,7 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
       </div>
     </div>
 
@@ -340,7 +340,7 @@
       
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
       </div>
     </div>
 
@@ -361,8 +361,8 @@
       
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success">Done</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success">Xong</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
       </div>
     </div>
 
@@ -506,17 +506,17 @@
                <div>
                  <%if(User.state == 'something'){%>
                    <%if(User.watchuser.isfollow==true){%>
-                    <button class="btn btn-primary" data-toggle="tooltip" onclick="unFollow('<%=User.infor.id%>', '<%=User.infor.name%>')" data-original-title="followed <%=User.infor.name%> at <%=User.watchuser.ftime%>">UnFollow</button>
+                    <button class="btn btn-primary" data-toggle="tooltip" onclick="unFollow('<%=User.infor.id%>', '<%=User.infor.name%>')" data-original-title="followed <%=User.infor.name%> at <%=User.watchuser.ftime%>">Bỏ theo dõi</button>
                    <%}else{%>
-                      <button class="btn btn-primary" data-toggle="tooltip" onclick="Follow('<%=User.infor.id%>','<%=User.infor.name%>')" data-original-title="follow <%=User.infor.name%> " >Follow</button>
+                      <button class="btn btn-primary" data-toggle="tooltip" onclick="Follow('<%=User.infor.id%>','<%=User.infor.name%>')" data-original-title="follow <%=User.infor.name%> " >Theo dõi</button>
                     <%}%>
 
                    <button class="btn btn-danger" data-toggle="tooltip" data-original-title="report <%=User.infor.name%>" onclick="Report('<%=User.infor.id%>', '<%=User.infor.name%>')">Report</button>
 
                    <%if(User.watchuser.isblock==false){%>
-                      <button class="btn btn-warning" data-toggle="tooltip" data-original-title="block <%=User.infor.name%>" onclick="Block('<%=User.infor.id%>', '<%=User.infor.name%>')">Block</button>
+                      <button class="btn btn-warning" data-toggle="tooltip" data-original-title="block <%=User.infor.name%>" onclick="Block('<%=User.infor.id%>', '<%=User.infor.name%>')">Khóa</button>
                     <%}else{%>
-                      <button class="btn btn-warning" data-toggle="tooltip" data-original-title="blocked  <%=User.infor.name%> at <%=User.watchuser.btime%>" onclick="unBlock('<%=User.infor.id%>', '<%=User.infor.name%>')">UnBlock</button>
+                      <button class="btn btn-warning" data-toggle="tooltip" data-original-title="blocked  <%=User.infor.name%> at <%=User.watchuser.btime%>" onclick="unBlock('<%=User.infor.id%>', '<%=User.infor.name%>')">Bỏ khóa</button>
                     <%}%>
                   <%}%>
                </div>
@@ -533,15 +533,15 @@
                  <div style="height: 35px;">
                   <span class="pull-right">
 
-                     <a href="#" data-original-title="Add more exchange language" data-toggle="tooltip" type="button" onclick = "addMoreExchange('<%=User.infor.id%>')" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-font"></i></a>
+                     <a href="#" data-original-title="Thêm ngôn ngữ thực hành" data-toggle="tooltip" type="button" onclick = "addMoreExchange('<%=User.infor.id%>')" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-font"></i></a>
 
-                     <a href="#" data-original-title="Add more native language" data-toggle="tooltip" type="button"  onclick = "addMoreNative('<%=User.infor.id%>')" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-bold"></i></a>
+                     <a href="#" data-original-title="Thêm ngôn ngữ tự nhiên" data-toggle="tooltip" type="button"  onclick = "addMoreNative('<%=User.infor.id%>')" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-bold"></i></a>
 
-                    <a href="#" data-original-title="Edit info" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning" onclick="editInformation('<%=User.infor.id%>')"><i class="glyphicon glyphicon-edit"></i></a>
+                    <a href="#" data-original-title="Chỉnh sửa thông tin" data-toggle="tooltip" type="button" class="btn btn-sm btn-warning" onclick="editInformation('<%=User.infor.id%>')"><i class="glyphicon glyphicon-edit"></i></a>
 
-                     <a data-original-title="My blocks list" data-toggle="tooltip" type="button" class="btn btn-sm btn-danger" onclick="myBlockList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-folder-open"></i></a>
+                     <a data-original-title="Danh sách block" data-toggle="tooltip" type="button" class="btn btn-sm btn-danger" onclick="myBlockList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-folder-open"></i></a>
 
-                     <a data-original-title="My followers list" data-toggle="tooltip" type="button" class="btn btn-sm btn-info" onclick="myFollowList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-eye-close"></i></a>
+                     <a data-original-title="Danh sách theo dõi" data-toggle="tooltip" type="button" class="btn btn-sm btn-info" onclick="myFollowList('<%=User.infor.id%>')"><i class="glyphicon glyphicon-eye-close"></i></a>
                   </span>
                  </div>
                <%}%>

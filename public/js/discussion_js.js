@@ -188,11 +188,11 @@ var showPost = function(User, Posts, state)
 	var id = Posts.pid;
 
 	var imgLike = "/img/dalike.jpg"
-	var contentLike = "Liked"
+	var contentLike = "Đã thích"
 
 	if(!Posts.meliked){
 		imgLike = "/img/dislike.png"
-		contentLike = "Like"
+		contentLike = "Thích"
 	}
 
 	var Time;
@@ -202,36 +202,36 @@ var showPost = function(User, Posts, state)
 	var isMyPost = "", notMypost = ""
     //moi bai dang se duoc cap quyen 
 	if(User.id == MYID){
-		isMyPost = '<a style="cursor:pointer;" onclick="deleteMyPost('+id+')">Delete post</a>'+
-                '<a style="cursor:pointer;" onclick="editMyPost('+id+')">Edit post</a>'+
-                '<a style="cursor:pointer;" id="'+id+'_turnoffcmt" onclick="turnoffComment('+id+')">Turn off comment</a>'+
-                '<a style="cursor:pointer;display:none;" id="'+id+'_turnoncmt" onclick="turnonComment('+id+')">Turn on comment</a>'
+		isMyPost = '<a style="cursor:pointer;" onclick="deleteMyPost('+id+')">Xóa bài đăng</a>'+
+                '<a style="cursor:pointer;" onclick="editMyPost('+id+')">Sửa bài đăng</a>'+
+                '<a style="cursor:pointer;" id="'+id+'_turnoffcmt" onclick="turnoffComment('+id+')">Tắt bình luận</a>'+
+                '<a style="cursor:pointer;display:none;" id="'+id+'_turnoncmt" onclick="turnonComment('+id+')">Bật bình luận</a>'
 
 	}
 
 	if(User.id != MYID){
-		notMypost = '<a style="cursor:pointer;" onclick="reportPost('+id+',\''+User.name+'\')">Report post</a>'+
-                   '<a style="cursor:pointer;" onclick="">Turn off notify</a>'
+		notMypost = '<a style="cursor:pointer;" onclick="reportPost('+id+',\''+User.name+'\')">Báo cáo bài đăng</a>'+
+                   '<a style="cursor:pointer;" onclick="">Tắt thông báo</a>'
 	}
 
 	var istracked = ""
 	if(Posts.istracked){
-	  istracked = " (followed)"
-	  notMypost += '<a style="cursor:pointer;" onclick="unFollow('+User.id+', \''+User.name+'\')">Unfollow '+User.name.split(" ")[0]+'</a>'
+	  istracked = " (đã theo dõi)"
+	  notMypost += '<a style="cursor:pointer;" onclick="unFollow('+User.id+', \''+User.name+'\')">Bỏ theo dõi '+User.name.split(" ")[0]+'</a>'
 	}
 
 	//tat comment trong bai dang
 	var isturnofcmt = "", notifyturnof = ""
 	if(Posts.turnofcmt > 0){
 		isturnofcmt = "disabled"
-		notifyturnof = User.name+' turned off comments for this post'
+		notifyturnof = '<span style="color:blue;">'+User.name+'</span> đã tắt bình luận trong bài đăng này'
 	}
 
 	var contenlikepost = ""
 	if(Posts.meliked)
-		contenlikepost='<span id="'+id+'_stringnumlike">You and </span><span>'+(Posts.totalliked-1)+'</span> people liked post.</a></div>'
+		contenlikepost='<span id="'+id+'_stringnumlike">Bạn và </span><span>'+(Posts.totalliked-1)+'</span> người đã thích bài đăng.</a></div>'
 	else
-		contenlikepost='<span id="'+id+'_stringnumlike"></span><span>'+Posts.totalliked+'</span> people liked post.</a></div>'
+		contenlikepost='<span id="'+id+'_stringnumlike"></span><span>'+Posts.totalliked+'</span> người đã thích bài đăng.</a></div>'
 
     element = '<div class="popup-box4" id="'+id+'_posts">'+
 
@@ -249,7 +249,7 @@ var showPost = function(User, Posts, state)
                  '<td><div style="margin-left:8px;padding:0px;">'+
                           '<p style="color:blue;margin-top:4px;">'+
                               '<a style="font-size:108%;cursor:pointer;" class="text-justify" href="/languageex/user/profile?uid='+User.id+'"><b>'+User.name+'</b></a>'+
-                                  ' discussed the topic <b style="color:black;font-size:150%;">'+Posts.title+'</b>'+
+                                  ' đã thảo luận chủ đề <b style="color:black;font-size:150%;">'+Posts.title+'</b>'+
                           '</p><div style="margin-top:-9px;">'+
                                   '<label style="font-size:90%;">'+Time+'</label> '+istracked+'</div></div>'+
                     '</td>'+
@@ -266,9 +266,9 @@ var showPost = function(User, Posts, state)
                    '<div id="'+id+'_showtrans" style="font-size:17px;color:black;background-color:white;'+
                        'height:auto;word-wrap:break-word;margin-left:2%;display:none;margin-top:2%;"></div>'+
 
-                  '<a id="'+id+'_showlink" style="margin-left:3%;cursor:pointer;text-decoration:none;" onclick="translatePost('+id+')">See translation</a>'+
-                  '<a id="'+id+'_hiddenlink" style="margin-left:3%;cursor:pointer;text-decoration:none;display:none;" onclick="backUpTranslate('+id+')">Hidden trans</a>'+
-                  '<a id="'+id+'_editpostdone" style="margin-left:3%;cursor:pointer;text-decoration:none;display:none;" onclick="editPostDone('+id+')">Edit done</a>'+
+                  '<a id="'+id+'_showlink" style="margin-left:3%;cursor:pointer;text-decoration:none;" onclick="translatePost('+id+')">Xem dịch</a>'+
+                  '<a id="'+id+'_hiddenlink" style="margin-left:3%;cursor:pointer;text-decoration:none;display:none;" onclick="backUpTranslate('+id+')">Ẩn dịch</a>'+
+                  '<a id="'+id+'_editpostdone" style="margin-left:3%;cursor:pointer;text-decoration:none;display:none;" onclick="editPostDone('+id+')">Xong chỉnh sửa</a>'+
                   '<input type = "hidden" id = "'+id+'_postcontent" value = "'+Posts.content+'">'+
                   '<div style="float:right;margin-right:10px;border: 1px solid blue;"></div>'+
                 '</div>'+
@@ -285,7 +285,7 @@ var showPost = function(User, Posts, state)
 				
                     '<div style="border:1px solid #d5e8e8;height:auto;">'+
                       '<div style="margin-top:12px;">'+
-                        '<a class="a4" onclick="showMoreComment('+id+','+User.id+')">Show more comments(<span id="'+id+'_numcmt">'+Posts.totalcomment+'</span>)</a>'+
+                        '<a class="a4" onclick="showMoreComment('+id+','+User.id+')">Xem tiếp bình luận(<span id="'+id+'_numcmt">'+Posts.totalcomment+'</span>)</a>'+
                       '</div>'+
                       '<div style="width: auto;height: auto;" id="'+id+'_showcmt"></div>'+
                     '</div>'+
@@ -295,7 +295,7 @@ var showPost = function(User, Posts, state)
                        '<tr>'+
                         '<td><img src="'+MYPHOTO+'" style="height:40px;width:42px;margin-top:5px;margin-left:-1px;" data="tooltip" title="'+MYNAME+'"></td>'+
                         '<td style="width:94%;">'+
-                           '<input type="text" placeholder="Write your comments...." class="divcmt2" '+
+                           '<input type="text" placeholder="Viết bình luận ở đây...." class="divcmt2" '+
                              isturnofcmt+' onkeypress="submitComment(event,'+id+','+User.id+')" id="'+id+'_writecmts" >'+
                         '</td>'+
                        '</tr>'+
@@ -364,7 +364,7 @@ var editPostDone = function(id){
 	this funtion will delete a post with id @@id
 **/
 var deleteMyPost = function(id){
-	var r = confirm("Are you sure want to delete your post?")
+	var r = confirm("Bạn chắc chắn muốn xóa bài đăng này?")
 	if(r == true){
 		requestServer('/languageex/user/delpost', 'DELETE', {pid: id}, 0, function(err, data){
 			if(err) alert(err)
@@ -391,7 +391,7 @@ var likeOrDis = function(id){
 			if(err) alert(err)
 			else{
 				imgStateLike.src = "/img/dislike.png"
-				contentLike.innerHTML = "Like"
+				contentLike.innerHTML = "Thích"
 				strnumlike.innerHTML = ""
 			}
 		})
@@ -401,8 +401,8 @@ var likeOrDis = function(id){
 			if(err) alert(err)
 			else{
 				imgStateLike.src = "/img/dalike.jpg"
-				contentLike.innerHTML = "Liked"
-				strnumlike.innerHTML = "You and "
+				contentLike.innerHTML = "Đã thích"
+				strnumlike.innerHTML = "Bạn và "
 			}
 		})
 	}
@@ -426,7 +426,7 @@ var showUserLikePost = function(postid)
 						element += '<tr><td><img class="img-rounded" height="40" width="40" alt="Avatar" src="'+
 					       data.userslikedpost[ind].photo+'" data="tooltip" title="'+data.userslikedpost[ind].email+'"></td>'+
 					       '<td><h4>'+data.userslikedpost[ind].name+'</h4></td>'+
-					       '<td><button type="button" class="btn btn-success" onclick="viewInfoLikePost('+data.userslikedpost[ind].id+')">View info</button></td>'
+					       '<td><button type="button" class="btn btn-success" onclick="viewInfoLikePost('+data.userslikedpost[ind].id+')">Xem thông tin</button></td>'
 					}
 					element += '</tbody></table>'
 					modalBody.innerHTML = element
@@ -520,18 +520,18 @@ var showComment = function(postinfo, Commentinfo, Userinfo, state){
 		Time = formatTime(new Date())
 
 	if(MYID == Userinfo.id){//neu comment la cua toi thi t co the xoa hoac edit no
-		ismycmt = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+',\''+randomid+'\')">  del  </a>'+
-                  '<a class="a11" onclick="editMyCmt(\''+randomid+'\')">  edit  </a>'
+		ismycmt = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+',\''+randomid+'\')">  xóa  </a>'+
+                  '<a class="a11" onclick="editMyCmt(\''+randomid+'\')">  sửa  </a>'
 	}else{
 		/*toi la chu so huu cua bai dang thi bat ki ai(tru toi) comment trong bai dang cua toi
 		thi toi co quyen xoa bai dang do nhung comment do khong phai la cua toi*/
 		if(MYID == postinfo.own)
-			ismypost = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+',\''+randomid+'\')">  del  </a>'
+			ismypost = '<a class="a11" onclick="deleteMyCmt('+Commentinfo.id+',\''+randomid+'\')">  xóa  </a>'
 	}
 
 	var isedit = ""
 	if(Commentinfo.isedit > 0)
-		isedit = '<span style="color:#660099;"> (edited)</span>'
+		isedit = '<span style="color:#660099;"> (đã sửa)</span>'
 
     element = '<div style="min-height:40px;margin-top:5px;" id="'+randomid+'_idcomment">'+
          '<img src="'+Userinfo.photo+'" width="41" height="42" style="float:left;margin-left:10px;margin-top:-2px;">'+
@@ -549,7 +549,7 @@ var showComment = function(postinfo, Commentinfo, Userinfo, state){
           '<div style="height:10px;margin-left:70px;font-size:93%;color:#474343;margin-top:0px;">'+
          	ismycmt+
          	ismypost+
-            '<a class="a11" onclick="translateCmt(\''+randomid+'\')">  trans  </a>'+
+            '<a class="a11" onclick="translateCmt(\''+randomid+'\')">  dịch  </a>'+
             '<span style="margin-left:10px;font-size: 80%;">'+Time+'</span>'+
           '</div>'+
          '<input type="hidden" value="'+Commentinfo.content+'" id="'+randomid+'_cmtcontent" >'+
@@ -625,7 +625,7 @@ var requestComment = function(postinfo){
 	@@ rid is set id for DOM element and we proces with this
 **/
 var deleteMyCmt = function(id, rid){
-	var r = confirm("Are you sure want to delete this comment?")
+	var r = confirm("Bạn chắc chắn muốn xóa bình luận này?")
 	var _DOMcmt = document.getElementById(rid+"_idcomment")
 	if(r == true){
 		requestServer('/languageex/user/delcmt', 'DELETE', {id: id, uid: MYID}, 0, function(err, data){
@@ -872,7 +872,7 @@ var reportPost = function(id, name)
 	var reportp = document.getElementById("reportPostUser")
 	var reportpBody = reportp.getElementsByClassName("modal-body")[0]
 	var reportTitle = reportp.getElementsByClassName("modal-title")[0]
-	reportTitle.innerHTML = "Why report this post of <h4><b>"+name+"</b></h4> ?"
+	reportTitle.innerHTML = "Lí do report bài đăng của <h4><b>"+name+"</b></h4> ?"
 
 	requestServer('/languageex/user/loadrppost', 'GET', {}, 0, function(err, data){
 		if(err) alert(err)
@@ -885,7 +885,7 @@ var reportPost = function(id, name)
             		 data.data[ind].content+'</label></div>'
 			}
 			element += '<div class="alert alert-warning">'+
-              '<strong>Warning!</strong> Do not abuse this feature, administrators will review and block who abuses this feature. Best regards'+
+              '<strong>Cảnh báp!</strong> Không lạm dụng tính năng này, quản trị viên sẽ xem xét và chặn những người lạm dụng tính năng này. Trân trọng'+
             '</div>'
 
 			reportpBody.innerHTML = element
@@ -984,16 +984,16 @@ var SearchUsersClick = function(id){
 		 else{
 			var Length = data.data.length
 			if(Length > 0){
-				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Results match.</h3>"
+				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Kết quả phù hợp.</h3>"
 				for(var ind = 0; ind < Length; ind++){
 		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
 		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
 		 		}
-		 		MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 		MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
 		 	}else{
 		 		document.getElementById("showpostusers").innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
-                      "<strong>Danger!</strong>No results match.</div>"+
-                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+                      "<strong>Danger!</strong>Không có kết quả nào phù hợp.</div>"+
+                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
 		 	}
 		 }
 	 })
@@ -1013,16 +1013,16 @@ var SearchUsersEnter = function(e, id){
 		 else{
 			var Length = data.data.length
 			if(Length > 0){
-				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Results match.</h3>"
+				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Kết quả phù hợp.</h3>"
 				for(var ind = 0; ind < Length; ind++){
 		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
 		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
 		 		}
-		 		document.getElementById("showpostusers").innerHTML+=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 		document.getElementById("showpostusers").innerHTML+=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
 		 	}else{
 		 		document.getElementById("showpostusers").innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
-                      "<strong>Danger!</strong>No results match.</div>"+
-                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+                      "<strong>Danger!</strong>Không có kết quả nào phù hợp.</div>"+
+                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
 		 	}
 		 }
 	 })
@@ -1048,16 +1048,16 @@ var filterByTopicPost = function(){
 		 else{
 			var Length = data.data.length
 			if(Length > 0){
-				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Results match.</h3>"
+				document.getElementById("showpostusers").innerHTML = "<h3>("+Length+") Kết quả phù hợp.</h3>"
 				for(var ind = 0; ind < Length; ind++){
 		 			showPost(data.data[ind].user, data.data[ind].posts, 0)
 		 			requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
 		 		}
-		 		document.getElementById("showpostusers").innerHTML+=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+		 		document.getElementById("showpostusers").innerHTML+=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
 		 	}else{
 		 		document.getElementById("showpostusers").innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
-                      "<strong>Danger!</strong>No results match.</div>"+
-                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Back to the start</button"
+                      "<strong>Danger!</strong>Không có kết quả nào phù hợp.</div>"+
+                      "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
 		 	}
 		 }
 	    })
@@ -1068,7 +1068,7 @@ var filterByTopicPost = function(){
 
 //unfollow user
 var unFollow = function(id, name){
-	var conf = confirm("Are you sure want to unfollow "+ name + " ?")
+	var conf = confirm("Bạn chắc chắn muốn bỏ theo dõi "+ name + " ?")
 	if(conf == true){
 		var data = {id: id, follow: false} 
 	    ajaxRequest('/languageex/home/unfollow', data, function(data, err){
@@ -1085,7 +1085,7 @@ var unFollow = function(id, name){
 var turnoffComment = function(id){//id of post
 	var data = {id: id, turnof: true, time: new Date()}
 	requestServer('/languageex/user/turnoffcmt', 'PUT', data, 0, function(data1){
-		alert("You turned off comments for your post. Nobody can comments on this.")
+		alert("Bạn đã tắt bình luận trên bài đăng của mình. Không ai có thể bình luận trên bài đăng này.")
 		socket.emit('turnoffcmt', data)
 		//xư lí dom event turn on comment bật event turn off comment bị tắt
 		document.getElementById(id+"_turnoffcmt").style.display = "none"
@@ -1097,7 +1097,7 @@ var turnoffComment = function(id){//id of post
 var turnonComment = function(id){//id of post
 	var data = {id: id, turnof: false, time: new Date()}
 	requestServer('/languageex/user/turnoncmt', 'PUT', data, 0, function(data1){
-		alert("You turned on comments for your post. Everybody can comments on this.")
+		alert("Bạn đã bật bình luận trên bài đăng của mình. Mọi người có thể bình luận trên bài đăng này.")
 		socket.emit('turnoncmt', data)
 		document.getElementById(id+"_turnoffcmt").style.display = "block"
 		document.getElementById(id+"_turnoncmt").style.display = "none"
@@ -1110,7 +1110,7 @@ socket.on('turnoffcmtnotify', function(data){
 	if(typeof document.getElementById(id+"_writecmts") != "undefined"){
 		var postidwasturnoff = document.getElementById(id+"_writecmts")
 		postidwasturnoff.disabled = true;
-		document.getElementById(id+"_notifyturnoffcmt").innerHTML = "The owner of the post has disabled the comment function"
+		document.getElementById(id+"_notifyturnoffcmt").innerHTML = "Chủ sở hữu bài đăng đã tắt chức năng bình luận"
 	}
 })
 
