@@ -31,6 +31,14 @@ git push -u https://github.com/phamvanlinh20111993/KLTN2018_ByREQUEST.git master
 		ket qua lenh tren: https://github.com/phamvanlinh20111993/KLTN2018_ByREQUEST.git
 
 
+		
+		
+		
+##, Up project to heroku
+		
+		
+		
+		
 ##, Call video choose one in three total
 simple-peer
 peerjs
