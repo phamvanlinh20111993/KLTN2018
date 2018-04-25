@@ -17,7 +17,7 @@ var querysimple = require('../../model/QuerysingletableSimple')
 
 function existAccount(email, cb)
 {
-   querysimple.selectTable("User", ["email", "provider"], 
+   querysimple.selectTable("user", ["email", "provider"], 
       [{ op:"", field: "email", value: email}], null, null, null, 
      function(result, fields, error)
      {
@@ -203,7 +203,7 @@ router.route('/user/signup/api/auth/google/callback').get(
 
          var value = encodeURIComponent(req.session.provider);
          var id = encodeURIComponent(CryptoJS.AES.encrypt(req.user.id.toString(), md5(req.session.username)));
-          console.log("fsdfdsf" + id)
+      //    console.log("fsdfdsf" + id)
          //307 in post router then redirect to url type post(not get)
          res.redirect(307, '/languageex/user/signup/register?key=' + value + '&id=' + id);//get redirect
       }

@@ -200,7 +200,7 @@ var myBlockList = function(id)
                 for(var ind = 0; ind < Length; ind++){
                     element += '<tr id="'+data.data[ind].id+'_blocklist"><td><img src="'+data.data[ind].photo+'" class="img-rounded" alt="Avatar" height="40"></td>'+
                          "<td>"+data.data[ind].name+"</td>"+
-                         '<td><button type="button" class="btn btn-warning" onclick="reMoveBlock('+data.data[ind].id+',\''+data.data[ind].name+'\')">Remove</button></td></tr>'
+                         '<td><button type="button" class="btn btn-warning" onclick="reMoveBlock('+data.data[ind].id+',\''+data.data[ind].name+'\')">Xóa khỏi ds</button></td></tr>'
                 }
                 element += '</tbody></table>'
             }
@@ -283,7 +283,7 @@ var addMoreExchange = function(id){
 
             var Ele = ''
             Ele += '<table class="table table-striped"><thead><tr>'+
-                '<th>Stt</th><th>Name</th><th>Degree</th><th>Change prio</th></tr></thead>'
+                '<th>Stt</th><th>Tên</th><th>Trình độ</th><th>Đang trao đổi</th></tr></thead>'
 
             for(var ind = 0; ind < data.result.ex.length; ind++){
                 var isprio = ""
@@ -378,7 +378,7 @@ var addMoreNative = function(id){
         else{
             var Ele = ""
             Ele += '<table class="table table-striped"><thead><tr>'+
-                '<th>Stt</th><th>Name</th><th>Change prio</th></tr></thead>'
+                '<th>Stt</th><th>Tên</th><th>Chọn</th></tr></thead>'
 
             for(var ind = 0; ind < data.result.nat.length; ind++){
                 var isprio = ""

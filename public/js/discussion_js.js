@@ -97,11 +97,11 @@ function Change_date(Date_time)
     d1 = new Date(String(Date_time));//;lay thoi gian da dang
     second = parseInt((d - d1)/1000);//thoi gian hien tai va thoi gian da dang
     if(second < 60) text = "Just now";
-    else if(second > 60 && second < 3600)            text =parseInt(second/60)+" Minutes before";
-    else if(second >= 3600 && second < 86400)        text = "About "+parseInt(second/3600)+" Hours ago"; 
-    else if(second >= 86400 && second < 2592000)     text = parseInt(second/86400)+" Days ago"; 
-    else if(second >= 2592000 && second < 946080000) text = parseInt(second/2592000)+" Months ago";
-    else                                             text = "Long time ago";     
+    else if(second > 60 && second < 3600)            text =parseInt(second/60)+" phút trước";
+    else if(second >= 3600 && second < 86400)        text = "About "+parseInt(second/3600)+" giờ trước"; 
+    else if(second >= 86400 && second < 2592000)     text = parseInt(second/86400)+" Ngày trước"; 
+    else if(second >= 2592000 && second < 946080000) text = parseInt(second/2592000)+" Tháng trước";
+    else                                             text = "Rất rất lâu";     
     return text;                               
 }
 
@@ -403,6 +403,11 @@ var likeOrDis = function(id){
 				imgStateLike.src = "/img/dalike.jpg"
 				contentLike.innerHTML = "Đã thích"
 				strnumlike.innerHTML = "Bạn và "
+				//tao thong bao socket thich bai dang
+				//tao socket thong bao post den nguoi dung
+				socket.emit("notifylike", {
+
+				})
 			}
 		})
 	}
@@ -756,6 +761,10 @@ var submitPost = function(){
 				Posts.pid = data.resp
 				showPost(User, Posts, 1)
 				document.getElementById("showpostusers").innerHTML += allpostafter
+				//tao socket thong bao post den nguoi dung
+				socket.emit("notifypost", {
+
+				})
 			}
 		})
 	}
@@ -790,6 +799,10 @@ var submitComment = function(e, postid, ownpostid){
 					data.id = dataid.res
 					var User = {id: MYID, name: MYNAME, photo: MYPHOTO, level: MYLEVEL, score: MYSCORE};
 					showComment({id: postid, own: MYID}, data, User, 1)
+					//tao socket thong bao binh luan den chu bai dang
+					socket.emit("notifycmt", {
+
+					})
 				}
 			})
 		}
@@ -1122,4 +1135,20 @@ socket.on('turnoncmtnotify', function(data){
 		postidwasturnoff.disabled = false;
 		document.getElementById(id+"_notifyturnoffcmt").innerHTML = ""
 	}
+})
+
+//take event cac thong bao like bai dang, binh luạn bai đăng, tạo bài dăng
+//tao bai đăng
+socket.on("notifypostdone", function(data){
+
+})
+
+//binh luan bai dang
+socket.on("notifycmtdone", function(data){
+
+})
+
+//thich bai dang
+socket.on("notifylikedone", function(data){
+
 })

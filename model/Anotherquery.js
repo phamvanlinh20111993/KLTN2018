@@ -236,7 +236,7 @@ var selectMinfield = function(tbname, field, cb){
 //tinh diem cho nguoi dung
 var calculateScore = function(id, score, cb)
 {
-	var sqlString = "UPDATE User SET score = score + "+parseInt(score)+
+	var sqlString = "UPDATE user SET score = score + "+parseInt(score)+
 	 				" WHERE id = "+mysql.escape(id)
 
 	con.beginTransaction(function(err){
@@ -262,7 +262,7 @@ var calculateScore = function(id, score, cb)
         		}
         		console.log('Transaction Complete.');
 
-        		var sqlString1 = "SELECT id, score, level_id FROM User "+
+        		var sqlString1 = "SELECT id, score, level_id FROM user "+
 		  				   " WHERE id =	" + mysql.escape(id)
         		
         		con.query(sqlString1, function(err1, result1, fields1){
@@ -287,7 +287,7 @@ var calculateScore = function(id, score, cb)
         								else break;
         							}
 
-        							var sqlString3 = "UPDATE User SET level_id="+mysql.escape(levelid)+
+        							var sqlString3 = "UPDATE user SET level_id="+mysql.escape(levelid)+
 	 				                                 " WHERE id = "+mysql.escape(id)
 	 				                con.query(sqlString3, function(err3, result3, fields3){
 	 				                	if(err3){

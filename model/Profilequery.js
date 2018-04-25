@@ -7,7 +7,7 @@ var mysql = require('mysql');
 **/
 var selectMyFollowList = function(id, cb){
 	var sqlString = "SELECT u.id, u.email, u.name, u.photo, le.level, fo.ctime, bl.id AS bluid "+
-					" FROM User u "+
+					" FROM user u "+
 					" JOIN level le ON le.id = u.level_id "+
 					" JOIN follow fo ON fo.tracked = u.id "+
                " LEFT JOIN blocklist_user bl ON (bl.whoblock="+mysql.escape(id)+ 
@@ -45,7 +45,7 @@ var selectMyFollowList = function(id, cb){
 **/
 var selectMyBlockList = function(id, cb){
 	var sqlString = "SELECT u.id, u.email, u.name, u.photo, bl.timeblock, bl.ctime "+
-					" FROM User u "+
+					" FROM user u "+
 					" JOIN blocklist_user bl ON bl.blockwho = u.id "+
 					" WHERE bl.whoblock = "+mysql.escape(id)
 

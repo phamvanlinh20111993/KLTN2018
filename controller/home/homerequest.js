@@ -19,7 +19,7 @@ router.route('/home')
 			var emailuser = bytes.toString(CryptoJS.enc.Utf8);//chuỗi string
 			var passuser = bytes1.toString(CryptoJS.enc.Utf8);
 
-			querysimple.selectTable("User", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
+			querysimple.selectTable("user", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
 				null, null, null, function(result, field, err)
 				{
 					if(err) throw err
@@ -48,7 +48,7 @@ router.route('/home')
 
 	}else{ //ton tai phien lam viec
 		if(req.session.filter){
-			querysimple.updateTable("User", [{field: "state", value: 1}, {field: "stay", value: 1}], 
+			querysimple.updateTable("user", [{field: "state", value: 1}, {field: "stay", value: 1}], 
 				[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
 				if(err) throw err;
 				console.log(result.affectedRows + " record(s) updated")
@@ -80,7 +80,7 @@ router.route('/home')
 
 	if(req.session.user_id && req.session.filter){
     	
-    	querysimple.updateTable("User", [{field: "state", value: 1}, {field: "stay", value: 1}], 
+    	querysimple.updateTable("user", [{field: "state", value: 1}, {field: "stay", value: 1}], 
 			[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
 			if(err) throw err;
 			anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){

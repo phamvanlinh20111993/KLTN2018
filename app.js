@@ -21,6 +21,7 @@ app.use(passport.session());
 app.use(morgan('dev'))
 app.use(bodyParser.urlencoded({extended: true, limit: '50mb'}))//limit data transfer from client
 app.use(bodyParser.json())
+var CryptoJS = require("crypto-js")
 
 var session = require("express-session")({
     secret: "secret",
@@ -63,19 +64,33 @@ app.use(function(req, res, next){
 	next();
 });
 
-var con = mysql.createConnection({
+/*var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
   database: "KLTN_ExLanguage",
   charset: "utf8_general_ci"
+}); */
+
+/*
+   Server: sql12.freemysqlhosting.net
+Name: sql12234645
+Username: sql12234645
+Password: 9wWUf9NFSM
+Port number: 3306
+*/
+
+var con = mysql.createConnection({
+  host: "sql12.freemysqlhosting.net",
+  user: "sql12234645",
+  password: "9wWUf9NFSM",
+  database: "sql12234645",
+  charset: "utf8_general_ci"
 });
 
-//Server: sql12.freemysqlhosting.net
-//Name: sql12227778
-//Username: sql12227778
-//Password: iuwLpRpXNe
-//Port number: 3306
+//account: thaithelong1995@gmail.com
+//pass: L12345678aaaaaaaaaaa
+//page: https://www.freemysqlhosting.net/account/
 
 con.connect(function(err) {
   if (err) throw err;
@@ -129,6 +144,7 @@ var TIME_OFFLINE = 8000;
 var anotherQuery = require('./model/Anotherquery')
 var querysimple = require('./model/QuerysingletableSimple')
 var roomchats = [];
+var _CONSTANTID = 10000000000000
 
 io.on('connection', function(client)
 {
@@ -136,70 +152,73 @@ io.on('connection', function(client)
 
 	client.on('notifyOnline', function(id){//tham so data la email cua nguoi dung
 
-    	client.handshake.session.uid = id;
-      client.handshake.session.save();
-
-      flag = false;
-
-    	for(index = 0; index < userOnorOffline_id.length; index ++){
-        	if(userOnorOffline_id[index] == id){
-	     		io.to(client.handshake.session.community).emit('numofuseronline',  client.handshake.session.numOn)
-            client.in(client.handshake.session.community).emit('whoonline', {id: id, state:true})//ca 
-          	flag = true;
-          	break;
-        	}
-      }
-
-      if(!flag){
-
-         client.handshake.session.numOn = 0;
-         //client.handshake.session.community = client.handshake.session.uid;//comment 12:56am 13/4/2018
-         client.handshake.session.community = "";//add 12:56am 13/4/2018
-         //add to array
-         userOnorOffline_id[userOnorOffline_id.length] = client.handshake.session.id;
+      if(parseInt(id) && parseInt(id) > _CONSTANTID){
+       	client.handshake.session.uid = id;
          client.handshake.session.save();
 
-         var sqlString = "UPDATE User SET state = 1 WHERE id = " + mysql.escape(client.handshake.session.uid)
-         con.beginTransaction(function(err){
-            if (err) { 
-               throw err; 
-            }
-            con.query(sqlString, function(err, result, fields){
-               if(err){
-                  con.rollback(function() {
-                     throw err;
-                  });
+         flag = false;
+
+       	for(index = 0; index < userOnorOffline_id.length; index ++){
+           	if(userOnorOffline_id[index] == id){
+   	     		io.to(client.handshake.session.community).emit('numofuseronline',  client.handshake.session.numOn)
+               client.in(client.handshake.session.community).emit('whoonline', {id: id, state:true})//ca 
+             	flag = true;
+             	break;
+           	}
+         }
+
+         if(!flag){
+
+            client.handshake.session.numOn = 0;
+            //client.handshake.session.community = client.handshake.session.uid;//comment 12:56am 13/4/2018
+            client.handshake.session.community = "";//add 12:56am 13/4/2018
+            //add to array
+            userOnorOffline_id[userOnorOffline_id.length] = client.handshake.session.id;
+            client.handshake.session.save();
+
+            var sqlString = "UPDATE user SET state = 1 WHERE id = " + mysql.escape(client.handshake.session.uid)
+            con.beginTransaction(function(err){
+               if (err) { 
+                  throw err; 
                }
-               else{
-                  
-                  con.commit(function(err) {
-                     if (err) { 
-                        con.rollback(function() {
-                           throw err;
-                        });
-                     }
-                     console.log(result.affectedRows + " record(s) updated online.");
-                     anotherQuery.selectListUsermyCommunityEx(client.handshake.session.uid, function(data){
-                        var index = 0
-                        for(index = 0; index < data.length; index++){
-                           if(data[index].state == 1)
-                              client.handshake.session.numOn++;
-                           client.handshake.session.community += data[index].id.toString() //add toString() 12:56am 13/4
+               con.query(sqlString, function(err, result, fields){
+                  if(err){
+                     con.rollback(function() {
+                        throw err;
+                     });
+                  }
+                  else{
+                     
+                     con.commit(function(err) {
+                        if (err) { 
+                           con.rollback(function() {
+                              throw err;
+                           });
                         }
-                        client.handshake.session.save();
+                        console.log(result.affectedRows + " record(s) updated online.");
+                        anotherQuery.selectListUsermyCommunityEx(client.handshake.session.uid, function(data){
+                           var index = 0
+                           for(index = 0; index < data.length; index++){
+                              if(data[index].state == 1)
+                                 client.handshake.session.numOn++;
+                              client.handshake.session.community += data[index].id.toString() //add toString() 12:56am 13/4
+                           }
+                           client.handshake.session.save();
 
-                        console.log("my community room " + client.handshake.session.community)
-                        console.log('Transaction Complete.');
-                        client.join(client.handshake.session.community)
-                        io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
-                        client.in(client.handshake.session.community).emit('whoonline', {id: id, state:false})
+                           console.log("my community room " + client.handshake.session.community)
+                           console.log('Transaction Complete.');
+                           client.join(client.handshake.session.community)
+                           io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
+                           client.in(client.handshake.session.community).emit('whoonline', {id: id, state:false})
+                        })
                      })
-                  })
 
-               }
+                  }
+               })
             })
-         })
+         }
       }
+
    })
 
 
@@ -215,7 +234,7 @@ io.on('connection', function(client)
 
       if(client.handshake.session.uid){
 
-         var sqlString = "UPDATE User SET state = 0 WHERE id = " + mysql.escape(client.handshake.session.uid)
+         var sqlString = "UPDATE user SET state = 0 WHERE id = " + mysql.escape(client.handshake.session.uid)
          con.beginTransaction(function(err){
 
             if(err) throw err
@@ -275,69 +294,73 @@ io.on('connection', function(client)
    
 
    client.on('createroomchat', function(data){
-      if(data)
+      if(data && parseInt(data.myid) > _CONSTANTID &&  parseInt(data.pid) > _CONSTANTID)
       {
          var myid = data.myid.toString();
          var pid = data.pid.toString();
          var isexistroom = false;
 
-         if(myid > pid){
-            client.join(myid + pid)
-            client.room = myid + pid
-         }else{
-            client.join(pid + myid)
-            client.room = pid + myid
-         }
-
-         for(var room in roomchats){
-            if(room.room == client.room){
-               isexistroom = true;
-               break;
+         if(myid && pid){
+            if(myid > pid){
+               client.join(myid + pid)
+               client.room = myid + pid
+            }else{
+               client.join(pid + myid)
+               client.room = pid + myid
             }
-         }
 
-         //create a new room
-         if(!isexistroom){
-            roomchats[roomchats.length] = {}
-            roomchats[roomchats.length-1].room = client.room
-            roomchats[roomchats.length-1].idM1 = data.myid//id of users in room
-            roomchats[roomchats.length-1].idM2 = data.pid//id of users in room
-         }
+            for(var room in roomchats){
+               if(room.room == client.room){
+                  isexistroom = true;
+                  break;
+               }
+            }
 
-         console.log("Da tao room " + client.room)
+            //create a new room
+            if(!isexistroom){
+               roomchats[roomchats.length] = {}
+               roomchats[roomchats.length-1].room = client.room
+               roomchats[roomchats.length-1].idM1 = data.myid//id of users in room
+               roomchats[roomchats.length-1].idM2 = data.pid//id of users in room
+            }
+
+            console.log("Da tao room " + client.room)
+         }
       }
      
    }) 
 
 
    client.on('leaveroomchat', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
+      if(data && parseInt(data.pid) > _CONSTANTID && parseInt(data.myid) > _CONSTANTID){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
 
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.leave(client.room);
-      console.log("Da out room " + client.room)
+         client.leave(client.room);
+         console.log("Da out room " + client.room)
 
-      var index = 0, roomchatsLength = roomchats.length
-      while(index < roomchatsLength){
-         if(roomchats[index].room == client.room)
-         {
-            if(roomchats[index].idM1 == client.handshake.session.uid)
-               roomchats[index].idM1 = null
-            if(roomchats[index].idM2 == client.handshake.session.uid)
-               roomchats[index].idM2 = null
+         var index = 0, roomchatsLength = roomchats.length
+         while(index < roomchatsLength){
+            if(roomchats[index].room == client.room)
+            {
+               if(roomchats[index].idM1 == client.handshake.session.uid)
+                  roomchats[index].idM1 = null
+               if(roomchats[index].idM2 == client.handshake.session.uid)
+                  roomchats[index].idM2 = null
 
-            if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
-               roomchats.splice(index, 1);
-               roomchatsLength--
+               if(roomchats[index].idM2 == null && roomchats[index].idM1 == null){
+                  roomchats.splice(index, 1);
+                  roomchatsLength--
+               }
             }
-         }
 
-         index++
+            index++
+         }
       }
 
    })
@@ -345,112 +368,123 @@ io.on('connection', function(client)
 
    //nguoi dung dang nhap tin nhan, báo cho phía bên đối tác: tao đang nhập tin nhắn cho mày
    client.on('chatting', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) > _CONSTANTID && parseInt(data.myid) > _CONSTANTID){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.in(client.room).emit('typing...', data)//ca 
+         client.in(client.room).emit('typing...', data)//ca 
+      }
    })
 
    
    client.on('sendmsg', function(data){//nhan tin nhan sau do gui di
 
-      var myid = data.myid.toString();//nguoi gui
-      var pid = data.pid.toString();//nguoi nhan
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) > _CONSTANTID && parseInt(data.myid) > _CONSTANTID){
 
-      //save in database
-      anotherQuery.selectMaxfield("message", "id", function(res)
-      {
-         var idmessg = res[0].max
-             idmessg = 0
-       //    console.log(data)
-         //chen du lieu vao bang
-         querysimple.insertTable("message", 
-            ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
-            [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
-           function(result, err){
-              if(err)  throw err;
-               else{
-                  console.log("1 record inserted messages.");
-                  console.log("nhan tin vao room " + client.room)
+         var myid = data.myid.toString();//nguoi gui
+         var pid = data.pid.toString();//nguoi nhan
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-                  data.content.messageid = idmessg + 1;//id cua tin nhan
+         //save in database
+         anotherQuery.selectMaxfield("message", "id", function(res)
+         {
+            var idmessg = res[0].max
+                idmessg = 0
+          //    console.log(data)
+            //chen du lieu vao bang
+            querysimple.insertTable("message", 
+               ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
+               [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
+              function(result, err){
+                 if(err)  throw err;
+                  else{
+                     console.log("1 record inserted messages.");
+                     console.log("nhan tin vao room " + client.room)
 
-                  //gui lai cho nguoi gui tin nhan ma cua tin nhan vua gui di
-                  io.sockets.in(client.room).emit('sendmsgid', {myid: data.myid, msgid: idmessg+1})
+                     data.content.messageid = idmessg + 1;//id cua tin nhan
 
-                  client.in(client.room).emit('receivermsg', { //server gui tin nhan den nguoi nhận
-                     content: data.content, 
-                     myphoto: data.photo,
-                     id_send: data.myid,
-                     id_receive: data.pid,
-                     time: data.time
-                  })
-               }
+                     //gui lai cho nguoi gui tin nhan ma cua tin nhan vua gui di
+                     io.sockets.in(client.room).emit('sendmsgid', {myid: data.myid, msgid: idmessg+1})
+
+                     client.in(client.room).emit('receivermsg', { //server gui tin nhan den nguoi nhận
+                        content: data.content, 
+                        myphoto: data.photo,
+                        id_send: data.myid,
+                        id_receive: data.pid,
+                        time: data.time
+                     })
+                  }
+            })
+
          })
 
-      })
-
-      client.in(client.handshake.session.community).emit('isturnonbox', { 
-         myphoto: data.photo,
-         id_send: data.myid,
-         id_receive: data.pid
-       })//ca 
+         client.in(client.handshake.session.community).emit('isturnonbox', { 
+            myphoto: data.photo,
+            id_send: data.myid,
+            id_receive: data.pid
+         })//ca 
+      }
    })
 
 
    client.on('isseemsg', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      querysimple.updateTable("message", [{field: "ischeck", value: 2}], 
-         [{op: "", field: "userA", value: parseInt(pid)}, {op:"AND", field: "userB", value: parseInt(myid)}],
-         function(result, err){
-            if(err)   throw err
-            else{
-              console.log(result.affectedRows + " record(s) updated seen message in socket");
-               client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
-               io.sockets.in(client.room)//ca 2 ben deu thay tin nhan-io.sockets se gui tin nhan cho het cac ben
-            }
-         })
+         querysimple.updateTable("message", [{field: "ischeck", value: 2}], 
+            [{op: "", field: "userA", value: parseInt(pid)}, {op:"AND", field: "userB", value: parseInt(myid)}],
+            function(result, err){
+               if(err)   throw err
+               else{
+                 console.log(result.affectedRows + " record(s) updated seen message in socket");
+                  client.in(client.room).emit('seen', data)//chi nguoi ben kia thay tin nhan
+                  io.sockets.in(client.room)//ca 2 ben deu thay tin nhan-io.sockets se gui tin nhan cho het cac ben
+               }
+          })
+      }
    })
 
 
    //su kien sua tin nhan cua nguoi dung
    client.on('editmsg', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.in(client.room).emit('editdone', data)
+         client.in(client.room).emit('editdone', data)
+      }
    })
 
    //su kien block tin nhan cua nguoi dung
    client.on('blockmsg', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
-      //insert to database
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
+         //insert to database
 
-      //ca 2 ben deu nhan duoc tin hieu block msg
-      io.sockets.in(client.room).emit('blockmsgdone', data)
+         //ca 2 ben deu nhan duoc tin hieu block msg
+         io.sockets.in(client.room).emit('blockmsgdone', data)
+      }
    })
 
 
@@ -468,73 +502,83 @@ io.on('connection', function(client)
    //su kien gui du lieu am thanh cua nguoi dung
    client.on('sendrecording', function(data){
       //insert to database
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      querysimple.insertTable("message", 
-            ["userA", "userB", "data", "content", "ischeck", "time"], //field
-            [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time], 
-            function(result, err){
-               if(err)  throw err;
-               else{
-                  console.log("1 record inserted messages audio.");
-                  console.log("nhan tin vao room " + client.room)
-                  client.in(client.room).emit('receiverecording', data)
-               }
-         })
+         querysimple.insertTable("message", 
+               ["userA", "userB", "data", "content", "ischeck", "time"], //field
+               [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time], 
+               function(result, err){
+                  if(err)  throw err;
+                  else{
+                     console.log("1 record inserted messages audio.");
+                     console.log("nhan tin vao room " + client.room)
+                     client.in(client.room).emit('receiverecording', data)
+                  }
+            })
+      }
    })
 
 
    //gui ma ket noi goi video
    client.on('sendcallvideocode', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.broadcast.emit('receivecallvideocode', data)
+         client.broadcast.emit('receivecallvideocode', data)
+      }
    })
 
 
    client.on('acceptcall', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.in(client.room).emit('calling', data)
+         client.in(client.room).emit('calling', data)
+      }
    })
 
 
    client.on('endcall', function(data){
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.in(client.room).emit('doneendcall', data)
+         client.in(client.room).emit('doneendcall', data)
+      }
    })
 
    //event tu choi cuoc goi ben phia nguoi dung
    client.on('refusecall', function(data){//nguoi dung tu choi cuoc goi
-      var myid = data.myid.toString();
-      var pid = data.pid.toString();
-      if(myid > pid)
-         client.room = myid + pid
-      else
-         client.room = pid + myid
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
 
-      client.broadcast.emit('donerefusecall', data)
+         client.broadcast.emit('donerefusecall', data)
+      }
    })
 
    //thong bao tat comment tren post id
@@ -547,6 +591,27 @@ io.on('connection', function(client)
    client.on('turnoncmt', function(data){
       if( client.handshake.session.community)
          io.sockets.in(client.handshake.session.community).emit('turnoncmtnotify', data)
+   })
+
+
+
+   //tao cac thong bao thong thao luan
+   //thong bao ve bai dang
+   client.on('notifypost', function(data){
+      if(client.handshake.session.community)
+         io.sockets.in(client.handshake.session.community).emit('notifypostdone', data)
+   })
+
+   //thong bao ve bai dang
+   client.on('notifycmt', function(data){
+      if(client.handshake.session.community)
+         io.sockets.in(client.handshake.session.community).emit('notifycmtdone', data)
+   })
+
+   //thong bao ve bai dang
+   client.on('notifylike', function(data){
+      if(client.handshake.session.community)
+         io.sockets.in(client.handshake.session.community).emit('notifylikedone', data)
    })
 
 })

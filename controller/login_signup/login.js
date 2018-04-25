@@ -40,7 +40,7 @@ router.route('/user/login')
 		&& req.session.filter)
 	{
 		//check database...., validate this do not trust user
-		querysimple.selectTable("User", ["id", "email", "password", "provider"], 
+		querysimple.selectTable("user", ["id", "email", "password", "provider"], 
 			[{op:"", field: "email", value: email}], null, null, null,
 			function(result, fields, err){
 				if(err)	throw err;
@@ -190,7 +190,7 @@ router.route('/user/login')
  				delete req.session.automailcode
  			}
 
- 			querysimple.updateTable("User", [{field: "password", value: password}], 
+ 			querysimple.updateTable("user", [{field: "password", value: password}], 
  				[{op: "", field: "id", value: parseInt(req.session.user_id)},
  				 {op: "AND", field: "email", value: req.session.email}], function(result, error){
  					if(error){

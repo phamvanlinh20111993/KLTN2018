@@ -22,6 +22,8 @@ SET time_zone = "+00:00";
 -- Database: `kltn_exlanguage`
 --
 
+CREATE DATABASE IF NOT EXISTS kltn_exlanguage1;
+USE kltn_exlanguage1;
 -- --------------------------------------------------------
 
 --

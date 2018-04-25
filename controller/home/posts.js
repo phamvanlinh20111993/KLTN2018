@@ -10,7 +10,7 @@ var anotherquery = require('../../model/Anotherquery')
 
 
 function createSession(req, res, emailuser, passuser){
-	querysimple.selectTable("User", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
+	querysimple.selectTable("user", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
 		null, null, null, function(result, field, err)
 		{
 			if(err) throw err

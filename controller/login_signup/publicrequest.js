@@ -79,7 +79,7 @@ var getDateTime1 = function(date){
 
 function createSession(req, res, emailuser, passuser)
 {
-	querysimple.selectTable("User", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
+	querysimple.selectTable("user", ["password", "stay"], [{op:"", field: "email", value: emailuser}],
 		null, null, null, function(result, field, err)
 		{
 			if(err) throw err
@@ -120,7 +120,7 @@ router.route('/user')
 		var emailuser = bytes.toString(CryptoJS.enc.Utf8);//chuỗi string
 		var passuser = bytes1.toString(CryptoJS.enc.Utf8);
 
-		querysimple.selectTable("User", ["id", "password", "stay"], [{op:"", field: "email", value: emailuser}],
+		querysimple.selectTable("user", ["id", "password", "stay"], [{op:"", field: "email", value: emailuser}],
 			null, null, null, function(result, field, err)
 		{
 			if(err) throw err
@@ -153,7 +153,7 @@ router.route('/user')
 		var emailuser = bytes.toString(CryptoJS.enc.Utf8);//chuỗi string
 		var passuser = bytes1.toString(CryptoJS.enc.Utf8);
 
-		querysimple.selectTable("User", ["id", "password", "stay"], [{op:"", field: "email", value: emailuser}],
+		querysimple.selectTable("user", ["id", "password", "stay"], [{op:"", field: "email", value: emailuser}],
 			null, null, null, function(result, field, err)
 		{
 			if(err) throw err
@@ -208,7 +208,7 @@ router.route('/user/signup')
  .get(function(req, res)
 {	
 	if(req.session.filter){
-		querysimple.updateTable("User", [{field: "state", value: 0}, {field: "stay", value: 0}], 
+		querysimple.updateTable("user", [{field: "state", value: 0}, {field: "stay", value: 0}], 
 			[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
 				if(err) throw err;
 				req.session.destroy()
@@ -221,7 +221,7 @@ router.route('/user/signup')
  .post(function(req, res)
 {	
 	if(req.session.user_id){
-		querysimple.updateTable("User", [{field: "state", value: 1},  {field: "stay", value: 1}], 
+		querysimple.updateTable("user", [{field: "state", value: 1},  {field: "stay", value: 1}], 
 			[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
 				if(err) throw err;
 				console.log(result.affectedRows + " record(s) updated")
@@ -252,7 +252,7 @@ router.route('/')
    	
  	if(userid && req.session.user_id){
  		//check database, escape sql injection..
- 		querysimple.selectTable("User", ["id"], [{op:"", field: "id", value: userid}], null, null, null,
+ 		querysimple.selectTable("user", ["id"], [{op:"", field: "id", value: userid}], null, null, null,
  			function(result, fields, err){
  				if(err) throw err;
  			else{

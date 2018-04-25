@@ -236,7 +236,7 @@ var selectTableJoin = function(tbname, data, cb){
 
 //tra ve thong tin nguoi dung email(params) hien thi trong trang home
 var selectUser = function(email, cb){//hien thi nguoi dung
-	var sqlString = "select user.id, user.name, user.email, user.photo, user.score,"+
+	var sqlString = "SELECT user.id, user.name, user.email, user.photo, user.score,"+
 	            " level.level, language.name as exname from user INNER JOIN level "+
 				" ON level.id = user.level_id JOIN exchangelg ON (user.id = exchangelg.user_id "+
 				" AND exchangelg.prio > 0) JOIN language ON exchangelg.language_id = language.id "+
@@ -672,7 +672,7 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 //tra ve danh sach nguoi dung trong messenger voi nhieu nhan tin giua 2 nguoi giam dan
 var selectListUserMessengerMaxContent = function(id, cb)
 {
-	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, count(u.id) as num"+
+	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, count(u.id) AS num"+
 	                " FROM user u JOIN message me ON "+
 	                " (me.userA = u.id AND me.userB = "+ id +")"+
 	                " OR (me.userA = "+ id +" AND me.userB = u.id)"+
@@ -814,7 +814,7 @@ var takeMessageContent = function(myid, cb)
 	               " max(msg.time) AS maxtime, msg.data, "+//"COUNT(msg.userA) AS totalmsg "+
 	               " (SELECT count(userA) from message WHERE time = max(msg.time) AND ischeck < 2) AS totalmsg"+
 	               " FROM message msg "+
-	               " JOIN User u ON msg.userA = u.id "+
+	               " JOIN user u ON msg.userA = u.id "+
 	               " WHERE msg.userB = "+mysql.escape(myid)+
 	             //  " WHERE (msg.userB = "+mysql.escape(myid)+" AND msg.userA = u.id)"+
 	            //   " OR (msg.userA = "+mysql.escape(myid)+" AND msg.userB = u.id)"+

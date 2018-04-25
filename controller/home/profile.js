@@ -179,7 +179,7 @@ router.route('/user/edit')
 
 			var wherecondition = [{op:"", field: "id", value: req.session.user_id}]
 
-			querysimple.updateTable("User", fields, wherecondition, function(result, err){
+			querysimple.updateTable("user", fields, wherecondition, function(result, err){
 				if(err) throw err
 				else 
 					res.redirect('/languageex/user/profile?uid='+encodeURIComponent(req.session.user_id))
@@ -199,7 +199,7 @@ router.route('/user/changepass')
 				var field = [{field: "password", value: updatepass}]
 				var wherecondition = [{op:"", field: "id", value: req.session.user_id}]
 
-				querysimple.updateTable("User", field, wherecondition, function(result, err){
+				querysimple.updateTable("user", field, wherecondition, function(result, err){
 					if(err) throw err
 					else 
 						res.json({result: 110000})
@@ -216,7 +216,7 @@ router.route('/user/checkpass')
 	if(req.session.user_id){
 		var oldpass = req.body.data.pass
 		if(!req.session.password){//han che truy van csdl
-			querysimple.selectTable("User", ["password"], [{op:"", field: "id", value: req.session.user_id}],
+			querysimple.selectTable("user", ["password"], [{op:"", field: "id", value: req.session.user_id}],
 			 null, null, null, function(result, fields, err){
 			 	if(err) throw err
 			    else{

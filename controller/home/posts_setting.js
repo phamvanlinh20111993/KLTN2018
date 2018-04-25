@@ -126,7 +126,11 @@ router.route('/user/likepost')
 							var value = [req.session.user_id, postid, time]
 							querysimple.insertTable("likes_post", field, value, function(result, err){
 								if(err) throw err
-								else res.json({response: result.affectedRows})
+								else{
+									postcomment.selectMaxIdTable("likes_post", function(data){
+								 		res.json({response: result.affectedRows})
+								 	})
+								}
 							})
 						}else
 							res.json({response: "No data."})

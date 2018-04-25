@@ -5,7 +5,7 @@ var mysql = require('mysql');
 var selectMyposts = function(myid, cb){
 
   var sqlString = "SELECT u.id, u.email,u.name,u.photo, u.score, le.level "+
-                  " FROM User u JOIN level le ON le.id = u.level_id "+
+                  " FROM user u JOIN level le ON le.id = u.level_id "+
                   " WHERE u.id = " + mysql.escape(myid)
 
   con.query(sqlString, function(err, result){
@@ -75,7 +75,7 @@ var selectMyposts = function(myid, cb){
 //load comment from specific post id
 var selectCmts = function(myid, postid, limit, cb){
   var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, le.level, "+
-               " c.id AS cid, c.isedit, c.content, c.ctime FROM User u "+
+               " c.id AS cid, c.isedit, c.content, c.ctime FROM user u "+
                " JOIN level le ON u.level_id = le.id "+
                " JOIN comment c ON c.user_id = u.id "+
                " WHERE c.post_id = " + mysql.escape(postid)+
@@ -147,7 +147,7 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
                " (SELECT ctime FROM post where post.id = p.id"+
                " AND (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+"))"+
                " AS timepostfl FROM post p"+
-               " JOIN User u ON p.user_id = u.id"+
+               " JOIN user u ON p.user_id = u.id"+
                " JOIN post_title ti ON ti.id = p.title_id"+
                " JOIN level le ON le.id = u.level_id"+
               // " JOIN exchangelg ex ON ex.user_id = u.id"+
@@ -233,7 +233,7 @@ var selectMaxIdTable = function(tbname, cb){
 //lay thong tin nguoi dung like bai dang
 var selectUserLikePost = function(myid, postid, cb){
    var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, li.ctime "+
-                   " FROM User u JOIN likes_post li "+
+                   " FROM user u JOIN likes_post li "+
                    " ON li.id_user = u.id "+
                    " WHERE li.id_post = " + mysql.escape(postid)+
                    " AND li.id_user != " + mysql.escape(myid)
@@ -282,7 +282,7 @@ var selectRecentPost = function(myid, limit, cb)
                " ti.name AS tiname, u.email, u.name AS uname, u.photo, u.score, le.level, ti.id AS tid,"+
                " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc, p.isedit, "+
                " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike FROM post p"+
-               " JOIN User u ON p.user_id = u.id"+
+               " JOIN user u ON p.user_id = u.id"+
                " JOIN post_title ti ON ti.id = p.title_id"+
                " JOIN level le ON le.id = u.level_id"+
              //  " JOIN exchangelg ex ON ex.user_id = u.id"+

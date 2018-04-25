@@ -25,12 +25,12 @@ router.route('/user/signup/register')
             key: CryptoJS.AES.encrypt((req.session.user_id + req.session.username), md5(req.session.user_id)).toString()
          }
 
-         querysimple.selectTable("Language", ["id", "name"], null, 
+         querysimple.selectTable("language", ["id", "name"], null, 
             [{field: "name", op: "ASC"}], null, null, function(result, fields, err){
                if(err) throw err
                var Language = result
 
-               querysimple.selectTable("Degree", ["id", "name"], null, 
+               querysimple.selectTable("degree", ["id", "name"], null, 
                   null, null, null, function(re, fields, err){
                   if(err) throw err
 
@@ -73,11 +73,11 @@ router.route('/user/signup/register')
       var value = [parseInt(req.session.user_id), req.session.email, password, 
       req.session.username, 1, describe, 0, req.session.photo, gender, date, new Date(), req.session.provider]
 
-      querysimple.insertTable("User", field, value, function(result, err){
+      querysimple.insertTable("user", field, value, function(result, err){
          if(err)
             throw err;
          else{
-            querysimple.insertTable("ExchangeLG", ["user_id", "degree_id", "language_id", "time", "prio"], 
+            querysimple.insertTable("exchangelg", ["user_id", "degree_id", "language_id", "time", "prio"], 
                [parseInt(req.session.user_id), parseInt(degree), parseInt(languageEx), new Date(), 1], function(result, err){
                if(err)
                   throw err;
