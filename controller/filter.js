@@ -33,7 +33,7 @@ router.route('/user/filter')
 					res.redirect('/languageex/user/error?err='+encodeURIComponent(md5(62)))
 				}else{
 					//check nguoi dung da dang nhap chua
-					querysimple.selectTable("User", ["state"], [{op:"", field: "email", value: emailuser}],
+					querysimple.selectTable("user", ["state"], [{op:"", field: "email", value: emailuser}],
 						null, null, null, function(result, fields, err){
 						if (err) throw err;
 						else{

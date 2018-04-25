@@ -35,7 +35,16 @@ git push -u https://github.com/phamvanlinh20111993/KLTN2018_ByREQUEST.git master
 		
 		
 ##, Up project to heroku
-		
+- 1: create new app in heroku server. Ex: exchangelanguage
+- 2: open cmd in your project
+- 3: heroku login
+- 4: git init
+- 5: heroku git:remote -a name 
+						 (name = exchangelanguage)
+- 6: git add .
+- 7: git commit -am "first commit heroku"
+- 8: git push heroku master
+
 		
 		
 		

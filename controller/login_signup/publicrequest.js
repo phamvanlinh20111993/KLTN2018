@@ -267,7 +267,7 @@ router.route('/')
  								User.infor.dateofbirth1 = getDateTime1(new Date(User.infor.dateofbirth))
  								User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
  								//console.log(User.exlang)
- 							    res.render('ejs/Profile', {User: User})
+ 							    res.render('ejs/profile', {User: User})
  							}else{//toi xem thong tin cua nguoi dung khac:
  								//co follow nguoi nay khong, co dang block nguoi nay khong
  								User.state = "something"
@@ -278,7 +278,7 @@ router.route('/')
 
  									User.infor.dateofbirth = getDateTime(new Date(User.infor.dateofbirth))
  									console.log(User)
- 							        res.render('ejs/Profile', {User: User})
+ 							        res.render('ejs/profile', {User: User})
  								})
 
  								
