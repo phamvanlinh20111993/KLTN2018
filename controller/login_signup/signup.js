@@ -149,7 +149,7 @@ passport.use(new GoogleStrategy({
     clientID: '163229107634-ve1vh1vknim98odu2kp6duujh0jfesqf.apps.googleusercontent.com',
     clientSecret: 'eJTV7yQB1cT_fxurc3qD723M',
   //  callbackURL: "http://localhost:5050/languageex/user/signup/api/auth/google/callback"
-    callbackURL: "https://app-chat-phamlinh.herokuapp.com/user/auth/google/callback"
+    callbackURL: "https://exchangelanguage.herokuapp.com/languageex/user/signup/api/auth/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     if (profile) {
