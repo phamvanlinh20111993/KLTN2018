@@ -96,7 +96,7 @@ function Change_date(Date_time)
     d = new Date();//lay thoi gian hien tai
     d1 = new Date(String(Date_time));//;lay thoi gian da dang
     second = parseInt((d - d1)/1000);//thoi gian hien tai va thoi gian da dang
-    if(second < 60) text = "Just now";
+    if(second < 60) text = "Vừa xong";
     else if(second > 60 && second < 3600)            text =parseInt(second/60)+" phút trước";
     else if(second >= 3600 && second < 86400)        text = "About "+parseInt(second/3600)+" giờ trước"; 
     else if(second >= 86400 && second < 2592000)     text = parseInt(second/86400)+" Ngày trước"; 
@@ -111,11 +111,11 @@ var formatTime = function(datestr){
 	var Hours = date.getHours()
 	var Day = date.getDate()
 
-	Hours = Hours - 7;
-	if(Hours < 0){
-		Hours = Hours + 24
-		Day--;
-	}
+//	Hours = Hours - 7;
+//	if(Hours < 0){
+//		Hours = Hours + 24
+//		Day--;
+//	}
 
 	return Hours+":"+ date.getMinutes() + " "+
 			Day + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
@@ -406,7 +406,10 @@ var likeOrDis = function(id){
 				//tao thong bao socket thich bai dang
 				//tao socket thong bao post den nguoi dung
 				socket.emit("notifylike", {
-
+					post_id: id, //mã bài đăng
+					user_id: MYID,//mã người thích bài đăng
+					photo: MYPHOTO,
+					time: new Date()
 				})
 			}
 		})
@@ -722,7 +725,7 @@ var submitPost = function(){
 
 		var selectTitle = document.getElementById("topicpost")
 		var value = selectTitle[selectTitle.selectedIndex].value;
-		var data = {content: content.value, title: value, time: new Date()}//data submit to server
+		var data = {content: content.value, title: value, time: new Date(), laid: MYPRIOEXID}//data submit to server
 
 		var User = {//user object
 			id: MYID,
@@ -747,9 +750,9 @@ var submitPost = function(){
 
 		SCORING = 2 // moi lan dang bai duoc cong 2 diem
 		requestServer('/languageex/user/score', 'POST', {score: SCORING}, 0, 
-            function(err, data){
-                if(err) alert(err)
-            })
+         function(err, data){
+            if(err) alert(err)
+         })
 	
 		requestServer('/languageex/user/createPost', 'POST', data, 0, function(err, data){
 			if(err) alert(err)
@@ -763,8 +766,11 @@ var submitPost = function(){
 				document.getElementById("showpostusers").innerHTML += allpostafter
 				//tao socket thong bao post den nguoi dung
 				socket.emit("notifypost", {
-
-				})
+					post_id: data.resp,//mã bài đăng
+					user_id: MYID,//mã người tạo bài đăng
+					photo: MYPHOTO,
+					time: new Date()
+		      })
 			}
 		})
 	}
@@ -801,7 +807,10 @@ var submitComment = function(e, postid, ownpostid){
 					showComment({id: postid, own: MYID}, data, User, 1)
 					//tao socket thong bao binh luan den chu bai dang
 					socket.emit("notifycmt", {
-
+						cmt_id: dataid.res,//mã bình luận
+						user_id: MYID,//mã người đăng bình luận
+						photo: MYPHOTO,
+						time: new Date()
 					})
 				}
 			})
@@ -1138,17 +1147,17 @@ socket.on('turnoncmtnotify', function(data){
 })
 
 //take event cac thong bao like bai dang, binh luạn bai đăng, tạo bài dăng
-//tao bai đăng
+//tao bai đăng, ngưởi tạo bài dăng sẽ gửi thông báo đến những người theo dõi mk
 socket.on("notifypostdone", function(data){
-
+	console.log(data)
 })
 
-//binh luan bai dang
+//binh luan bai dang, người đăng bình luận sẽ gửi thông báo đến chủ bài đăng
 socket.on("notifycmtdone", function(data){
-
+	console.log(data)
 })
 
-//thich bai dang
+//thich bai dang, người thích bài đăng sẽ gửi thông báo đến chủ bài đăng
 socket.on("notifylikedone", function(data){
-
+	console.log(data)
 })

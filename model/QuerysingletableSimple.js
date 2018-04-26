@@ -808,13 +808,17 @@ var selectStateBlockOrFollow = function(myid, userA, cb){
 //lay noi dung tin nhan chua doc
 var takeMessageContent = function(myid, cb)
 {
-	var sqlString = "SELECT u.id, u.name AS uname, u.photo, "+//msg.ischeck
-						"(SELECT ischeck from message WHERE time = max(msg.time)) AS ischeck, "+
+	var sqlString = "SELECT u.id, u.name AS uname, u.photo, bl.ctime AS bltime,  bl1.ctime AS bltime1, "+//msg.ischeck
+				   " (SELECT ischeck from message WHERE time = max(msg.time)) AS ischeck, "+
 	               " (SELECT content from message WHERE time = max(msg.time)) AS content,"+
 	               " max(msg.time) AS maxtime, msg.data, "+//"COUNT(msg.userA) AS totalmsg "+
 	               " (SELECT count(userA) from message WHERE time = max(msg.time) AND ischeck < 2) AS totalmsg"+
 	               " FROM message msg "+
 	               " JOIN user u ON msg.userA = u.id "+
+	               " LEFT JOIN blockmessages bl ON bl.whoblock = "+mysql.escape(myid)+
+	               								   " AND bl.blockwho = u.id "+	//block người khác
+	               	" LEFT JOIN blockmessages bl1 ON bl1.blockwho = "+mysql.escape(myid)+
+	               								   " AND bl1.whoblock = u.id "+	//bị block bởi ng khác							   											
 	               " WHERE msg.userB = "+mysql.escape(myid)+
 	             //  " WHERE (msg.userB = "+mysql.escape(myid)+" AND msg.userA = u.id)"+
 	            //   " OR (msg.userA = "+mysql.escape(myid)+" AND msg.userB = u.id)"+
@@ -827,14 +831,23 @@ var takeMessageContent = function(myid, cb)
 			throw err
 			cb(null)
 		}else{
-			var contentmsgnotseen = []
+			var contentmsgnotseen = [], isblock, wasblock
 			for(var ind = 0; ind < result.length; ind++){
+				isblock = false//toi da block ai
+				wasblock = false
+				if(result[ind].bltime)
+					isblock = true
+				if(result[ind].bltime1)
+					wasblock = true
+
 				contentmsgnotseen[ind] = {
 					uid: result[ind].id,
 					name: result[ind].uname,
 					photo: result[ind].photo,
 					msgcontent:  result[ind].content,
 					ischeck: result[ind].ischeck,
+					isblock: isblock,
+					wasblock: wasblock,
 					time:  result[ind].maxtime,
 					totalmsg:  result[ind].totalmsg
 				}

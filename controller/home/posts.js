@@ -28,8 +28,10 @@ function createSession(req, res, emailuser, passuser){
 						req.session.photo = result[0].photo
 
 						anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
-							req.session.mynative = data[0].natsy
+							req.session.mynative = data[0].natsy//kí hieu ngon ngu
 							req.session.myexchange = data[0].exsy
+							req.session.mynativeid = data[0].natid//kí hieu ma ngon ngu
+							req.session.myexchangeid = data[0].exid
 							res.render('ejs/discussion', {user: result})
 						})
 					}

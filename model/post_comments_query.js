@@ -30,11 +30,13 @@ var selectMyposts = function(myid, cb){
                   " (SELECT COUNT(*) FROM comment c WHERE p.id = c.post_id) AS totalc" +
                   " FROM post p "+
                   " JOIN post_title ti ON ti.id = p.title_id "+
-               ///   " JOIN exchangelg ex ON ex.user_id = p.user_id "+
+                  " JOIN exchangelg ex ON ex.user_id = p.user_id AND ex.prio = 1"+
+                  " JOIN language la ON ex.language_id = la.id "+
                   " LEFT JOIN likes_post li ON li.id_post = p.id "+
                   " LEFT JOIN likes_post li1 "+
                   " ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
                   " WHERE p.user_id = " + mysql.escape(myid)+
+                  " AND p.language_id = ex.language_id "+
                   " GROUP BY p.id ORDER BY p.ctime DESC"//, ex.prio DESC"
 
       console.log(sqlString1)
@@ -150,9 +152,9 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
                " JOIN user u ON p.user_id = u.id"+
                " JOIN post_title ti ON ti.id = p.title_id"+
                " JOIN level le ON le.id = u.level_id"+
-              // " JOIN exchangelg ex ON ex.user_id = u.id"+
-           //    " JOIN language la ON la.id = ex.language_id "+
-               " JOIN language la ON la.id = "+parseInt(res[0].exid)+//add 3:40pm
+               " JOIN exchangelg ex ON ex.user_id = u.id"+
+               " JOIN language la ON la.id = ex.language_id "+
+           //    " JOIN language la ON la.id = "+parseInt(res[0].exid)+//add 3:40pm
                " LEFT JOIN follow fo ON (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+")"+
                " LEFT JOIN likes_post li ON li.id_post = p.id "+
                " LEFT JOIN likes_post li1 ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
@@ -161,6 +163,7 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
                likefilter +
                " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
                " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
+               " AND p.language_id = " + parseInt(res[0].exid) +
                " GROUP BY p.id"+
                " ORDER BY timepostfl DESC, p.ctime DESC"
 
@@ -285,15 +288,16 @@ var selectRecentPost = function(myid, limit, cb)
                " JOIN user u ON p.user_id = u.id"+
                " JOIN post_title ti ON ti.id = p.title_id"+
                " JOIN level le ON le.id = u.level_id"+
-             //  " JOIN exchangelg ex ON ex.user_id = u.id"+
-             //  " JOIN language la ON la.id = ex.language_id"+
-               " JOIN language la ON la.id = "+parseInt(res[0].exid)+
+               " JOIN exchangelg ex ON ex.user_id = u.id"+
+               " JOIN language la ON la.id = ex.language_id"+
+             //  " JOIN language la ON la.id = "+parseInt(res[0].exid)+
                " LEFT JOIN follow fo ON (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+")"+
                " LEFT JOIN likes_post li ON li.id_post = p.id "+
                " LEFT JOIN likes_post li1 ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
                " WHERE p.user_id != "+mysql.escape(myid)+
                " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
                " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
+               " AND p.language_id = " + parseInt(res[0].exid) +
                " GROUP BY p.id"+
                " ORDER BY p.ctime DESC LIMIT "+mysql.escape(limit)
 

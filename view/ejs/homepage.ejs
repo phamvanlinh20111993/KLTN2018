@@ -146,6 +146,8 @@
      var MYPHOTO = "<%= session.photo %>"
      var MYPRIONAT = "<%= session.mynative %>"
      var MYPRIOEX = "<%= session.myexchange %>"
+     var MYPRIONATID = "<%= session.mynativeid %>"
+     var MYPRIOEXID = "<%= session.myexchangeid %>"
      var _COUNT_ID_DOM = 0;
      var IDMESSAGEUSER = 0;
      var AUTOCHECKMISSPELLING = true
@@ -423,8 +425,8 @@
 
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul id="nav_ul" class="nav navbar-nav">
-        <li class="active"><a href="/languageex/user/profile" onclick="Profile()">Cá nhân</a></li>
-        <li><a href="/languageex/user/post" onclick="Post()">Thảo luận</a></li>
+        <li class="active" onclick="Profile()"><a href="/languageex/user/profile">Cá nhân</a></li>
+        <li onclick="Post()"><a href="/languageex/user/post" >Thảo luận</a></li>
 
         <li><a href="#">Nhóm</a></li>
         <li><a href="#">Khóa học</a></li>
@@ -589,7 +591,7 @@
       socket.on('numofuseronline', function(signal){
        //  if(signal < 0) signal = 0                                         // comment 12:57am 13/4
       //   document.getElementById("numofusersonline").innerHTML = " (" + signal + ")"//comment 12:57 13/4
-         if(signal < 1) signal = 0 //add 12:57am 13/4
+         if(signal < 1) signal = 1 //add 12:57am 13/4
          document.getElementById("numofusersonline").innerHTML = " (" + (parseInt(signal)-1) + ")" //add 12:57 13/4
       })
 

@@ -174,8 +174,8 @@ var selectListUsermyCommunityEx = function(id, cb){
 
 //tra ve ngon ngu tu nhien va ngon ngu trao doi co do uu tien cao nhat
 var select_max_prio_Ex_and_Navtive = function(id, cb){
-	var sqlstr = "SELECT la.symbol AS exsy, la.name AS natname, la1.symbol AS natsy,"+
-	        " la1.name AS exname FROM exchangelg JOIN language la "+
+	var sqlstr = "SELECT la.symbol AS exsy, la.name AS exname, la.id AS exid, "+
+	        " la1.name AS natname, la1.symbol AS natsy, la1.id AS natid FROM exchangelg JOIN language la "+
 	        " ON la.id = exchangelg.language_id JOIN nativelg "+
 	        " ON exchangelg.user_id = nativelg.user_id JOIN language la1 "+
 	        " ON la1.id = nativelg.language_id WHERE exchangelg.user_id = "+ mysql.escape(id)+

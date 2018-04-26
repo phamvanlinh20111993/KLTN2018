@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer')
 var smtpTransport = require('nodemailer-smtp-transport')
-var App_url = "localhost:5050/languageex/"
+//var App_url = "localhost:5050/languageex/"
+var App_url = "https://exchangelanguage.herokuapp.com/languageex/"
 
 function sendMail(email, code, url, type, Callback)
 {

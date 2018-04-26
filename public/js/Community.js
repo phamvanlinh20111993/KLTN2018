@@ -41,17 +41,18 @@ var ajaxRequest = function(url, type, data, callback) {//data is a object
     })
 }
 
-function formatAMPM(date)
+function formatAMPM1(date)
 {
+
   var hours = date.getHours();
   var minutes = date.getMinutes();
   var ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
   minutes = minutes < 10 ? '0'+minutes : minutes;
-  var strTime = hours + ':' + minutes + ' ' + ampm +" "+ data.getDate() + "/" + (date.getMonth()+1)+
-                date.getYear();
-
+  var strTime = hours + ':' + minutes + ' ' + ampm +" "+ date.getDate() + "/" + (date.getMonth()+1)+
+                "/"+date.getFullYear();
+ 
   return strTime;
 }    
 
@@ -92,7 +93,7 @@ var showUserCommunity = function(User)
     isblockedmsg = ""
     followstr = '<div class="alert alert-info"'+
          '<strong>Info!</strong> Bạn đã khóa '+User.infor.name +
-         ' At '+formatAMPM(new Date(User.youblocked.time))+
+         ' At '+formatAMPM1(new Date(User.youblocked.time))+
     '</div>'
   }
 
@@ -100,7 +101,7 @@ var showUserCommunity = function(User)
     isblockedmsg = ""
     followstr = '<div class="alert alert-info"'+
          '<strong>Info!</strong> Bạn bị khóa bởi '+User.infor.name +
-         ' lúc '+formatAMPM(new Date(User.youwasblocked.time))+
+         ' lúc '+formatAMPM1(new Date(User.youwasblocked.time))+
          ' với Lý do: ' + User.youwasblocked.reason
     '</div>'
   }
@@ -181,11 +182,14 @@ showTotalNoftify()
 
 //nhan thong bao tu server
 var CONSTANTSTRING = 4566456456//random number
-var showContentNotifyMsg = function(DOMelement, data){
+var showContentNotifyMsg = function(DOMelement, data)
+{
    var ele = ""
    var ischeckmsg = ""
+    console.log(data)
    for(ind = 0; ind < data.data.length; ind++)
    {
+
       var Userinfor = {
          id: data.data[ind].uid,
          name: data.data[ind].name,
@@ -193,26 +197,35 @@ var showContentNotifyMsg = function(DOMelement, data){
          ischeck: data.data[ind].ischeck
       }
 
+      var isblockedmsg = ""/*tôi đã block ai */
+      if(data.data[ind].isblock)
+         isblockedmsg = '<span style="color:red;margin-left:2%;" class="glyphicon glyphicon-remove"></span>'
+     
       var replacementJSON = replaceAll(JSON.stringify(Userinfor), '"', CONSTANTSTRING)
 
-      if(ind > 0){
-         ele += '<tr onclick="messageToUser(\''+replacementJSON+'\')">'
-      }else
-         ele += '<tr style="border-top: 0px;" onclick="messageToUser(\''+replacementJSON+'\')">'
+      if(data.data[ind].wasblock){/* tôi bị block bởi ai*/
+           var msg = "Bạn đã bị "+ data.data[ind].name + " khóa tin nhắn lúc "+formatAMPM1(new Date(data.data[ind].time))
+           ele += '<tr onclick="alert(\''+msg+'\');">'
+      }else{
+         if(ind > 0){
+            ele += '<tr onclick="messageToUser(\''+replacementJSON+'\')">'
+         }else
+            ele += '<tr style="border-top:0px;" onclick="messageToUser(\''+replacementJSON+'\')">'
+      }
 
       if(parseInt(data.data[ind].ischeck) < 2)
          ischeckmsg = " ("+data.data[ind].totalmsg+")"
 
       ele += '<td style="padding: 2%;"><img src="'+data.data[ind].photo+'" '+
                 'class="img-circle" alt="Avatar" height="45" width="45"></td>'+
-              '<td style="width: 70%;">'+
+              '<td style="width: 65%;">'+
                 '<div style="height: auto;width: auto;margin-left: 2%;">'+
                   '<span style="font-style: italic;font-size: 120%;font-weight: bold;">'+data.data[ind].name+ischeckmsg+'</span></br>'+
-                  '<span style="font-size: 95%;">'+data.data[ind].msgcontent+'</span>'+
+                  '<span style="font-size: 95%;">'+data.data[ind].msgcontent+'</span>'+ isblockedmsg+
                 '</div>'+
               '</td>'+
-              '<td style="width:25%;">'+
-                '<div style="float: right;">'+formatAMPM(new Date(data.data[ind].time))+'</div>'+
+              '<td style="width:30%;">'+
+                '<div style="float: right;">'+formatAMPM1(new Date(data.data[ind].time))+'</div>'+
               '</td>'+
             '</tr>'
 

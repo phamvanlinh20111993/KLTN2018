@@ -64,13 +64,13 @@ app.use(function(req, res, next){
 	next();
 });
 
-/*var con = mysql.createConnection({
+var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
   database: "KLTN_ExLanguage",
   charset: "utf8_general_ci"
-}); */
+});
 
 /*
    Server: sql12.freemysqlhosting.net
@@ -80,13 +80,13 @@ Password: 9wWUf9NFSM
 Port number: 3306
 */
 
-var con = mysql.createConnection({
+/*var con = mysql.createConnection({
   host: "sql12.freemysqlhosting.net",
   user: "sql12234645",
   password: "9wWUf9NFSM",
   database: "sql12234645",
   charset: "utf8_general_ci"
-});
+}); */
 
 //account: thaithelong1995@gmail.com
 //pass: L12345678aaaaaaaaaaa

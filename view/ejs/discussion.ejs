@@ -114,11 +114,14 @@
 
   </style>
   <script type="text/javascript">
-     var MYID = parseInt("<%= session.user_id  %>")
-     var MYEMAIL = "<%= session.email %>"
-     var MYPHOTO = "<%= session.photo %>"
-     var MYPRIONAT = "<%= session.mynative %>"
-     var MYPRIOEX = "<%= session.myexchange %>"
+      var MYID = parseInt("<%= session.user_id  %>")
+      var MYEMAIL = "<%= session.email %>"
+      var MYPHOTO = "<%= session.photo %>"
+      var MYPRIONAT = "<%= session.mynative %>"
+      var MYPRIOEX = "<%= session.myexchange %>"
+      var MYPRIONATID = "<%= session.mynativeid %>"
+      var MYPRIOEXID = "<%= session.myexchangeid %>"
+      console.log(MYPRIOEXID)
 
   </script>
 
