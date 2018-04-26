@@ -201,14 +201,22 @@ var loadUser = function(){
                         messageUser(data.listuser[0].id)
                      }
                      else{
-                        alert("Do not exist this user.Please try again.")
+                        alert("Không tồn tại người dùng này.Vui lòng thử lại.")
                         location.href = "/languageex/messenger"
                      }
                   }
                })
             }
-         }else
-            messageUser(data.listuser[0].id)//tra ve nguoi dau tien trong danh sach
+         }else{
+            //click vao nguoi dung khong bị khóa tin nhắn
+            for(index = 0; index < data.listuser.length; index++){
+               if(data.listuser[index].bltime == null && data.listuser[index].bl1time == null){
+                  messageUser(data.listuser[index].id)//tra ve nguoi dau tien trong danh sach
+                  break;
+               }
+            }
+            
+         }
 		}
 		
 	})
@@ -220,14 +228,27 @@ loadUser();
 function showUsers(users, setting)
 {
 	var isonline = '<span class="contact-status online"></span>'
+   var Funcblock = 'onclick="messageUser('+users.id+')"'
+
 	if(users.state != 1)
-		var isonline = '<span class="contact-status offline"></span>'
+		isonline = '<span class="contact-status offline"></span>'
+   
+
+   if(users.bltime){// toi block nguoi khac
+      isonline = '<span class="contact-status away"></span>'
+      Funcblock = 'onclick="youBlocked('+users.id+')"'
+   }
+
+   if(users.bl1time){//toi bi nguoi khac block
+      isonline = '<span class="contact-status busy"></span>'
+       Funcblock = 'onclick="youwasBlocked('+users.id+')"'
+   }
 
    var replacementJSON = replaceAll(JSON.stringify(users), '"', CONSTANTSTRING)
 
 	var element = '<li class="contact" id="'+users.id+'_identity" '+
               'data-toggle="tooltip" title="Score: '+users.score+'" ">'+
-          '<div class="wrap" onclick="messageUser('+users.id+')">'+
+          '<div class="wrap" '+Funcblock+'>'+
            isonline+//isonline
             '<img src="'+users.photo+'" alt="" />'+
             '<div class="meta">'+
@@ -244,6 +265,16 @@ function showUsers(users, setting)
 
     contact_ul.innerHTML += element
 
+}
+
+function youwasBlocked(id){
+   alert("Bạn đã bị người dùng này khóa tin nhắn.")
+   document.getElementById("contentMessage").disabled = true;
+}
+
+function youBlocked(id){
+   alert("Bạn đã khóa tin nhắn với người dùng này.")
+   document.getElementById("contentMessage").disabled = true;
 }
 
 
@@ -345,6 +376,9 @@ function showMessageuserReceive(user, messages, setting, state){
 //event lay tin nhan
 var messageUser = function(uid)
 {
+
+   document.getElementById("contentMessage").disabled = false;
+
   var infoUser = document.getElementById(uid+"_hiddeninfouser").value
   var users = JSON.parse(replaceAll(infoUser, CONSTANTSTRING, '"'))
    //khoi tao object

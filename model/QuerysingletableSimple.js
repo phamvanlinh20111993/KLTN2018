@@ -693,10 +693,14 @@ var selectListUserMessenger = function(id, cb)
 {
 
 	var sqlString = "SELECT u.id, u.email, u.name, u. photo, u.score, u.state, MAX(me.time) AS max, "+
-	        " fo.tracked "+
+	        " fo.tracked, bl.ctime AS bltime, bl1.ctime AS bl1time "+
 	        " FROM user u JOIN message me ON (me.userA = u.id AND me.userB = "+mysql.escape(id)+") "+
 	        " OR (me.userA = "+mysql.escape(id)+" AND me.userB = u.id) "+
 	        " LEFT JOIN follow fo ON (fo.followers = "+mysql.escape(id)+" AND tracked = u.id)"+
+	        " LEFT JOIN blockmessages bl ON bl.whoblock = "+mysql.escape(id)+
+	                                        " AND bl.blockwho = u.id "+	//block người khác
+	        " LEFT JOIN blockmessages bl1 ON bl1.blockwho = "+mysql.escape(id)+
+	               						    " AND bl1.whoblock = u.id "+	//bị block bởi ng khác	
 	        " WHERE u.id != "+mysql.escape(id)+
 	        " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock = "+mysql.escape(id)+")"+
 	        " GROUP BY u.id"+
@@ -817,7 +821,7 @@ var takeMessageContent = function(myid, cb)
 	               " JOIN user u ON msg.userA = u.id "+
 	               " LEFT JOIN blockmessages bl ON bl.whoblock = "+mysql.escape(myid)+
 	               								   " AND bl.blockwho = u.id "+	//block người khác
-	               	" LEFT JOIN blockmessages bl1 ON bl1.blockwho = "+mysql.escape(myid)+
+	               " LEFT JOIN blockmessages bl1 ON bl1.blockwho = "+mysql.escape(myid)+
 	               								   " AND bl1.whoblock = u.id "+	//bị block bởi ng khác							   											
 	               " WHERE msg.userB = "+mysql.escape(myid)+
 	             //  " WHERE (msg.userB = "+mysql.escape(myid)+" AND msg.userA = u.id)"+
