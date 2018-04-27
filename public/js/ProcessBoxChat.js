@@ -1,4 +1,23 @@
-            
+         
+            const APP_TITLE = document.title//hang so
+            var Switch_tab = false, Intval_show, Intval_hidden;
+            var Count_message_to_you = []
+
+            //bat su kien kick vao cửa sổ blur bắt sự kiện là khi chuyển cửa sổ
+            $(window).blur(function() {
+               Switch_tab = true
+            });
+
+            $(window).focus(function() {
+               Switch_tab = false
+               document.title = APP_TITLE// khoi phuc trang thai ban dau
+               Count_message_to_you = []
+               if(typeof Intval_hidden !== 'undefined'){
+                  clearInterval(Intval_show)
+                  clearInterval(Intval_hidden)
+               }
+            });
+
             //clear all session when refresh page
          //   window.onload = function(){
          //      sessionStorage.clear();
@@ -267,7 +286,7 @@
                             sessionStorage.setItem("_checkmiss_"+id, true);
                     }
                     
-                	takecontentMessage(id, function(content)
+                	  takecontentMessage(id, function(content)
                     {
                			document.getElementsByTagName("nav")[0].innerHTML += 
                				Show_pop_up_message(id, name, photo, setting); 
@@ -396,6 +415,7 @@
                }
             })
 
+            var check_true_false = false;//bien kiem tra la nguoi dung cu hay moi
             //nhan tin nhan cua nguoi gui
             socket.on('receivermsg', function(data)
             {
@@ -405,6 +425,10 @@
             		var seenmsg = document.getElementsByClassName(data.id_send+"_seen")
             		if(seenmsg.length > 0)
 						seenmsg[seenmsg.length-1].style.display = "none"
+                  //play audio
+                  var audio = new Audio('/data/sound/NhacChuong.mp3');
+                  audio.play();
+                  audio.volume = 1.0
 
             	 	Message_receiver(data.id_send, time, data.myphoto, data.content, 0)
             	    document.getElementById(data.id_send+"_typing").style.display = "none"
@@ -414,6 +438,54 @@
           				//if($(this).is(':focus')){}//if focus
           				socket.emit('isseemsg', { myid: MYID, pid: data.id_send })
           			})
+
+                  /*
+                     hiển thị người nhắn tin trên title của page
+                   */
+                  for(var i = 0;i < Count_message_to_you.length; i++)
+                  {
+                     if(Count_message_to_you[i] == data.id_send){
+                        check_true_false = true
+                        break;
+                     }
+                  }
+            
+                  if(!check_true_false){
+                     Count_message_to_you[Count_message_to_you.length] = data.id_send
+                  }else 
+                     check_true_false = false//reset lại giá trị
+
+                  //hiển thị trên title của page người nt cho bạn
+                  if(Switch_tab)
+                  {
+                     clearInterval(Intval_show)
+                     clearInterval(Intval_hidden)
+                     var Messsage = "Ai đó "
+
+                     if(Count_message_to_you.length== 1){
+                        for(var ind = 0; ind < INFORCOMMUNITY.length; ind++){
+                           if(Count_message_to_you[ind]==INFORCOMMUNITY[ind].infor.id){
+                              var arrName = INFORCOMMUNITY[ind].infor.name.split(" ")
+                              Messsage = arrName[arrName.length - 1]
+                              break
+                           }
+                        }
+
+                        Messsage += " đã nhắn tin...."
+                                 //nguoi dung nt den nam ngoai danh sach hoac nhieu hon 1 nguoi nt cho mk
+                     }else if(SAVE_ID_HAVE_NOTIFY.length > 1){
+                        Messsage  = "(" + SAVE_ID_HAVE_NOTIFY.length + ")" + APP_TITLE
+                     }
+                  
+                     Intval_show = setInterval(function(){
+                        document.title = Messsage
+                     }, 1000)
+                  
+                     Intval_hidden = setInterval(function(){
+                        document.title = APP_TITLE
+                     }, 2000)
+                  }
+
 
                   /**
                      Khi nhận tin nhắn từ ai đó gửi đến, bên người nhận sẽ kiểm tra các hộp thoại boxchat
