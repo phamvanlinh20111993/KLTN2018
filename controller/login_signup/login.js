@@ -9,7 +9,7 @@ var querysimple = require('../../model/QuerysingletableSimple')
 
 function existAccount(email, cb)
 {
-   querysimple.selectTable("User", ["id", "email"], 
+   querysimple.selectTable("user", ["id", "email"], 
       [{ op:"", field: "email", value: email }], null, null, null, 
      function(result, fields, error)
      {
