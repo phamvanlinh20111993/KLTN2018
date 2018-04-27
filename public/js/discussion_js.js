@@ -341,8 +341,8 @@ var editPostDone = function(id){
 	var _postcontenthd = document.getElementById(id+"_postcontent")	//input type hidden
 	var newcontent = _textareaEdit.value
 
-	if(newcontent == "" || newcontent.length < 100)
-		alert("Please dont edit your post under 100 characters.")
+	if(newcontent == "" || newcontent.length < 40)
+		alert("Please dont edit your post under 40 characters.")
 	else if(_postcontent.innerHTML == newcontent)//noi dung moi va cu trung nhau
 		alert("This is old content.Please try again.")
 	else{

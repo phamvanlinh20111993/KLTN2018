@@ -5,7 +5,6 @@ var sendEmail = require('../../local_modules/lib/sendmail1')
 var md5 = require('md5') 
 var libfunction = require('../../local_modules/customfunction')
 var querysimple = require('../../model/QuerysingletableSimple')
-var CryptoJS = require("crypto-js")
 
 
 function existAccount(email, cb)

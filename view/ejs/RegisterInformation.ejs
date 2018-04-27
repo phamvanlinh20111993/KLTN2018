@@ -418,8 +418,8 @@
       function validateDescribe(describe, cb)
       {
          var notify_p_describe = null 
-         if(describe.length < 100)
-            notify_p_describe = "!!! Describe yourself atleast 100 characters."
+         if(describe.length < 40)
+            notify_p_describe = "!!! Describe yourself atleast 40 characters."
          
          var format = /[@#$%^&*_+\-=\[\]{}'"\\|<>\/]/;
          if(format.test(describe))
