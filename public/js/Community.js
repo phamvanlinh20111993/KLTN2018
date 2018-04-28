@@ -449,7 +449,7 @@ socket.on('whoonline', function(data){
       popupDiv1.style.display = "block"
       setTimeout(function() {
           popupDiv1.style.display = "none"
-      }, 7000)
+      }, 20000)
    }
 })
 

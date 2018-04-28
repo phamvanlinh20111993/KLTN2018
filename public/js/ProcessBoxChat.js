@@ -350,54 +350,53 @@
 
 	          	if(e.keyCode == 13){
 	          		var time = formatAMPM(new Date());
-					var val = document.getElementById(id + "_mymsg").value;
+					   var val = document.getElementById(id + "_mymsg").value;
 
-					if(val.length > 0)
-               {
-                        //tao object
-                  var message = {}
-                  message.content = val
-                  message.data = null
-                  message.edit = []//khoi tao rong
+   					if(val.length > 0)
+                  {
+                           //tao object
+                     var message = {}
+                     message.content = val
+                     message.data = null
+                     message.edit = []//khoi tao rong
 
-						Message_send(id, time, MYPHOTO, message, 0)
+   						Message_send(id, time, MYPHOTO, message, 0)
 
-                     //   console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
-                  var ismisspelling = 0;//khong co loi dich, tin nhan ok
-                  Translate_or_Misspelling("/languageex/user/checkmisspelling", 
-                     MYPRIOEX, MYPRIONAT, val, function(data){
+                        //   console.log("gia tri la " +INPUT_HIDDEN_SAVE_MSSID)
+                     var ismisspelling = 0;//khong co loi dich, tin nhan ok
+                     Translate_or_Misspelling("/languageex/user/checkmisspelling", 
+                        MYPRIOEX, MYPRIONAT, val, function(data){
 
-                     if(data.content.error == null){
-                        if(data.content.value==""){
-                           ismisspelling = 0;//tin nhan ok
-                        }else{
-                           if(data.content.language == MYPRIOEX)
-                              ismisspelling = 1;//co loi chinh ta(đỏ)
-                           else
-                              ismisspelling = 2//khong phai ngon ngu dang trao doi(vàng)
-                        }
-                     }else
-                        ismisspelling = 3;//loi dich tin nhan(cam)
+                        if(data.content.error == null){
+                           if(data.content.value==""){
+                              ismisspelling = 0;//tin nhan ok
+                           }else{
+                              if(data.content.language == MYPRIOEX)
+                                 ismisspelling = 1;//co loi chinh ta(đỏ)
+                              else
+                                 ismisspelling = 2//khong phai ngon ngu dang trao doi(vàng)
+                           }
+                        }else
+                           ismisspelling = 3;//loi dich tin nhan(cam)
 
-                     SCORING = 1;
-                     REQUEST_AJAX_SERVER('/languageex/user/score', 'POST', {score: SCORING}, 
-                        function(err, data){
-                           if(err) alert(err)
+                        SCORING = 1;
+                        REQUEST_AJAX_SERVER('/languageex/user/score', 'POST', {score: SCORING}, 
+                           function(err, data){
+                              if(err) alert(err)
+                        })
+                        //  console.log("gia tri la: " + ismisspelling)
+                        message.misspelling = ismisspelling
+   						   socket.emit('sendmsg', {
+   							content: message,
+   							time: new Date(),
+                           myid: MYID,
+                           photo: MYPHOTO,
+                           pid: id
+   						   }) 
                      })
-                     //  console.log("gia tri la: " + ismisspelling)
-                     message.misspelling = ismisspelling
-						   socket.emit('sendmsg', {
-							content: message,
-							time: new Date(),
-                        myid: MYID,
-                        photo: MYPHOTO,
-                        pid: id
-						   }) 
-                  })
-						//reset input box
-						document.getElementById(id + "_mymsg").value = "";
-
-					}
+   						//reset input box
+   						document.getElementById(id + "_mymsg").value = "";
+					   }
 			  	   }else{//nguoi dung dang nhap ban phim
 			  		   socket.emit('chatting', {
                      myid: MYID,
@@ -464,7 +463,7 @@
                      if(MESSAGE_TO_YOU_TITLE_PAGE.length == 1){
                         for(var ind = 0; ind < INFORCOMMUNITY.length; ind++){
                            if(MESSAGE_TO_YOU_TITLE_PAGE[ind]==INFORCOMMUNITY[ind].infor.id){
-                              var arrName = INFORCOMMUNITY[ind].infor.name.split(" ")
+                              var arrName = INFORCOMMUNITY[ind].infor.name.split(" ")//lay ten cuoi
                               Messsage = arrName[arrName.length - 1]
                               break
                            }
@@ -535,22 +534,29 @@
 				   var seenmsg = document.getElementsByClassName(data.myid+"_seen")
 				   if(seenmsg.length > 0)
 					   seenmsg[seenmsg.length-1].style.display = "block"
-		       })	
+		      })	
             
-            var TIME_TYPING = 4500;
+            var TIME_TYPING = 2200;
+            var timeout = null;//setTimeout function hien thi thong tin nguoi dung nhap tin nhan
             //nguoi dung dang nhap tin nhan
             socket.on('typing...', function(data){
             	//xóa dòng đã xem tin nhắn
             	var seenmsg = document.getElementsByClassName(data.myid+"_seen")
             	if(seenmsg.length > 0)
-					seenmsg[seenmsg.length-1].style.display = "none"
-
+					   seenmsg[seenmsg.length-1].style.display = "none"
+               
             	if(parseInt(data.pid) == parseInt(MYID)){
             		document.getElementById(data.myid+"_typing").style.display = "block"
-            		setTimeout(function(){
-            			document.getElementById(data.myid+"_typing").style.display = "none"
-            		}, TIME_TYPING)
-            		
+
+                  if(timeout){
+                     clearTimeout(timeout);
+                     timeout = null
+                  }
+                  else{
+            		   timeout = setTimeout(function(){
+            			   document.getElementById(data.myid+"_typing").style.display = "none"
+            		   }, TIME_TYPING) 
+                  }
             	}
             })
 

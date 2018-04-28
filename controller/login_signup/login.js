@@ -21,7 +21,8 @@ function existAccount(email, cb)
      })
 }
 
-
+///https://accounts.google.com/DisplayUnlockCaptcha.
+//neu gap loi khong the dung nodemailer de dăng nhap vao tai khoan gmail
 router.route('/user/login')
  .post(function(req, res)
 {	
