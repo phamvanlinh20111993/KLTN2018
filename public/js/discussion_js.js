@@ -123,7 +123,7 @@ var formatTime = function(datestr){
 
 var Notify = function(){
 	$('#Notify_post').modal('show')
-
+	document.getElementById("notifyposticon").innerHTML = "(0)"
 }
 
 
@@ -1160,7 +1160,7 @@ socket.on("notifypostdone", function(data){
 
 	if(istrue){
 		var notifynow = document.getElementById("notifyposticon").innerHTML
-		var numofnotify = parseInt(notifynow.substring(2, notifynow.length-1))
+		var numofnotify = parseInt(notifynow.substring(1, notifynow.length-1))
 		var audio1 = new Audio('/data/sound/AmBao.mp3');
       audio1.play();
       audio1.volume = 1.0
@@ -1173,7 +1173,7 @@ socket.on("notifycmtdone", function(data){
 	console.log(data)
 	if(data.ownpost == MYID){
 		var notifynow = document.getElementById("notifyposticon").innerHTML
-		var numofnotify = parseInt(notifynow.substring(2, notifynow.length-1))
+		var numofnotify = parseInt(notifynow.substring(1, notifynow.length-1))
 		var audio1 = new Audio('/data/sound/AmBao.mp3');
       audio1.play();
       audio1.volume = 1.0
@@ -1186,7 +1186,7 @@ socket.on("notifylikedone", function(data){
 	console.log(data)
 	if(data.ownpost == MYID){
 		var notifynow = document.getElementById("notifyposticon").innerHTML
-		var numofnotify = parseInt(notifynow.substring(2, notifynow.length-1))
+		var numofnotify = parseInt(notifynow.substring(1, notifynow.length-1))
 		var audio1 = new Audio('/data/sound/AmBao.mp3');
       audio1.play();
       audio1.volume = 1.0
