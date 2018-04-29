@@ -598,20 +598,58 @@ io.on('connection', function(client)
    //tao cac thong bao thong thao luan
    //thong bao ve bai dang
    client.on('notifypost', function(data){
-      if(client.handshake.session.community)
-         io.sockets.in(client.handshake.session.community).emit('notifypostdone', data)
+      if(client.handshake.session.community){
+         if(data.user_id){
+            querysimple.selectTable("follow", ["followers"], [{op: "", field: "tracked", value: data.user_id}],
+               null, null, null, function(result, fields, err){
+                  if (err) {throw err}
+                  else{
+                     var listwasfollowed = []
+                     for(var ind = 0; ind < result.length; ind++){
+                        listwasfollowed[ind] = result[ind].followers
+                     }
+
+                     data.listwasfollowed = listwasfollowed
+                     io.sockets.in(client.handshake.session.community).emit('notifypostdone', data)
+                  }
+            })
+                  
+         }
+         
+      }
    })
 
    //thong bao ve bai dang
    client.on('notifycmt', function(data){
-      if(client.handshake.session.community)
-         io.sockets.in(client.handshake.session.community).emit('notifycmtdone', data)
+      if(client.handshake.session.community){
+         if(data.post_id){
+            querysimple.selectTable("post", ["user_id"], [{op: "", field: "id", value: data.post_id}],
+               null, null, null, function(result, fields, err){
+                  if (err) {throw err}
+                  else{
+                     data.ownpost = result[0].user_id
+                     io.sockets.in(client.handshake.session.community).emit('notifycmtdone', data)
+                  }
+            })
+         }
+      }
    })
 
    //thong bao ve bai dang
    client.on('notifylike', function(data){
-      if(client.handshake.session.community)
-         io.sockets.in(client.handshake.session.community).emit('notifylikedone', data)
+      if(client.handshake.session.community){
+         if(data.post_id){
+            querysimple.selectTable("post", ["user_id"], [{op: "", field: "id", value: data.post_id}],
+               null, null, null, function(result, fields, err){
+                  if (err) {throw err}
+                  else{
+                     data.ownpost = result[0].user_id
+                     io.sockets.in(client.handshake.session.community).emit('notifylikedone', data)
+                  }
+            })
+         }
+        
+      }
    })
 
 })

@@ -290,8 +290,7 @@ var selectUserCommunity = function(){
       if(err) alert(err)
       else{
          var size = data.community.length;
-         var ind = 0;
-         for(ind = 0; ind < size; ind++)
+         for(var ind = 0; ind < size; ind++)
             showUserCommunity(data.community[ind])
       }
    })

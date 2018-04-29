@@ -807,6 +807,7 @@ var submitComment = function(e, postid, ownpostid){
 					showComment({id: postid, own: MYID}, data, User, 1)
 					//tao socket thong bao binh luan den chu bai dang
 					socket.emit("notifycmt", {
+						post_id: postid,
 						cmt_id: dataid.res,//mã bình luận
 						user_id: MYID,//mã người đăng bình luận
 						photo: MYPHOTO,
@@ -1149,15 +1150,46 @@ socket.on('turnoncmtnotify', function(data){
 //take event cac thong bao like bai dang, binh luạn bai đăng, tạo bài dăng
 //tao bai đăng, ngưởi tạo bài dăng sẽ gửi thông báo đến những người theo dõi mk
 socket.on("notifypostdone", function(data){
-	console.log(data)
+	var istrue = false;
+	for(var ind = 0; ind < data.listwasfollowed.length; ind++){
+		if(parseInt(MYID) == parseInt(data.listwasfollowed[ind])){
+			istrue = true;
+			break;
+		}
+	}
+
+	if(istrue){
+		var notifynow = document.getElementById("notifyposticon").innerHTML
+		var numofnotify = parseInt(notifynow.substring(2, notifynow.length-1))
+		var audio1 = new Audio('/data/sound/AmBao.mp3');
+      audio1.play();
+      audio1.volume = 1.0
+		document.getElementById("notifyposticon").innerHTML = "("+(numofnotify+1)+")"
+	}
 })
 
 //binh luan bai dang, người đăng bình luận sẽ gửi thông báo đến chủ bài đăng
 socket.on("notifycmtdone", function(data){
 	console.log(data)
+	if(data.ownpost == MYID){
+		var notifynow = document.getElementById("notifyposticon").innerHTML
+		var numofnotify = parseInt(notifynow.substring(2, notifynow.length-1))
+		var audio1 = new Audio('/data/sound/AmBao.mp3');
+      audio1.play();
+      audio1.volume = 1.0
+		document.getElementById("notifyposticon").innerHTML = "("+(numofnotify+1)+")"
+	}
 })
 
 //thich bai dang, người thích bài đăng sẽ gửi thông báo đến chủ bài đăng
 socket.on("notifylikedone", function(data){
 	console.log(data)
+	if(data.ownpost == MYID){
+		var notifynow = document.getElementById("notifyposticon").innerHTML
+		var numofnotify = parseInt(notifynow.substring(2, notifynow.length-1))
+		var audio1 = new Audio('/data/sound/AmBao.mp3');
+      audio1.play();
+      audio1.volume = 1.0
+		document.getElementById("notifyposticon").innerHTML = "("+(numofnotify+1)+")"
+	}
 })

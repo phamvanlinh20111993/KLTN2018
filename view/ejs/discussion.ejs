@@ -131,15 +131,38 @@
 
 
 
-<div class="modal fade" id="Notify_post" role="dialog">
-    <div class="modal-dialog modal-lg">
+  <div class="modal fade" id="Notify_post" role="dialog">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Thông báo</h4>
         </div>
-        <div class="modal-body">
-          <p>Nội dung</p>
+        <div class="modal-body" style="height: 475px;overflow-y: scroll;">
+            <table class="notifymessage" style="border: 1px solid red;width:100%;">
+            <tr style="border-top: 0px;">
+              <td style="padding: 2%;"><img src="<%= user[0].photo %>" class="img-circle" alt="Avatar" height="45" width="45"></td>
+              <td style="width: 85%;">
+                <div style="height: auto;width: auto;margin-left: 4%;">
+                  <span style="font-style: italic;font-size: 120%;font-weight: bold;">Hoang Anh</span>
+                  <span style="font-size: 95%;"> đã bình luận trên bài đăng của bạn.</span></br>
+                  <span style="font-size: 95%;"> Thứ 3, 23:05 PM </span>
+                </div>
+              </td>
+            </tr>
+
+            <tr style="border-top: 0px;">
+              <td style="padding: 2%;"><img src="<%= user[0].photo %>" class="img-circle" alt="Avatar" height="45" width="45"></td>
+              <td style="width: 85%;">
+                <div style="height: auto;width: auto;margin-left: 4%;">
+                  <span style="font-style: italic;font-size: 120%;font-weight: bold;">Hoang Anh</span>
+                  <span style="font-size: 95%;"> đã bình luận trên bài đăng của bạn.</span></br>
+                  <span style="font-size: 95%;"> Thứ 4, 23:05 PM </span>
+                </div>
+              </td>
+            </tr>
+            
+          </table>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
@@ -257,7 +280,7 @@
 
 
                 <li style="text-align: left;margin-top:4%;"><a href="#" onclick="Notify()"><span style="font-size: 130%;">
-                   <span class="glyphicon glyphicon-bullhorn"></span> <span style="margin-left: 10%;">Thông báo</span>
+                   <span class="glyphicon glyphicon-bullhorn"></span> <span style="margin-left: 10%;">Thông báo</span> <span style="color: red;" id="notifyposticon"> (0)</span>
                </span></a></li>
 
             </ul>
@@ -273,7 +296,7 @@
 
           <div class="form-group" style="margin-top: 4%;" id="commentinpost">
             <textarea class="form-control" rows="4" placeholder="Viết nội dung vào đây..." style="width: 100%;border-right: 0px;border-left: 0px;"></textarea>
-            <p style="color: red;font-style: inherit;display: none;">##) Do not empty this field.</p>
+            <p style="color: red;font-style: inherit;display: none;">##) Không để trống trường này.</p>
           </div>
          <!-- <a href="#">
             <input id="file-0a" class="file"  style="margin-left: 20%;" name = "tep" type="file" multiple data-min-file-count="1"> 

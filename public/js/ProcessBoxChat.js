@@ -814,7 +814,7 @@
                             '<div class="text text-l">' +
                             messageType+
                     '</li>'+
-                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">seen at '+Time+'</div>';  
+                    '<div style="font-size:80%;display:none;" class="'+id+'_seen">Đã xem lúc '+Time+'</div>';  
 
 				document.getElementById(id+"_content").innerHTML +=  control;
 
@@ -976,9 +976,9 @@
 						if(data.content.error == null){
 							if(data.content.value == ""){
 								if(data.content.language == MYPRIOEX)
-                                    showcheckedmis.innerHTML = "your message ok."
+                                    showcheckedmis.innerHTML = "Tin nhắn không lỗi."
                                 else
-                                    showcheckedmis.innerHTML = "your message ok. But not your exchange language."
+                                    showcheckedmis.innerHTML = "Tin nhắn không lỗi. Nhưng không đúng ngôn ngữ trao đổi."
                                     document.getElementById(id+"_check").style.color = "#337ab7"
 							}else{
 								if(data.content.language == MYPRIOEX){
@@ -986,12 +986,12 @@
 									document.getElementById(id+"_check").style.color = "red"
 								}
 								else{
-									showcheckedmis.innerHTML = "Detected language: " + data.content.language +"(symbol)"
+									showcheckedmis.innerHTML = "Phát hiện ngôn ngữ: " + data.content.language +"(symbol)"
 									document.getElementById(id+"_check").style.color = "yellow"
 								}
 							}
 						}else
-							showcheckedmis.innerHTML = "Not match with your language.  Error misspelling."
+							showcheckedmis.innerHTML = "Không phù hợp với ngôn ngữ của bạn. Lỗi chính tả."
 					})
 				}
 			}

@@ -27,14 +27,14 @@ router.route('/user/createPost')
 		var resobj = req.body.data
 		var value = [req.session.user_id, resobj.content, resobj.title, 0, 
 		               getDateTime(new Date(resobj.time)), resobj.laid]
-		querysimple.insertTable("post", field, value, function(result, fields, err){
-			if(err) throw err
-			else{
+	//	querysimple.insertTable("post", field, value, function(result, fields, err){
+		//	if(err) throw err
+		//	else{
 				postcomment.selectMaxIdTable("post", function(data){
 					res.json({resp: parseInt(data)})
 				})
-			}
-		})
+	//		}
+	//	})
 	}
 })
 
@@ -47,13 +47,13 @@ router.route('/user/createcmt')
 		var field = ["post_id", "user_id", "content", "ctime"]
 		var value = [rqdata.id, rqdata.uid, rqdata.content, getDateTime(new Date(rqdata.time))]
 		postcomment.selectMaxIdTable("comment", function(data){
-			querysimple.insertTable("comment", field, value, function(result, fields, err){
-				if(err) throw err
-				else{
+		//	querysimple.insertTable("comment", field, value, function(result, fields, err){
+		//		if(err) throw err
+		//		else{
 					var idcmt = parseInt(data) + 1
 					res.json({res: idcmt})
-				}
-			})
+		//		}
+		//	})
 		})
 	}
 })
@@ -125,14 +125,14 @@ router.route('/user/likepost')
 						//	console.log("time la " + time)
 							var field = ["id_user", "id_post", "ctime"]
 							var value = [req.session.user_id, postid, time]
-							querysimple.insertTable("likes_post", field, value, function(result, err){
-								if(err) throw err
-								else{
+						//	querysimple.insertTable("likes_post", field, value, function(result, err){
+						//		if(err) throw err
+						//		else{
 									postcomment.selectMaxIdTable("likes_post", function(data){
 								 		res.json({response: result.affectedRows})
 								 	})
-								}
-							})
+						//		}
+						//	})
 						}else
 							res.json({response: "No data."})
 					}

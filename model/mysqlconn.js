@@ -15,7 +15,7 @@ var con = mysql.createConnection({
   password: "9wWUf9NFSM",
   database: "sql12234645",
   charset: "utf8_general_ci"
-}); 
+});
 
 con.connect(function(err) {
   if (err) throw err;
