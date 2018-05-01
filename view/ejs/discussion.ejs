@@ -479,7 +479,12 @@
     });
    
     socket.on('connect_error', function(err){
-      alert(err)
+      alert(err + ". Lỗi kết nối server.")
+    })
+
+    //loi timeout
+    socket.on('connect_timeout', function(err){
+      alert(err + ". Thời gian phản hồi quá lâu.")
     })
 
     socket.on('numofuseronline', function(signal){

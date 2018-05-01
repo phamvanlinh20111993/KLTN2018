@@ -231,17 +231,14 @@ var selectPostById = function(myid, pid, cb)
          var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime AS ptime, ti.name AS tiname,"+
                " p.turnof_cmt, ti.id AS tid, u.email, u.name AS uname, u.photo, u.score, p.isedit, "+
                " le.level, (SELECT COUNT(*) FROM comment c WHERE p.id=c.post_id) AS totalc,"+
-               " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike, "+
-               " (SELECT ctime FROM post where post.id = p.id"+
-               " AND (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+"))"+
-               " AS timepostfl FROM post p"+
+               " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike "+
+               " FROM post p"+
                " JOIN user u ON p.user_id = u.id"+
                " JOIN post_title ti ON ti.id = p.title_id"+
                " JOIN level le ON le.id = u.level_id"+
                " JOIN exchangelg ex ON ex.user_id = u.id"+
                " JOIN language la ON la.id = ex.language_id "+
                " LEFT JOIN follow fo ON (p.user_id = fo.tracked AND fo.followers="+mysql.escape(myid)+")"+
-               " LEFT JOIN likes_post li ON li.id_post = p.id "+
                " LEFT JOIN likes_post li1 ON (li1.id_user = "+ mysql.escape(myid)+" AND li1.id_post = p.id )"+
                " WHERE p.id = "+mysql.escape(pid)+
                " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+

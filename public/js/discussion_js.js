@@ -65,7 +65,7 @@ var requestServer = function(url, type, data, choose, cb){
           //  console.log("da chay thanh cong ham request")
         }
         else{
-        	cb("An unknown error. ", null)
+        	   cb("Lỗi không xác định. ", null)
            	console.log("xay ra loi khong xac dinh. Sorry!!!")
         }
     };
@@ -81,7 +81,7 @@ var requestServer = function(url, type, data, choose, cb){
         		var data_response = JSON.parse(xhr.responseText);
             	cb(null, data_response)
             }else{
-            	var err = "Mã trạng thái: " + xhr.status + ". Request bị hủy."
+            	var err = "Mã trạng thái: " + xhr.status + ". Request trang web bị hủy."
             	cb(err, null)
             }
         }
