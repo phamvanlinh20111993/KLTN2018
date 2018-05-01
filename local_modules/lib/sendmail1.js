@@ -13,21 +13,21 @@ function sendMail(email, code, url, type, Callback)
 
     if(type == 0){//authenticate
     	this.title = 'Mã xác thực tài khoản đăng kí Language exchange';
-    	str = '<div><div><span style="font-size:150%;color:red;"><i>Chao mung ban da dang nhap vao' 
-		str += ' he thong Exchange English Language cua chung toi!!!</i></span></div><div>'
-		str += '<p>Ma xac thuc tai khoan cua ban la: </p><b>'+code+'</b></br>'
-		str += '<p>Hoac truy cap vao duong dan sau:</p>';
+    	str = '<div><div><span style="font-size:150%;color:red;"><i>Chào mừng bạn đã đăng nhập vào' 
+		str += ' dịch vụ trực tuyến trao đổi ngôn ngữ  của chúng tôi !!!</i></span></div><div>'
+		str += '<p>Mã xác thực tài khoản của bạn là: </p><b>'+code+'</b></br>'
+		str += '<p>Hoặc truy cập vào đường dẫn sau:</p>';
 		str += '<a style="color:blue;cursor:pointer;" href="'+App_url+url+'" target="_blank">'+App_url+url+'</a></div></div>'
     }else{
     	this.title = 'Mã xác thực tài khoản người dùng';
    		str = '<div><div><span style="font-size:150%;color:red;"><i>Email của bạn đã được xác thực!!!</i>'
-	    str += '</span></div><div><p>Ma xac nhan lai tai khoan cua ban la: </p><b>'+code+'</b></br>';
-	    str += '<p>Hoac truy cap vao duong dan sau:</p>';
+	    str += '</span></div><div><p>Mã xác nhận lại tài khoản của bạn là: </p><b>'+code+'</b></br>';
+	    str += '<p>Hoặc truy cập vào đường dẫn sau:</p>';
 	    str += '<a style="color:blue;cursor:pointer;" href="'+App_url+url+'">'+App_url+url+'</a></div></div>'
     }
 
     let transporter = nodemailer.createTransport(smtpTransport({
-		service: "Gmail" ,
+		service: "Gmail",
 		auth: {
 			user: "duanwebptudweb@gmail.com",
 			pass: "DuAnWebPTUDWEB123",

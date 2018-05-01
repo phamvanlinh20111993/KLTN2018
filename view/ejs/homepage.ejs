@@ -91,14 +91,14 @@
 
 
    .popup122 {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+   }
 
 /* The actual popup */
 .popup122 .popuptext {
@@ -110,8 +110,8 @@
     padding: 8px 0;
     position: fixed;
     z-index: 1;
-    margin-left:1140px;
-    margin-top: 120px;
+    margin-left:85%;
+    margin-top: 10%;
 }
 
  .notifymessage td{
@@ -169,7 +169,7 @@
 
    
 <div class="popup122" id="myPopupdiv" style="display:none;">
-  <span class="popuptext" id="myPopupcommunity"><span class="glyphicon glyphicon-refresh"></span> Someone is online, refresh page!</span>
+  <span class="popuptext" id="myPopupcommunity"><span class="glyphicon glyphicon-refresh"></span> Ai đó đang trực tuyến, load lại trang!</span>
 </div>
 
   <div class="modal fade" id="InformationEditMessage" role="dialog">
@@ -202,7 +202,7 @@
 
         <div class="modal-body" style="height: 475px;overflow-y: scroll;">
          
-          <table class="notifymessage">
+        <!--  <table class="notifymessage">
             <tr style="border-top: 0px;">
               <td style="padding: 2%;"><img src="<%= user[0].photo %>" class="img-circle" alt="Avatar" height="45" width="45"></td>
               <td style="width: 80%;">
@@ -229,7 +229,7 @@
               </td>
             </tr>
 
-          </table>
+          </table>-->
         </div>
 
         <div class="modal-footer">
@@ -393,16 +393,16 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Video call</h4>
+          <h4 class="modal-title">Gọi video</h4>
         </div>
         <div class="modal-body">
             <img src="" class="img-circle" alt="Cinque Terre">
-            <p>want to connect with you...</p>
-            <button type="button" class="btn btn-warning">Accept</button>
-            <button type="button" class="btn btn-success">Refuse</button>
+            <p>muốn kết nối với bạn...</p>
+            <button type="button" class="btn btn-warning">Chấp nhận</button>
+            <button type="button" class="btn btn-success">Từ chối</button>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
         </div>
       </div>
     </div>

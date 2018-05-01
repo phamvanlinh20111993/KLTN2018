@@ -112,6 +112,29 @@
       background-color:yellow;
     }
 
+    .popup122 {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+   }
+
+   /* The actual popup */
+   .popup122 .popuptext {
+      width: 260px;
+      background-color: #ccc;
+      color: red;
+      border-radius: 6px;
+      padding: 8px 0;
+      position: fixed;
+      z-index: 1;
+      margin-left:78%;
+      margin-top: 30%;
+   }
+
   </style>
   <script type="text/javascript">
       var MYID = parseInt("<%= session.user_id  %>")
@@ -121,7 +144,6 @@
       var MYPRIOEX = "<%= session.myexchange %>"
       var MYPRIONATID = "<%= session.mynativeid %>"
       var MYPRIOEXID = "<%= session.myexchangeid %>"
-      console.log(MYPRIOEXID)
 
   </script>
 
@@ -129,7 +151,22 @@
 
 <body data-spy="scroll" data-target=".navbar" data-offset="0">
 
+   <div class="popup122" id="myPopupdivNotify" style="display:none;">
+     <div class="popuptext" id="myPopupDisscusion">
+         <table>
+           <tr>
+           <td style="padding: 3px;"> <img src="<%= session.photo %>" class="img-circle" alt="Cinque Terre" height="40" width="40"> </td>
+            <td><span style="color: black;font-style: italic;font-weight: bold;">Linh văn </span>
+          <a style="cursor: pointer;text-decoration: none;">đã bình luận trên bài đăng của bạn</a></td>
+          </tr>
 
+            <tr>
+               <td></td>
+               <td><span style="font-style: italic;color: black;">Một giờ trước</span></td>
+            </tr>
+         </table>
+     </div>
+   </div>
 
   <div class="modal fade" id="Notify_post" role="dialog">
     <div class="modal-dialog">
@@ -139,7 +176,7 @@
           <h4 class="modal-title">Thông báo</h4>
         </div>
         <div class="modal-body" style="height: 475px;overflow-y: scroll;">
-            <table class="notifymessage" style="border: 1px solid red;width:100%;">
+         <!--   <table class="notifymessage" style="border: 1px solid red;width:100%;">
             <tr style="border-top: 0px;">
               <td style="padding: 2%;"><img src="<%= user[0].photo %>" class="img-circle" alt="Avatar" height="45" width="45"></td>
               <td style="width: 85%;">
@@ -162,7 +199,7 @@
               </td>
             </tr>
             
-          </table>
+          </table>-->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
@@ -395,6 +432,9 @@
 
 
      <div class="col-lg-2 sidenav" style="height:100%;width: 13%;border: 1px solid #BBBBBB;position:fixed;margin-left:87%;">
+      <div style="border-style: outset;border-left: 0px;border-right: 0px;">
+          <h2 style="text-align: right;">Online<span style="color: red;" id="numofusersonline"> (0)</span></h2>
+      </div>
      <h3>Lọc theo chủ đề</h3>
      <select class= "form-control" style="width: 100%;" id="fitlerbytopicpost" data="tooltip" title="show posts by topic" onchange="filterByTopicPost()">
         <option style="font-size:130%;" value="value"><b>giá trị</b></option>
@@ -440,6 +480,11 @@
    
     socket.on('connect_error', function(err){
       alert(err)
+    })
+
+    socket.on('numofuseronline', function(signal){
+      if(signal < 1) signal = 1
+        document.getElementById("numofusersonline").innerHTML = " (" + (parseInt(signal)-1) + ")"
     })
 </script>
 

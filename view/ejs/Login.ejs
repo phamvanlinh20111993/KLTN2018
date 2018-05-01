@@ -274,6 +274,14 @@
       Login_form_p_pass.getElementsByTagName("span")[0].innerHTML = ""
    }
 
+   Login_form_input_pass.addEventListener("keyup", function(e){
+      if(e.keyCode == 13){
+         if(validateEmail(Login_form_input_email.value) 
+            && validatePassword(Login_form_input_pass.value)){
+            Login_form.submit()
+         }
+      }
+   })
 
    
 </script>

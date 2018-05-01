@@ -14,6 +14,7 @@ var passport = require('passport')
 var mysql = require('mysql');
 var cloudinary = require('cloudinary')
 var engines = require('consolidate');
+var con = require('./model/mysqlconn')
 
 var port = process.env.PORT||5050;
 app.use(passport.initialize());
@@ -63,40 +64,6 @@ app.use(function(req, res, next){
 	res.locals.session = req.session;//su dung session trong file client vi du session.name trong file home.ejs
 	next();
 });
-
-/*var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "KLTN_ExLanguage",
-  charset: "utf8_general_ci"
-}); */
-
-/*
-   Server: sql12.freemysqlhosting.net
-Name: sql12234645
-Username: sql12234645
-Password: 9wWUf9NFSM
-Port number: 3306
-*/
-
-var con = mysql.createConnection({
-  host: "sql12.freemysqlhosting.net",
-  user: "sql12234645",
-  password: "9wWUf9NFSM",
-  database: "sql12234645",
-  charset: "utf8_general_ci"
-});
-
-//account: thaithelong1995@gmail.com
-//pass: L12345678aaaaaaaaaaa
-//page: https://www.freemysqlhosting.net/account/
-
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Mysql Connected Successful in Control App file!");
-});
-//var connection = mysql.createConnection('mysql://user:pass@host/db?debug=true&charset=BIG5_CHINESE_CI&timezone=-0700');
 
 
 //config cloudinary
@@ -658,3 +625,4 @@ io.on('connection', function(client)
 server.listen(port, function(){
 	console.log('Server running on port %s!', port)
 });
+

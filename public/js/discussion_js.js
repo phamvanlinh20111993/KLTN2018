@@ -81,7 +81,7 @@ var requestServer = function(url, type, data, choose, cb){
         		var data_response = JSON.parse(xhr.responseText);
             	cb(null, data_response)
             }else{
-            	var err = "Status code err: " + xhr.status
+            	var err = "Mã trạng thái: " + xhr.status + ". Request bị hủy."
             	cb(err, null)
             }
         }
@@ -120,6 +120,20 @@ var formatTime = function(datestr){
 	return Hours+":"+ date.getMinutes() + " "+
 			Day + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
 }
+
+function formatAMPMDate(date)
+{
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+	var ampm = hours >= 12 ? 'PM' : 'AM';
+	var Dayoftheweek = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"]
+	hours = hours % 12;
+	hours = hours ? hours : 12; // the hour '0' should be '12'
+	minutes = minutes < 10 ? '0'+minutes : minutes;
+	var strTime = Dayoftheweek[date.getDay()] +", " + hours + ':' + minutes + ' ' + ampm ;
+
+	return strTime;
+}          
 
 var Notify = function(){
 	$('#Notify_post').modal('show')
@@ -233,7 +247,7 @@ var showPost = function(User, Posts, state)
 	else
 		contenlikepost='<span id="'+id+'_stringnumlike"></span><span>'+Posts.totalliked+'</span> người đã thích bài đăng.</a></div>'
 
-    element = '<div class="popup-box4" id="'+id+'_posts">'+
+   element = '<div class="popup-box4" id="'+id+'_posts">'+
 
              '<div class="dropdown">'+
               '<a class="dropbtn"><h5 class="glyphicon glyphicon-chevron-down"></h5></a>'+
@@ -408,6 +422,7 @@ var likeOrDis = function(id){
 				socket.emit("notifylike", {
 					post_id: id, //mã bài đăng
 					user_id: MYID,//mã người thích bài đăng
+					myname: MYNAME,
 					photo: MYPHOTO,
 					time: new Date()
 				})
@@ -767,8 +782,10 @@ var submitPost = function(){
 				//tao socket thong bao post den nguoi dung
 				socket.emit("notifypost", {
 					post_id: data.resp,//mã bài đăng
+					title: selectTitle[selectTitle.selectedIndex].text,
 					user_id: MYID,//mã người tạo bài đăng
 					photo: MYPHOTO,
+					myname: MYNAME,
 					time: new Date()
 		      })
 			}
@@ -811,6 +828,7 @@ var submitComment = function(e, postid, ownpostid){
 						cmt_id: dataid.res,//mã bình luận
 						user_id: MYID,//mã người đăng bình luận
 						photo: MYPHOTO,
+						myname: MYNAME,
 						time: new Date()
 					})
 				}
@@ -1147,6 +1165,51 @@ socket.on('turnoncmtnotify', function(data){
 	}
 })
 
+var showPostByid = function(pid){
+	document.getElementById("showpostusers").innerHTML = ""
+	document.getElementById("myPopupdivNotify").style.display = "none"
+	  requestServer('/languageex/user/post/findpost', 'POST', {value: pid}, 0, function(err, data){
+		 if(err) alert(err)
+		 else{
+			var Length = data.data.length
+			if(Length > 0){
+		 		showPost(data.data[0].user, data.data[0].posts, 0)
+		 		requestComment({id: data.data[0].posts.pid, own: data.data[0].user.id})
+		 		document.getElementById("showpostusers").innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại trang chính</button>"
+		 	}else{
+		 		alert("Bài đăng không tồn tại.")
+		 		location.reload()
+		 	}
+		 }
+	 })
+}
+
+
+//hàm hiển thị thông báo trên giao diện có người thích bài đăng
+var showNofityDom = function(obj){
+	document.getElementById("myPopupdivNotify").style.display = "block"
+	var Element = '<div class="popuptext" id="myPopupDisscusion">'+
+         '<table>'+
+           '<tr>'+
+           '<td style="padding: 3px;"> <img src="'+obj.photo+'" class="img-circle" alt="" height="40" width="40"> </td>'+
+            '<td><span style="color: black;font-style: italic;font-weight: bold;">'+obj.name+'</span>'+
+          '<a href='+obj.link+' style="cursor:pointer;text-decoration:none;" onclick="showPostByid('+obj.postid+')">'+obj.title+'</a></td>'+
+         '</tr>'+
+
+            '<tr>'+
+               '<td></td>'+
+               '<td><span style="font-style: italic;color: black;">'+Change_date(new Date(obj.time))+'</span></td>'+
+            '</tr>'+
+         '</table>'+
+     '</div>'
+
+   document.getElementById("myPopupdivNotify").innerHTML = Element
+
+   setTimeout(function(){
+		document.getElementById("myPopupdivNotify").style.display = "none"
+   }, 15000)     
+}
+
 //take event cac thong bao like bai dang, binh luạn bai đăng, tạo bài dăng
 //tao bai đăng, ngưởi tạo bài dăng sẽ gửi thông báo đến những người theo dõi mk
 socket.on("notifypostdone", function(data){
@@ -1165,6 +1228,15 @@ socket.on("notifypostdone", function(data){
       audio1.play();
       audio1.volume = 1.0
 		document.getElementById("notifyposticon").innerHTML = "("+(numofnotify+1)+")"
+		var obj = {
+			photo: data.photo,
+			postid: data.post_id,
+			name: data.myname,
+			link: "#"+data.post_id+"_posts",
+			time: data.time,
+			title: ", người mà bạn theo dõi đã đăng bài về chủ đề " + data.title
+		}
+		showNofityDom(obj)
 	}
 })
 
@@ -1178,6 +1250,15 @@ socket.on("notifycmtdone", function(data){
       audio1.play();
       audio1.volume = 1.0
 		document.getElementById("notifyposticon").innerHTML = "("+(numofnotify+1)+")"
+		var obj = {
+			photo: data.photo,
+			name: data.myname,
+			link: "#"+data.post_id+"_posts",
+			postid: data.post_id,
+			time: data.time,
+			title: " đã bình luận trên bài đăng của bạn."
+		}
+		showNofityDom(obj)
 	}
 })
 
@@ -1191,5 +1272,19 @@ socket.on("notifylikedone", function(data){
       audio1.play();
       audio1.volume = 1.0
 		document.getElementById("notifyposticon").innerHTML = "("+(numofnotify+1)+")"
+
+		var obj = {
+			photo: data.photo,
+			name: data.myname,
+			postid: data.post_id,
+			link: "#"+data.post_id+"_posts",
+			time: data.time,
+			title: " đã thích bài đăng của bạn."
+		}
+		showNofityDom(obj)
 	}
 })
+
+
+
+

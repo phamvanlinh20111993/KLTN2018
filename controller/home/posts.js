@@ -135,6 +135,17 @@ router.route('/user/post/search')
 	}
 })
 
+//filter post by name or filter
+router.route('/user/post/findpost')
+.post(function(req, res){
+	if(req.session.user_id){
+		var pid = req.body.data.value
+		postcomment.selectPostById(req.session.user_id, pid, function(data){
+			res.json({data: data})
+		})
+	}
+})
+
 //filter post by topic post
 router.route('/user/post/filter')
 .post(function(req, res){

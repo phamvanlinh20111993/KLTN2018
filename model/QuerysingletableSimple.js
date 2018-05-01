@@ -201,7 +201,7 @@ var deleteTable = function(tbname, whcondi, cb){
 		}
 	}
 
-//	console.log("Query: " + sqlString)
+	console.log("Query: " + sqlString)
    //start transaction
 	con.beginTransaction(function(err){
 		if(err){
