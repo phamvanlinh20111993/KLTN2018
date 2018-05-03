@@ -250,7 +250,7 @@ var selectUser = function(email, cb){//hien thi nguoi dung
 }
 
 //hien thi tin nhan giua nguoi dung idme va nguoi dung idB
-var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
+var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(phuc tap)
 
 	var sqlString = "SELECT u.id, u.name, u.photo, u.score" +
 	 		    " FROM user u JOIN message me ON (u.id = me.userA OR u.id = me.userB)"+
@@ -297,7 +297,8 @@ var selectMessage = function(idme, idB, cb){//nhan tin voi nguoi khac(phuc tap)
 	 		    		 	" WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
 	 					 	" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
 	 					 	deltime +
-	 					 	" ORDER BY me.time DESC"
+	 					 	" ORDER BY me.time DESC"+
+	 					 	" LIMIT "+ lmp + " ," +lmn
 
 	 					   console.log(sqlString2)
 
@@ -602,7 +603,7 @@ var selectUserCommunityNative = function(id, cb){
 
 
 //tra ve cong dong nguoi dung su dung exchange language voi nguoi dung id
-var selectUserCommunityEx = function(id, searchcd, cb){
+var selectUserCommunityEx = function(id, lmp, lmn, searchcd, cb){
 	//select my id, my exchangelanguage
 	var sqlstr = "SELECT user.id, exchangelg.language_id AS exid FROM user "+
 			  " JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(id)+
@@ -624,7 +625,8 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 			}
 			if(resu.length > 1) orcondi +=")"
 
-			var searchcondition = ""
+			 var searchcondition = ""
+			 var limit = " LIMIT "+lmp + ", "+ lmn
 		    var morefield = "bll.blockwho AS blockuser1, bll.reason, bll.ctime AS timebluser, ",
 		    morejoin = " LEFT JOIN blocklist_user bll ON (bll.whoblock= u.id "+
 							" AND bll.blockwho = "+mysql.escape(id)+") "
@@ -638,6 +640,7 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 				morefield = "bll.blockwho AS blockuser, bll.reason, bll.ctime AS timebluser, "
 				morejoin = " LEFT JOIN blocklist_user bll ON (bll.whoblock="+mysql.escape(id)+
 							" AND bll.blockwho = u.id) "
+				limit = ""//tim kiem cac ket qua khong gioi han
 			}
 
 			//all user online and have max lever sorted, max level
@@ -654,7 +657,8 @@ var selectUserCommunityEx = function(id, searchcd, cb){
 				" WHERE u.id != " +mysql.escape(id)+ " AND "+orcondi+" AND ex.prio = 1"+
 				 blockusers+
 				 searchcondition +
-				" ORDER BY u.state DESC, le.level ASC";
+				" ORDER BY u.state DESC, le.level ASC "+
+				limit
 
 			console.log(sqlString)
 
@@ -748,7 +752,7 @@ var selectSpecificUserMessenger = function(id, pid, cb)
 	        " OR (me.userA="+mysql.escape(id)+" AND me.userB="+mysql.escape(pid)+") "+
 	        " LEFT JOIN follow fo ON (fo.followers="+mysql.escape(id)+" AND tracked="+mysql.escape(pid)+")"+
 	        " WHERE u.id = "+mysql.escape(pid)+
-	        " AND u.id not IN(SELECT blockwho from blocklist_user WHERE whoblock="+mysql.escape(id)+")"+
+	        " AND u.id not IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(id)+")"+
 	        " ORDER BY max DESC, u.state DESC"
 
 	console.log(sqlString)
@@ -878,6 +882,71 @@ var getNotifyMessage = function(myid, cb){
 	})
 }
 
+var selectTotalUserInComunity = function(myid, cb){
+	//select my exchangelanguage with prio = 1
+	var sqlstr = "SELECT exchangelg.language_id AS exid FROM user "+
+			  " JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(myid)+
+			  " AND exchangelg.prio = 1"
+
+	con.query(sqlstr, function(err, result, field){
+		if(err){
+			throw err
+		}else{
+			var sqlString = "SELECT COUNT(u.id) AS total FROM user u "+
+			            " JOIN exchangelg ex ON(ex.user_id = u.id AND ex.language_id= "+result[0].exid+" AND ex.prio=1)"+
+		   				" WHERE u.id != " + parseInt(myid)+
+		   				" AND u.id not IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"
+
+		   console.log(sqlString)
+
+			con.query(sqlString, function(err1, result1, field1){
+				if(err1){
+					throw err1
+					cb(null)
+				}else{
+					cb(result1[0].total)
+				}
+			})
+		}
+	})
+}
+
+
+//total message between two users
+var selectTotalMsg = function(idme, idB, cb){
+	//delete conversation
+	var sqlString1 = "SELECT del.whodel, del.delwho, del.ctime" +
+	                 " FROM delconversation del WHERE del.whodel = " +mysql.escape(idme)+ 
+	                 " AND del.delwho = "+mysql.escape(idB)+
+	                 " ORDER BY del.ctime DESC LIMIT 1"
+
+	con.query(sqlString1, function(err1, result1, fields1){
+	   if(err) throw err;
+	   else{
+
+	      var deltime = ""
+	      console.log(result1)
+	      if(result1.length > 0)
+	         deltime = " AND me.time > '" + getDateTime(new Date(result1[0].ctime))+"'"
+	      //select all message between idme and idB 
+			var sqlString2 = "SELECT COUNT(me.id) AS total, "+
+						 	" FROM message me"+
+	 		    		 	" WHERE ((me.userA = "+mysql.escape(idme)+" AND me.userB = "+mysql.escape(idB)+")" +
+	 					 	" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
+	 					 	deltime +
+
+	 		console.log(sqlString2)
+
+	 		con.query(sqlString2, function(err2, result2, fields2){
+	 			if(err2) cb(null)
+	 			else
+	 				cb(result2[0].total)
+	 		})
+
+	   }
+	})
+}
+
 
 module.exports = {
 	insertTable: insertString,
@@ -898,5 +967,7 @@ module.exports = {
 	selectListUserMessengerCondition: selectListUserMessengerCondition,
 
 	takeMessageContent: takeMessageContent,
-	getNotifyMessage: getNotifyMessage
+	getNotifyMessage: getNotifyMessage,
+	selectTotalUserInComunity: selectTotalUserInComunity,
+	selectTotalMsg: selectTotalMsg
 }

@@ -119,7 +119,7 @@ var selectCmts = function(myid, postid, limit, cb){
 }
 
 //select all post from specific exchange language community
-var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
+var selectNotMyposts = function(myid, lmp, lmn, searchcondi, filtercondi, cb)
 {
 
    var sqlStr = "SELECT user.id, exchangelg.language_id AS exid FROM user "+
@@ -135,11 +135,15 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
       {
          var likesearchcondi = ""
          var likefilter = ""
-         if(searchcondi)
+         var limit = " LIMIT "+lmp+", "+lmn
+         if(searchcondi){
             likesearchcondi = " AND(u.name LIKE'%"+searchcondi+"%' OR u.email LIKE '%"+searchcondi+"%')"
+            limit = ""
+         }
          if(filtercondi){//search by title id
             if(parseInt(filtercondi) > 0 && parseInt(filtercondi) < 20)
                likefilter = " AND ti.id = "+parseInt(filtercondi)
+            limit = ""
          }
 
       	var sqlString = "SELECT p.id AS pid, p.user_id AS uid, p.content, p.ctime AS ptime, ti.name AS tiname,"+
@@ -162,10 +166,11 @@ var selectNotMyposts = function(myid, searchcondi, filtercondi, cb)
                likesearchcondi+
                likefilter +
                " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
-               " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
+             //  " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
                " AND p.language_id = " + parseInt(res[0].exid) +
                " GROUP BY p.id"+
-               " ORDER BY timepostfl DESC, p.ctime DESC"
+               " ORDER BY timepostfl DESC, p.ctime DESC"+
+               limit
 
          console.log(sqlString)
 
@@ -429,6 +434,36 @@ var selectRecentPost = function(myid, limit, cb)
 
 }
 
+//total post là post của tôi, gần đây hay là chung
+var selectTotalPost = function(myid, code, cb){
+   //select my exchangelanguage with prio = 1
+   var sqlstr = "SELECT exchangelg.language_id AS exid FROM user "+
+           " JOIN exchangelg ON exchangelg.user_id = user.id WHERE user.id = "+ parseInt(myid)+
+           " AND exchangelg.prio = 1"
+
+   con.query(sqlstr, function(err, result, field){
+      if(err){
+         throw err
+      }else{
+         var sqlString = "SELECT COUNT(p.id) AS total FROM post p "+
+                     " WHERE p.user_id != " + parseInt(myid)+
+                     " AND p.user_id not IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
+                     " AND p.language_id = " + result[0].exid
+
+         console.log(sqlString)
+
+         con.query(sqlString, function(err1, result1, field1){
+            if(err1){
+               throw err1
+               cb(null)
+            }else{
+               cb(result1[0].total)
+            }
+         })
+      }
+   })
+}
+
 
 module.exports = {
 	selectPosts_myfollow: selectPosts_myfollow,
@@ -438,5 +473,6 @@ module.exports = {
    selectUserLikePost: selectUserLikePost,
    selectRecentPost: selectRecentPost,
    selectMaxIdTable: selectMaxIdTable,
-   selectPostById: selectPostById
+   selectPostById: selectPostById,
+   selectTotalPost: selectTotalPost
 }

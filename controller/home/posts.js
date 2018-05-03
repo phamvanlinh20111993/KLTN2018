@@ -6,6 +6,7 @@ var md5 = require('md5') // su dung md5 ma hoa pass
 var postcomment = require('../../model/post_comments_query')
 var querysimple = require('../../model/QuerysingletableSimple')
 var anotherquery = require('../../model/Anotherquery')
+const LIMITPOST = 15;
 
 
 
@@ -116,9 +117,11 @@ router.route('/user/loadtitle')
 
 router.route('/user/loadpost')
 .post(function(req, res){
-	if(req.session.user_id){
+	var limit = parseInt(req.body.data.limit)
+	if(req.session.user_id && limit > -1){
+		limit *= LIMITPOST
 		//3 param, userid, search condition, fitle condition
-		postcomment.selectNotMyposts(req.session.user_id, null, null, function(data){
+		postcomment.selectNotMyposts(req.session.user_id, limit, LIMITPOST, null, null, function(data){
 			res.json({data: data})
 		})
 	}
@@ -129,7 +132,7 @@ router.route('/user/post/search')
 .post(function(req, res){
 	if(req.session.user_id){
 		var valuesearch = req.body.data.value
-		postcomment.selectNotMyposts(req.session.user_id, valuesearch, null, function(data){
+		postcomment.selectNotMyposts(req.session.user_id, null, null, valuesearch, null, function(data){
 			res.json({data: data})
 		})
 	}
@@ -218,6 +221,17 @@ router.route('/user/loadinfolikepost')
 				res.json({userslikedpost: data})
 			})
 		}
+	}
+})
+
+//info of user like post 
+router.route('/user/totalpost')
+.get(function(req, res){
+	var code = null
+	if(req.session.user_id){
+		postcomment.selectTotalPost(req.session.user_id, code, function(data){
+			res.json({total: data})
+		})
 	}
 })
 

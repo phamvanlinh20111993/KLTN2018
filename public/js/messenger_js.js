@@ -1,7 +1,7 @@
 
 var USERCHATNOW = {};//tra ve object infor cua nguoi dung dang nhan tin hien tai(dang click)]
 var CONSTANTSTRING = 38492124245347//random number
-var SCORING = 0;
+var SCORING = 0, COUNTLOADMSG = 0;
 
 //gui du lieu len server
 var Translate_or_Misspelling = function(url, myex, mynat, content, cb){
@@ -154,7 +154,7 @@ function loadMessage(uid, cb){
 	$.ajax({
         type: "GET",
         url: "/languageex/user/messages?uid="+encodeURIComponent(uid),
-        data:{},
+        data:{limit: COUNTLOADMSG},
         success: function(data)//hien thi message
         {
             if(typeof cb == "function")
@@ -386,6 +386,8 @@ var messageUser = function(uid)
   USERCHATNOW.photo = users.photo
   USERCHATNOW.email = users.email
   USERCHATNOW.name = users.name
+
+  COUNTLOADMSG = 0//reset value
 
   document.getElementById("user_pid_src").src = users.photo
   document.getElementById("user_pid_name").innerHTML = users.name

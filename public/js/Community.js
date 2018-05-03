@@ -1,15 +1,18 @@
 
+
+var COUNTLOADUSER = 0;
+
  //thay the tat ca string 'search' trong 'string' bang string 'replacement'
 var replaceAll = function(string, search, replacement) {
    return string.replace(new RegExp(search, 'g'), replacement);
 }
 
-var getListUserCommnunity = function(id, callback) {
+var getListUserCommnunity = function(id, limit, callback) {
 	// body...
 	$.ajax({
         type: "POST",
         url: "/languageex/home/community",
-        data:{id: id},
+        data:{id: id, limit: limit},
         error: function(xhr, status, error){
           callback(null, error)
         },
@@ -139,9 +142,9 @@ Object.size = function(obj) {
     return size;
 };
 
-//tu dong hoi ham nay
+//tu dong goi ham nay
 var INFORCOMMUNITY = []//global array
-getListUserCommnunity(MYID, function(data, err)
+getListUserCommnunity(MYID, COUNTLOADUSER, function(data, err)
 {
    console.log(data)
   if(err) alert(err)
@@ -286,7 +289,7 @@ var showMyNotify = function(){
 
 var selectUserCommunity = function(){
    document.getElementById("MycommunityExchange").innerHTML = ""
-   getListUserCommnunity(MYID, function(data, err){
+   getListUserCommnunity(MYID, COUNTLOADUSER, function(data, err){
       if(err) alert(err)
       else{
          var size = data.community.length;
@@ -388,7 +391,7 @@ var SearchUsersEnter = function(e, id){
 
 //quay lai man hinh bat dau cua commnunity
 var backToStart = function(){
-   getListUserCommnunity(MYID, function(data, err){
+   getListUserCommnunity(MYID, COUNTLOADUSER, function(data, err){
       if(err) alert(err)
       else{
          document.getElementById("MycommunityExchange").innerHTML = ""
@@ -457,13 +460,45 @@ document.getElementById("myPopupcommunity").onclick = function(e) {
    var popupDiv1 = document.getElementById("myPopupdiv")
    popupDiv1.style.display = "none"
    document.getElementById("MycommunityExchange").innerHTML = ""
-   getListUserCommnunity(MYID, function(data, err){
+   getListUserCommnunity(MYID, COUNTLOADUSER, function(data, err){
       if(err) alert(err)
       else{
-         var size = data.community.length;
-         var ind = 0;
+         var size = data.community.length, ind = 0;
          for(ind = 0; ind < size; ind++)
             showUserCommunity(data.community[ind])
       }
    })
 }
+
+var TOTALUSECOMMUNITY = 0;
+var getTotalUSerCommunity = function(){
+   ajaxRequest('/languageex/home/totaluser', 'GET', {}, function(data, err){
+      TOTALUSECOMMUNITY = data.total
+  }) 
+}
+
+getTotalUSerCommunity();
+
+$(window).scroll(function() {
+   if($(window).scrollTop() + $(window).height() == $(document).height()){
+     if(TOTALUSECOMMUNITY > 0){
+         COUNTLOADUSER++;
+         if(COUNTLOADUSER*30 < TOTALUSECOMMUNITY){//moi lan lay 30 nguoi
+             console.log(COUNTLOADUSER)
+            getListUserCommnunity(MYID, COUNTLOADUSER, function(data, err)
+            {
+               if(err) alert(err)
+               else{
+                  var size = data.community.length;
+                  var ind = 0;
+                  for(ind = 0; ind < size; ind++){
+                     showUserCommunity(data.community[ind])
+                     INFORCOMMUNITY[INFORCOMMUNITY.length] = data.community[ind]
+                  }
+               }
+            })
+         }
+     }
+
+   }
+});

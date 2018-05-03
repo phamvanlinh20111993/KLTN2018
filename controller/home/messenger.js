@@ -6,6 +6,7 @@ var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
 var anotherquery = require('../../model/Anotherquery')
 const translate = require('google-translate-api');
+const LOADMSG = 5;
 
 
 router.route('/user/messages')
@@ -14,8 +15,10 @@ router.route('/user/messages')
 	if(req.session.user_id){
 
 		var uid = req.query.uid
-		if(typeof uid != 'undefined'){
-			querysimple.selectMessage(req.session.user_id, uid, function(err, data){
+		var limit = parseInt(req.body.limit) 
+		if(typeof uid != 'undefined' && limit > -1){
+			limit *= LOADMSG
+			querysimple.selectMessage(req.session.user_id, uid, null, null, function(err, data){
 				if(err) throw err;
 				else {
 					console.log("Start send messages....")
@@ -29,9 +32,11 @@ router.route('/user/messages')
 {
 	if(req.session.filter)
 	{
-		var idanother = req.body.anotherid    	                   	
-		if(typeof idanother != 'undefined'){
-			querysimple.selectMessage(req.session.user_id, idanother, function(err, data){
+		var idanother = req.body.anotherid  
+		var limit = parseInt(req.body.limit)  	                   	
+		if(typeof idanother != 'undefined' && limit > -1){
+			limit *= LOADMSG
+			querysimple.selectMessage(req.session.user_id, idanother, limit, LOADMSG, function(err, data){
 				if(err) throw err;
 				else {
 					console.log("Start send messages....")
@@ -74,6 +79,7 @@ router.route('/user/loasdusermsg')
 	}else
 		res.redirect('/languageex/user/login', {state: 1})
 })
+
 
 router.route('/user/loasdspecuser')
 .post(function(req, res)
@@ -309,6 +315,24 @@ router.route('/user/checkmisspelling')
          	
          	res.send(JSON.stringify({content:Misscontent}))
       });
+	}
+})
+
+
+router.route('/user/totalmsg')
+.get(function(req, res){
+	//khoi tao session
+	if(req.session.user_id){
+	//	var uid = req.body.data.uid
+		console.log(req.body)
+		if(typeof uid != 'undefined'){
+			querysimple.selectTotalMsg(req.session.user_id, uid, function(err, data){
+				if(err) throw err;
+				else{
+					res.send(JSON.stringify({total: data}))
+				}
+			})
+		}	
 	}
 })
 

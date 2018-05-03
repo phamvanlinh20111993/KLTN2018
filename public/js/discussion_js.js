@@ -1,4 +1,4 @@
-var  SCORING = 0;
+var  SCORING = 0, COUNTLOADPOST = 0;
 //theo doi hoac bo theo doi nguoi dung
 var ajaxRequest = function(url, data, callback) {//data is a object
   // body...
@@ -843,7 +843,7 @@ var submitComment = function(e, postid, ownpostid){
 var selectComunityPost = function(){
 	document.getElementById("showpostusers").innerHTML = ""
 	document.getElementById("fitlerbytopicpost").selectedIndex = "0";
-	requestServer('/languageex/user/loadpost', 'POST', {}, 0, function(err, data){
+	requestServer('/languageex/user/loadpost', 'POST', {limit: COUNTLOADPOST}, 0, function(err, data){
 		if(err) alert(err)
 		else{
 			var Length = data.data.length
@@ -1285,6 +1285,39 @@ socket.on("notifylikedone", function(data){
 	}
 })
 
+var TOTALPOSTCOMMUNITY = 0
+var getTotalPostCommunity = function(){
+   requestServer('/languageex/user/totalpost', 'GET', {}, 0, function(err, data){
+   	if(err) alert(err)
+   	else{
+      	TOTALPOSTCOMMUNITY = data.total
+      }
+  }) 
+}
 
+getTotalPostCommunity();
 
+//bat su kien muon load them binh luan
+$(window).scroll(function(){
+   if($(window).scrollTop() + $(window).height() == ($(document).height())){
+   	if(TOTALPOSTCOMMUNITY > 0){
+   		COUNTLOADPOST++;
+   		if(COUNTLOADPOST*15 < TOTALPOSTCOMMUNITY){
+   			console.log(TOTALPOSTCOMMUNITY)
+   			requestServer('/languageex/user/loadpost', 'POST', {limit: COUNTLOADPOST}, 0, function(err, data){
+					if(err) alert(err)
+					else{
+						var Length = data.data.length
+						if(Length){
+							for(var ind = 0; ind < Length; ind++){
+		 						showPost(data.data[ind].user, data.data[ind].posts, 0)
+		 						requestComment({id: data.data[ind].posts.pid, own: data.data[ind].user.id})
+		 					}
+		 				}
+					}
+				})
+   		}
+   	}
+   }
+});
 

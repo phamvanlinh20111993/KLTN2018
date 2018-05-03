@@ -4,14 +4,15 @@ var router = express.Router()
 var CryptoJS = require("crypto-js")
 var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
+const LIMITUSER = 30;
 
 
 /**
 searchcondi is param for user seach users by name, or email
 **/
-function APIComunityEx(id, searchcondi, cb)
+function APIComunityEx(id, limitp, limitn, searchcondi, cb)
 {
-	querysimple.selectUserCommunityEx(id, searchcondi, function(result, err){
+	querysimple.selectUserCommunityEx(id, limitp, limitn, searchcondi, function(result, err){
 	    if(err) throw err;
 	 	else{
 	 		var res = result
@@ -198,10 +199,12 @@ router.route('/home/community')
 })
 .post(function(req, res)
 {
-	var iduser = req.body.id 
-	if(req.session.user_id){
+	var iduser = req.body.id
+	var limit = parseInt(req.body.limit)
+	if(req.session.user_id && limit > -1){
+		limit *= LIMITUSER 
 		if(iduser && parseInt(iduser) == parseInt(req.session.user_id)){
-			APIComunityEx(req.session.user_id, null, function(data){
+			APIComunityEx(req.session.user_id, limit, LIMITUSER, null, function(data){//lay 30 nguoi
 				res.send(JSON.stringify({community: data}))
 			})
 		}
@@ -275,7 +278,7 @@ router.route('/home/search')
 .post(function(req, res){
 	if(req.session.user_id){
 		var searchvalue = req.body.data.value
-		APIComunityEx(req.session.user_id, searchvalue, function(data){
+		APIComunityEx(req.session.user_id, null, null, searchvalue, function(data){
 			console.log(data)
 			res.send(JSON.stringify({community: data}))
 		})
@@ -320,5 +323,16 @@ router.route('/home/seenmsgnotify')
 	    }
 	}
 })
+
+
+router.route('/home/totaluser')
+.get(function(req, res){
+	if(req.session.user_id){
+		querysimple.selectTotalUserInComunity(req.session.user_id, function(data){
+			res.json({total: data})
+		})
+	}
+})
+
 
 module.exports = router;
