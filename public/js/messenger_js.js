@@ -113,9 +113,10 @@ function formatAMPM(date)
 
 function formatTime(date)
 {
-   var hours = date.getHours() + 7;
-   if(hours > 23) hours = hours - 24
+  // var hours = date.getHours() + 7;
+ //  if(hours > 23) hours = hours - 24
 
+   var hours = date.getHours();
    var minutes = date.getMinutes();
    var days = date.getDate();
    var months = date.getMonth() + 1;//getMonth() return 0-11
@@ -241,7 +242,7 @@ function showUsers(users, setting)
 
    if(users.bl1time){//toi bi nguoi khac block
       isonline = '<span class="contact-status busy"></span>'
-       Funcblock = 'onclick="youwasBlocked('+users.id+')"'
+      Funcblock = 'onclick="youwasBlocked('+users.id+')"'
    }
 
    var replacementJSON = replaceAll(JSON.stringify(users), '"', CONSTANTSTRING)
@@ -697,6 +698,48 @@ var searchContactPress = function(e){
                      }
                   }
                }
+         })
+      }
+   }
+}
+
+//bat su kien scroll
+document.getElementById("messagesbox").onscroll = function(){
+   if(this.scrollTop == 0){
+      COUNTLOADMSG++;
+      if(USERCHATNOW.id > 1000000000){
+         loadMessage(USERCHATNOW.id, function(data)
+         {
+            if(data.listmessage){
+               var listLength = data.listmessage.messages.length
+               if(listLength > 0)
+               {
+                  var message = document.getElementById("messagesbox")
+                  var message_ul = message.getElementsByTagName("ul")[0]
+                  var temp =  message_ul.innerHTML
+                  message_ul.innerHTML = ""
+                  
+                  var userSend = {}
+                  var userReceive = {}         
+
+                  if(MYID == data.listmessage.userA.id){
+                     userSend = data.listmessage.userA
+                     userReceive = data.listmessage.userB
+                  }else{
+                     userSend = data.listmessage.userB
+                     userReceive = data.listmessage.userA
+                  }
+
+                  for(var index = listLength-1; index >= 0; index--){
+                     if(parseInt(MYID) == parseInt(data.listmessage.messages[index].idA)){//toi la nguoi gui tin nhan
+                        showMessageuserSend(userSend, data.listmessage.messages[index], null, 1)
+                     }else{
+                        showMessageuserReceive(userReceive, data.listmessage.messages[index], null, 1)
+                     }
+                  }
+                  message_ul.innerHTML += temp
+               }
+            }
          })
       }
    }

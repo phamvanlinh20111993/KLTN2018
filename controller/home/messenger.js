@@ -6,7 +6,7 @@ var md5 = require('md5') // su dung md5 ma hoa pass
 var querysimple = require('../../model/QuerysingletableSimple')
 var anotherquery = require('../../model/Anotherquery')
 const translate = require('google-translate-api');
-const LOADMSG = 5;
+const LOADMSG = 15;
 
 
 router.route('/user/messages')
@@ -15,10 +15,10 @@ router.route('/user/messages')
 	if(req.session.user_id){
 
 		var uid = req.query.uid
-		var limit = parseInt(req.body.limit) 
+		var limit = parseInt(req.query.limit) 
 		if(typeof uid != 'undefined' && limit > -1){
 			limit *= LOADMSG
-			querysimple.selectMessage(req.session.user_id, uid, null, null, function(err, data){
+			querysimple.selectMessage(req.session.user_id, uid, limit, LOADMSG, function(err, data){
 				if(err) throw err;
 				else {
 					console.log("Start send messages....")
