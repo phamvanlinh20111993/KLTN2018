@@ -45,7 +45,7 @@ router.route('/user/login')
 			function(result, fields, err){
 				if(err)	throw err;
 
-				if(result.length > 0 && result[0].provider == "custom"){//co ton tai tai khoan
+				if(result.length > 0 && result[0].provider == "custom" || result[0].provider == "admin"){//co ton tai tai khoan
 					var bytes  = CryptoJS.AES.decrypt(result[0].password, md5(pass));
 					var deemail = bytes.toString(CryptoJS.enc.Utf8);
 

@@ -947,6 +947,21 @@ var selectTotalMsg = function(idme, idB, cb){
 	})
 }
 
+var returnListAdminBLock = function(myemail, cb){
+	var sqlString = "SELECT u.id AS id FROM user u "+
+					    " JOIN blocklist_admin bl ON bl.blockwho = u.id"+
+					     " WHERE u.email = "+mysql.escape(myemail)
+	console.log(sqlString)
+	con.query(sqlString, function(err, result){
+		if(err){
+			throw err
+			cb(err, null)
+		}else{
+			cb(null, result)
+		}
+	})
+}
+
 
 module.exports = {
 	insertTable: insertString,
@@ -969,5 +984,6 @@ module.exports = {
 	takeMessageContent: takeMessageContent,
 	getNotifyMessage: getNotifyMessage,
 	selectTotalUserInComunity: selectTotalUserInComunity,
-	selectTotalMsg: selectTotalMsg
+	selectTotalMsg: selectTotalMsg,
+	returnListAdminBLock: returnListAdminBLock
 }

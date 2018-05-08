@@ -77,12 +77,13 @@ router.route('/user/changetrasprio')
 						if (err1) {throw err1}
 						else{
 
-							querysimple.selectTable("language", ["name", "symbol"], 
+							querysimple.selectTable("language", ["id", "name", "symbol"], 
 							 [{op: "", field: "id", value: idlg}], null, null, null, 
 							 function(result3, fields3, err3){
 							 	if (err3) { throw err3}
 							 	else{
 									req.session.mynative = result3[0].symbol
+									req.session.mynativeid = result3[0].id
 							        res.send(JSON.stringify({notify: "Done"}))
 								}
 							})
@@ -117,12 +118,13 @@ router.route('/user/changemissprio')
 					querysimple.updateTable("exchangelg", field1, wherecond, function(result1, err1){
 						if (err1) {throw err1}
 						else{
-							querysimple.selectTable("language", ["name", "symbol"], 
+							querysimple.selectTable("language", ["id", "name", "symbol"], 
 							 [{op: "", field: "id", value: idlg}], null, null, null, 
 							 function(result3, fields3, err3){
 							 	if (err3) { throw err3}
 							 	else{
 							 		req.session.myexchange = result3[0].symbol
+							 		req.session.myexchangeid = result3[0].id
 									res.send(JSON.stringify({notify: "Done"}))
 								}
 							})

@@ -127,7 +127,7 @@
 				//this is used to close a popup
 				function close_popup(id)
 				{
-					console.log("gui tin hieu out room")
+					 console.log("gui tin hieu out room")
 					 socket.emit('leaveroomchat', {myid: MYID, pid: id}) 
 					 
 					 for(var iii = 0; iii < popups.length; iii++)
@@ -160,9 +160,15 @@
 				function display_popups()
 				{
 					 var right = 220;
-					 
-					 var iii = 0;
+				
+				//mới xược lúc 11:54pm, 5/5/2018 line 165-167
+				/*	 var iii = 0;
 					 for(iii; iii < total_popups; iii++)
+					 { */
+ 				
+ 				//mới thêm lúc 11:54pm, 5/5/2018 line 170-172
+					 var iii = total_popups - 1;
+					 for(iii; iii >= 0; iii--)
 					 {
 						  if(popups[iii] != undefined)
 						  {
@@ -223,6 +229,8 @@
 						  }
 					 }
 					 
+					 //mới thêm lúc 11:54pm, 5/5/2018 line 233
+					 iii = total_popups;
 					 for(var jjj = iii; jjj < popups.length; jjj++)
 					 {
 						  var element = document.getElementById(popups[jjj]);

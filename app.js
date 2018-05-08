@@ -73,6 +73,7 @@ cloudinary.config({
   api_secret: 'M9TfXOrwtKx0SklY5wOrxPJv-MU' 
 });
 
+//user's controller
 var login = require('./controller/login_signup/login')
 var signup = require('./controller/login_signup/signup')
 var publicrq = require('./controller/login_signup/publicrequest');
@@ -86,8 +87,15 @@ var filter = require('./controller/filter')
 var msgsetting = require('./controller/home/msgsetting')
 var profile = require('./controller/home/profile')
 var post_setting =  require('./controller/home/posts_setting')
-//var admin = require('./controller/admin')
 
+//admin's controller
+var adminlg = require('./controller/admin/login')
+var adminmnpost = require('./controller/admin/managepost')
+var adminmnreport = require('./controller/admin/managereport')
+var adminmnuser = require('./controller/admin/manageuser')
+var rqpageadmin =  require('./controller/admin/requestpages.js')
+
+//use for user
 app.use('/languageex', publicrq)
 app.use('/languageex', login)
 app.use('/languageex', signup)
@@ -102,6 +110,12 @@ app.use('/languageex', msgsetting)
 app.use('/languageex', profile)
 app.use('/languageex', post_setting)
 
+//use for admin
+app.use('/languageex', adminlg)
+app.use('/languageex', adminmnpost)
+app.use('/languageex', adminmnreport)
+app.use('/languageex', adminmnuser)
+app.use('/languageex', rqpageadmin)
 
 const translate = require('google-translate-api');
 

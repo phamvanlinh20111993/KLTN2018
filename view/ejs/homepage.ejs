@@ -423,6 +423,9 @@
 
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul id="nav_ul" class="nav navbar-nav">
+        <%if(typeof session.admin != 'undefined'){%>
+            <li><a onclick="adminPage()" style="cursor: pointer;">Trang quản trị</a></li>
+        <%}%>
         <li class="active" onclick="Profile()"><a href="/languageex/user/profile">Cá nhân</a></li>
         <li onclick="Post()"><a href="/languageex/user/post" >Thảo luận</a></li>
 
@@ -569,6 +572,10 @@
 
    function Post(){
       location.href = '/languageex/user/post'//'?uid=' + encodeURIComponent("<%= user[0].id  %>")
+   }
+
+   function adminPage(){
+      location.href = '/languageex/admin'//'?uid=' + encodeURIComponent("<%= user[0].id  %>")
    }
 
    function Messenger(){

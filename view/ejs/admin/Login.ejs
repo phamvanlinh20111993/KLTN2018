@@ -1,0 +1,87 @@
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="icon bar" type="text/css" href="http://tespl.org/oes/images/admin_login.gif">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <style>
+        .container {
+          margin-top: 10%;
+          margin-left: 30%;
+          width: 500px;
+        }
+        h2{
+            text-align: center;
+            color: azure;
+        }
+        label{
+            font-size: 14px;
+        }
+        a{
+            font-size: 14px;
+            padding-left: 15px;
+        }
+        .form-control{
+            margin: 15px;
+        }
+        body{
+            background-image: url('/img/Language-Exchange.jpg');
+            /* Full height */
+            height: 100%; 
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+      </style>
+   </head>
+<body>
+<div class="container">
+   <nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+       <a class="navbar-brand" href="#">Dịch vụ thực hành ngôn ngữ</a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <img src="http://inperugia.com/wp-content/uploads/2011/08/language-exchange-perugia.png" alt="Logo" style="width:40px;margin-top:10px;">
+    </div>
+  </div>
+</nav>
+
+    <h2 style="color: black;">Quản trị viên đăng nhập</h2>
+    <div class="panel panel-info">
+        <div class="panel-heading">Vui lòng điền thông tin để đăng nhập</div>
+        <div class="panel-body">
+            <form action="/languageex/admin/login" method="POST">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><label for="email"><b>Email: </b></label></td>
+                            <td><input id="email" style="width: 300px;" class ="form-control" type="email" placeholder="Enter Email" name="username" required></td>
+                        </tr>
+                        <tr>
+                            <td><label for="psw"><b>Mật khẩu: </b></label></td>
+                            <td><input id="password" style="width: 300px;" class="form-control" type="password" placeholder="Enter Password" name="password" required></td>
+                        </tr>
+                     <!--   <tr><td></td><td><a href="./forgotPassword">Forgot password</a></td></tr>-->
+                    </tbody>
+                </table>
+                <br>
+               <input type="checkbox" checked="checked" name="rememberMe" style="margin-bottom:15px"> Remember me
+                <!-- <span style="margin-left: 10px;">Create a account!  </span>
+                <a style="text-decoration: underline" href='./signup'>Signup</a>
+                <br><br> -->
+                <div style="text-align: center;"><button type="submit" id="login" class="btn btn-success">Login</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

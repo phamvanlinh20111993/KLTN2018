@@ -138,6 +138,11 @@ function formatAMPMDate(date)
 var Notify = function(){
 	$('#Notify_post').modal('show')
 	document.getElementById("notifyposticon").innerHTML = "(0)"
+	//thay doi state tu co so du lieu
+	requestServer('/languageex/user/changestatenofifypost', 'PUT', {}, 0, function(err, data){
+		if(err)  alert(err)
+		else   console.log(data)
+	})	
 }
 
 
@@ -189,6 +194,67 @@ var loadRequirePost = function(){
 	})	
 }
 loadRequirePost()
+
+function viewProfileByName(uid){
+	console.log("sdsfdsfsdf")
+  location.href = "/languageex/user/profile?uid="+encodeURIComponent(uid)
+}
+
+var showNotifyDiscussion = function(obj){
+	var element = '<tr style="border-top: 0px;">'+
+              '<td style="padding:2%;"><img src="'+obj.photo+'" class="img-circle" alt="Avatar" height="45" width="45"></td>'+
+              '<td style="width: 85%;">'+
+                '<div style="height: auto;width: auto;margin-left: 4%;">'+
+                  '<span style="font-style: italic;font-size: 120%;font-weight: bold;">'+
+                      '<a style="cursor:pointer;color:black;text-decoration: none;" onclick="viewProfileByName('+obj.id+')">'+obj.name+'</a></span>'+
+                  '<span style="font-size: 95%;"><a style="cursor:pointer;text-decoration: none;"> '+obj.content+'</a></span></br>'+
+                  '<span style="font-size: 95%;font-style:italic;">'+formatAMPMDate(obj.time)+'</span>'+
+                '</div>'+
+              '</td>'+
+            '</tr>'
+
+   document.getElementsByClassName("notifymessage")[0].innerHTML += element
+}
+
+
+var loadNotifyDiscussion = function()
+{
+	requestServer('/languageex/user/loadnotify', 'POST', {}, 0, function(err, data){
+		if(err)  alert(err)
+		else{
+			document.getElementsByClassName("notifymessage")[0].innerHTML = ""
+			if(data.notify.length > 0){
+				console.log(data)
+				var numofnotify = 0;
+				for(var ind = 0; ind < data.notify.length; ind++){
+					if(data.notify[ind].state == 0)
+						numofnotify++
+					var content = ""
+					if(data.notify[ind].kind.type == "post"){
+						content = " người mà bạn theo dõi, đã đăng bài trên cộng đồng "+data.notify[ind].language+"."
+					}else if(data.notify[ind].kind.type == "like")
+						content = " đã thích bài đăng của bạn."
+					else
+						content = " đã bình luận trên bài đăng của bạn."
+
+					var obj = {
+						id: data.notify[ind].notifier.id,
+						name: data.notify[ind].notifier.name,
+						photo: data.notify[ind].notifier.photo,
+						type: data.notify[ind].kind.type,
+						code: data.notify[ind].kind.typecodeid,//mã bài đăng hoặc mã bình luận,
+						content: content,
+						state: data.notify[ind].state,
+						time: new Date(data.notify[ind].time)
+					}
+					showNotifyDiscussion(obj)
+				}
+				document.getElementById("notifyposticon").innerHTML = "("+numofnotify+")"
+			}
+		}
+	})	
+}
+loadNotifyDiscussion()
 	
 /**
 	Posts: object chua thong tin cua bai dang
@@ -426,6 +492,19 @@ var likeOrDis = function(id){
 					photo: MYPHOTO,
 					time: new Date()
 				})
+
+				var data = {
+					post_id: id, //mã bài đăng
+					user_id: MYID,//mã người thích bài đăng
+					time: new Date()
+				}
+
+				//tao thong bao like bai dang len server
+				requestServer('/languageex/user/notifylike', 'POST', {data: data}, 0, function(err, data){
+					if(err) alert(err)
+					else
+						console.log(data)
+				})
 			}
 		})
 	}
@@ -441,9 +520,9 @@ var showUserLikePost = function(postid)
 	requestServer('/languageex/user/loadinfolikepost', 'POST', {id: postid}, 0, function(err, data){
 		if(err) alert(err)
 		else{
+			var modalBody = document.getElementById("showuserlikespost").getElementsByClassName("modal-body")[0]
 			if(data){
 			 	var Length = data.userslikedpost.length
-			 	var modalBody = document.getElementById("showuserlikespost").getElementsByClassName("modal-body")[0]
 			 	if(Length > 0){
 					for(var ind = 0; ind < Length; ind++){
 						element += '<tr><td><img class="img-rounded" height="40" width="40" alt="Avatar" src="'+
@@ -733,8 +812,8 @@ var submitPost = function(){
 		errnotify.innerHTML = "##) Do not empty this field."
 		errnotify.style.display = "block"
 
-	}else if(content.value.length < 100){
-		errnotify.innerHTML = "##) This discussion too short, may be > 100 characters."
+	}else if(content.value.length < 40){
+		errnotify.innerHTML = "##) This discussion too short, may be > 40 characters."
 		errnotify.style.display = "block"
 	}else{
 
@@ -788,6 +867,19 @@ var submitPost = function(){
 					myname: MYNAME,
 					time: new Date()
 		      })
+
+		      var data = {
+					post_id: data.resp, //mã bài đăng
+					user_id: MYID,//mã người thích bài đăng
+					time: new Date()
+				}
+
+				//tao thong bao dang bai bai dang len server
+				requestServer('/languageex/user/notifypostp', 'POST', {data: data}, 0, function(err, data){
+					if(err) alert(err)
+					else
+						console.log(data)
+				})
 			}
 		})
 	}
@@ -830,6 +922,20 @@ var submitComment = function(e, postid, ownpostid){
 						photo: MYPHOTO,
 						myname: MYNAME,
 						time: new Date()
+					})
+
+					var data1 = {
+						post_id: postid,
+						cmt_id: dataid.res, //mã bài đăng
+						user_id: MYID,//mã người thích bài đăng
+						time: new Date()
+					}
+
+					//tao thong bao like bai dang len server
+					requestServer('/languageex/user/notifycmt', 'POST', {data: data1}, 0, function(err, data){
+						if(err) alert(err)
+						else
+							console.log(data)
 					})
 				}
 			})
@@ -1242,7 +1348,7 @@ socket.on("notifypostdone", function(data){
 
 //binh luan bai dang, người đăng bình luận sẽ gửi thông báo đến chủ bài đăng
 socket.on("notifycmtdone", function(data){
-	console.log(data)
+	//console.log(data)
 	if(data.ownpost == MYID){
 		var notifynow = document.getElementById("notifyposticon").innerHTML
 		var numofnotify = parseInt(notifynow.substring(1, notifynow.length-1))
@@ -1264,7 +1370,7 @@ socket.on("notifycmtdone", function(data){
 
 //thich bai dang, người thích bài đăng sẽ gửi thông báo đến chủ bài đăng
 socket.on("notifylikedone", function(data){
-	console.log(data)
+//	console.log(data)
 	if(data.ownpost == MYID){
 		var notifynow = document.getElementById("notifyposticon").innerHTML
 		var numofnotify = parseInt(notifynow.substring(1, notifynow.length-1))

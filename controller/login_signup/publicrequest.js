@@ -11,53 +11,83 @@ var workfile = require('../../local_modules/workwithfile')
 var querysimple = require('../../model/QuerysingletableSimple')
 var anotherquery = require('../../model/Anotherquery')
 
-function Error(id){
-	var errstr = "";
-	switch(id)
-	{
-		case md5(0): 
-			errstr = "Fail to authentication user.Please back to page and login again."
-			break;
+function Error(id, req, cb){
+	var errstr = {};
 
-		case md5(1):
-			errstr = "This file is not a image file or not application/image. Using valid image file."
-			break;
-
-		case md5(2):
-			errstr = "Failed to sign in with facebook account."
-			break;
-
-		case md5(3):
-			errstr = "Failed to sign in with google account."
-			break;
-
-		case md5(4):
-			errstr = "Failed to change password."
-			break;
-
-		case md5(5):
-			errstr = "This account was logged in.Failed to sign in with facebook account."
-			break;
-
-		case md5(6):
-			errstr = "This account was logged in.Failed to sign in with google account."
-			break;
-
-		case md5(7):
-			errstr = "This account does not exist.Please try again."
-			break;
-
-		case md5(8):
-			errstr = "This account is being used. Please try again."
-			break;
-
-		case md5(30):
-			//truy van csdl
-		default:
-		    errstr = "Not valid code.Or something wrong.:((((("
-		    break;
+	if(id == md5(0)) {
+		errstr.err = "Fail to authentication user.Please back to page and login again."
+		cb(errstr)
 	}
-	return errstr;
+
+	else if(id == md5(1)){
+		errstr.err = "This file is not a image file or not application/image. Using valid image file."
+		cb(errstr)
+	}
+
+	else if(id== md5(2)){
+		errstr.err = "Failed to sign in with facebook account."
+		cb(errstr)
+	}
+
+	else if(id == md5(3)){
+		errstr.err = "Failed to sign in with google account."
+		cb(errstr)
+	}
+	else if(id == md5(4)){
+		errstr.err = "Failed to change password."
+		cb(errstr)
+	}
+
+	else if(id == md5(5)){
+		errstr.err = "This account was logged in.Failed to sign in with facebook account."
+		cb(errstr)
+	}
+
+	else if(id ==md5(6)){
+		errstr.err = "This account was logged in.Failed to sign in with google account."
+		cb(errstr)
+	}
+			
+
+	else if(id == md5(7)){
+		errstr.err = "This account does not exist. Please try again."
+		cb(errstr)
+	}
+
+	else if(id == md5(8)){
+		errstr.err = "This account is being used. Please try again."
+		cb(errstr)
+	}
+
+	else if(id == md5(30)){
+		//truy van csdl
+
+	}
+	else if(id == md5(47)){
+		errstr.err = "Admin account is being used. Please try again."
+		errstr.link = "/languageex/admin/login"
+		cb(errstr)
+	}
+	else if(id==md5(62)){
+		//truy van csdl
+		querysimple.selectTable("blocklist_admin", ["timeblock", "content", "time"], 
+      			[{ op:"", field: "blockwho", value: req.session.idblock}], null, null, null, 
+     		function(result, fields, error){
+     			if(error) throw error
+     			if(req.session)
+					req.session.destroy()
+				var timebl = (new Date(result[0].timeblock) - new Date(result[0].time))/31536000000
+				errstr.err = "Tài khoản của bạn bị khóa vì "+result[0].content + ". Thời gian khóa " + timebl*365+ " ngày."
+				if(timebl > 50)
+					errstr.err = "Tài khoản của bạn bị xóa khỏi hệ thống vì "+result[0].content +"."
+				errstr.link =  "/languageex/user"
+				cb(errstr)
+     		})
+	}
+	else{
+		errstr.err = "Not valid code.Or something wrong.:((((("
+		cb(errstr)
+	}	
 }
 
 var getDateTime = function(date){
@@ -190,14 +220,21 @@ router.route('/user/signup')
  router.route('/user/error')
  .get(function(req, res)
 {	
-	
 	var id = req.query.err
-	var err = {
-		id: id,
-		content: Error(id)
-	}
+	
+	Error(id, req, function(takeerr){
+		var err = {
+			id: id,
+			content: takeerr.err,
+			link:  "/languageex/user"
+		}
 
-	res.render('ejs/Error', {err: err})
+		if(takeerr.link)
+			err.link = takeerr.link
+
+			res.render('ejs/Error', {err: err})
+	})
+
 })
  .post(function(req, res)
 {	
@@ -230,6 +267,35 @@ router.route('/user/signup')
 		})
 	}else
 		res.redirect('/languageex/user')
+})
+
+
+ router.route('/admin/logout')
+ .get(function(req, res)
+{	
+	if(req.session.user_id){
+		querysimple.updateTable("user", [{field: "state", value: 0}, {field: "stay", value: 0}], 
+			[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
+				if(err) throw err;
+				req.session.destroy()
+				console.log(result.affectedRows + " record(s) updated")
+				res.redirect('/languageex/admin')
+		})
+	}else
+		res.redirect('/languageex/admin')
+})
+ .post(function(req, res)
+{	
+	if(req.session.user_id){
+		querysimple.updateTable("user", [{field: "state", value: 1},  {field: "stay", value: 1}], 
+			[{op:"", field: "id", value: parseInt(req.session.user_id)}], function(result, err){
+				if(err) throw err;
+				console.log(result.affectedRows + " record(s) updated")
+				req.session.destroy()
+				res.redirect('/languageex/admin')
+		})
+	}else
+		res.redirect('/languageex/admin')
 })
 
 router.route('/')

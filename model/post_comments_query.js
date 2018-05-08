@@ -47,6 +47,7 @@ var selectMyposts = function(myid, cb){
          }else{
           //  console.log(result1)
             for(var ind = 0; ind < result1.length; ind++){
+               var totallike = result1[ind].total
                ListMyPost.posts[ind] = {
                   pid: result1[ind].pid,
                   content: result1[ind].content,
@@ -56,12 +57,14 @@ var selectMyposts = function(myid, cb){
                   turnofcmt: result1[ind].turnof_cmt,
                   time: result1[ind].ptime,
                   meliked: false,
-                  totalcomment: result1[ind].totalc,
-                  totalliked: result1[ind].total
+                  totalcomment: result1[ind].totalc
                }
 
                if(result1[ind].melike)
-                  ListMyPost.posts[ind].meliked = true  
+                  ListMyPost.posts[ind].meliked = true
+               else
+                  totallike--;
+               ListMyPost.posts[ind].totalliked = totallike
             }
             
             cb(ListMyPost)
@@ -166,7 +169,7 @@ var selectNotMyposts = function(myid, lmp, lmn, searchcondi, filtercondi, cb)
                likesearchcondi+
                likefilter +
                " AND u.id NOT IN(SELECT blockwho FROM blocklist_user WHERE whoblock="+mysql.escape(myid)+")"+
-             //  " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
+               " AND la.id IN (SELECT language_id FROM exchangelg WHERE user_id="+mysql.escape(myid)+")"+
                " AND p.language_id = " + parseInt(res[0].exid) +
                " GROUP BY p.id"+
                " ORDER BY timepostfl DESC, p.ctime DESC"+
@@ -181,9 +184,9 @@ var selectNotMyposts = function(myid, lmp, lmn, searchcondi, filtercondi, cb)
             }
             else{
                var ListPosts = []
-              
                for(var ind = 0; ind < result.length; ind++)
                {
+                  var totallike = result[ind].totallike
                   ListPosts[ind] = {}
                   ListPosts[ind].user = {
                      id: result[ind].uid,
@@ -204,12 +207,14 @@ var selectNotMyposts = function(myid, lmp, lmn, searchcondi, filtercondi, cb)
                      meliked: false,
                      totalcomment: result[ind].totalc, 
                      isedit: result[ind].isedit,
-                     istracked: result[ind].istracked,
-                     totalliked : result[ind].totallike
+                     istracked: result[ind].istracked
                   } 
 
-                  if(result[ind].melike)
+                  if(result[ind].melike){
                      ListPosts[ind].posts.meliked = true    
+                  }else
+                     totallike--;
+                  ListPosts[ind].posts.totalliked = totallike
                }
 
                cb(ListPosts)
@@ -319,36 +324,44 @@ var selectMaxIdTable = function(tbname, cb){
 
 //lay thong tin nguoi dung like bai dang
 var selectUserLikePost = function(myid, postid, cb){
-   var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, li.ctime "+
-                   " FROM user u JOIN likes_post li "+
-                   " ON li.id_user = u.id "+
-                   " WHERE li.id_post = " + mysql.escape(postid)+
-                   " AND li.id_user != " + mysql.escape(myid)
 
-   con.query(sqlString, function(err, result){
-      if(err) {
-         throw err
-         cb(null)
-       }
+   var sqlStr = "SELECT p.user_id AS pid FROM post p WHERE p.id = " + mysql.escape(postid)
+
+   con.query(sqlStr, function(err1, result1){
+      if(err1) throw err1;
       else{
-         var lisuserlikes = []
-         for(var ind = 0; ind < result.length; ind++){
-            lisuserlikes[ind] = {
-               id: result[ind].id,
-               email: result[ind].email,
-               name: result[ind].name,
-               photo: result[ind].photo,
-               score: result[ind].score,
-               liketime: result[ind].ctime
+         var sqlString = "SELECT u.id, u.email, u.name, u.photo, u.score, li.ctime "+
+                         " FROM user u JOIN likes_post li "+
+                         " ON li.id_user = u.id "+
+                         " WHERE li.id_post = " + mysql.escape(postid)+
+                         " AND li.id_user != " + mysql.escape(myid)+
+                         " AND li.id_user != " + result1[0].pid//id cua chu bai dang
+
+         con.query(sqlString, function(err, result){
+            if(err) {
+               throw err
+               cb(null)
+             }
+            else{
+               var lisuserlikes = []
+               for(var ind = 0; ind < result.length; ind++){
+                  lisuserlikes[ind] = {
+                     id: result[ind].id,
+                     email: result[ind].email,
+                     name: result[ind].name,
+                     photo: result[ind].photo,
+                     score: result[ind].score,
+                     liketime: result[ind].ctime
+                  }
+               }
+
+               cb(lisuserlikes)
+
             }
-         }
 
-         cb(lisuserlikes)
-
+         })
       }
-
    })
-
 }
 
 //lay ra nhung bai dang gan day nhat
@@ -397,6 +410,8 @@ var selectRecentPost = function(myid, limit, cb)
 
                for(var ind = 0; ind < result.length; ind++)
                {
+                  var totallike = result[ind].totallike
+
                   ListPosts[ind] = {}
                   ListPosts[ind].user = {
                      id: result[ind].uid,
@@ -419,11 +434,14 @@ var selectRecentPost = function(myid, limit, cb)
                      totalcomment: result[ind].totalc, 
                      isedit: result[ind].isedit,
                      istracked: result[ind].istracked,
-                     totalliked :result[ind].totallike
+                     totalliked: result[ind].totallike
                   }
 
                   if(result[ind].melike)
                      ListPosts[ind].posts.meliked = true
+                  else 
+                     totallike--;
+                  ListPosts[ind].posts.totalliked =  totallike 
                }
 
                cb(ListPosts)
@@ -464,6 +482,48 @@ var selectTotalPost = function(myid, code, cb){
    })
 }
 
+var selectNotifyDiscussion = function(myid, cb){
+   var sqlString = "SELECT nd.creater AS id, u.name AS name, u.email AS email, u.photo AS photo, nd.ctime AS ctime, "+
+                " nd.type_id AS tyid, ty.content AS tyname, nd.code AS code, nd.state AS state, "+
+                " lg.name AS lgname FROM user u"+
+                " JOIN notify_discussion nd ON nd.creater = u.id"+
+                " JOIN type ty ON ty.id = nd.type_id "+
+                " JOIN exchangelg exlg ON (exlg.language_id=nd.language_id AND exlg.user_id = "+mysql.escape(myid)+")"+//nhan thong bao tren cong dong
+                " JOIN language lg ON lg.id = exlg.language_id"+
+                " WHERE nd.receiver = "+mysql.escape(myid)+
+                " AND exlg.prio = 1"+
+                " ORDER BY nd.ctime DESC"
+
+   console.log(sqlString)
+
+   con.query(sqlString, function(err, result){
+      if(err){
+         throw err
+         cb(null)
+      }else{
+         var notify = []
+         for(var ind = 0; ind < result.length; ind++){
+            notify[ind] = {
+               notifier:{
+                  id: result[ind].id,
+                  name: result[ind].name,
+                  email: result[ind].email,
+                  photo: result[ind].photo
+               },
+               kind:{
+                  id: result[ind].tyid,
+                  type: result[ind].tyname,
+                  typecodeid: result[ind].code
+               },
+               state: result[ind].state,
+               language:  result[ind].lgname,
+               time: result[ind].ctime
+            }
+         }
+           cb(notify)
+      }
+   })
+}
 
 module.exports = {
 	selectPosts_myfollow: selectPosts_myfollow,
@@ -474,5 +534,6 @@ module.exports = {
    selectRecentPost: selectRecentPost,
    selectMaxIdTable: selectMaxIdTable,
    selectPostById: selectPostById,
-   selectTotalPost: selectTotalPost
+   selectTotalPost: selectTotalPost,
+   selectNotifyDiscussion: selectNotifyDiscussion
 }

@@ -103,7 +103,6 @@ router.route('/user/post')
 
 router.route('/user/loadtitle')
 .post(function(req, res){
-
 	if(req.session.user_id){
 		querysimple.selectTable("post_title", ["id", "name", "code"], null, null, null, null,
 			function(result, fields, err){
@@ -206,7 +205,9 @@ router.route('/user/loadnotify')
 .post(function(req, res){
 
 	if(req.session.user_id){
-
+		postcomment.selectNotifyDiscussion(req.session.user_id, function(data){
+				res.json({notify: data})
+		})
 	}
 })
 
@@ -235,5 +236,106 @@ router.route('/user/totalpost')
 	}
 })
 
+//insert notify like post
+router.route('/user/notifylike')
+.post(function(req, res){
+	var data = req.body.data.data
+	var type_id = 7//like
+	if(req.session.user_id && typeof data == 'object'){
+		//lấy id người nhận
+		querysimple.selectTable("post", ["user_id"], [{op: "", field: "id", value: data.post_id}],
+         null, null, null, function(result, fields, err){
+         if (err) {throw err}
+         else{
+         	if(result[0].user_id != data.user_id){
+					var field = ["receiver", "creater", "type_id","code", "state", "ctime"]
+					var value = [result[0].user_id, data.user_id, type_id, data.post_id, 0, new Date(data.time)]
+					querysimple.insertTable("notify_discussion", field, value, 
+		  				function(result1, fields1, err1){
+							if(err1) throw err1;
+							else
+								res.json({data: result1})
+					})
+				}
+			}
+		})
+	}
+})
+
+//insert notify comment post
+router.route('/user/notifycmt')
+.post(function(req, res){
+	var data = req.body.data.data
+	var type_id = 1//comment
+	if(req.session.user_id && typeof data == 'object'){
+		querysimple.selectTable("post", ["user_id"], [{op: "", field: "id", value: data.post_id}],
+            null, null, null, function(result, fields, err){
+         if (err) {throw err}
+         else{
+         	if(result[0].user_id != data.user_id){
+	            var field = ["receiver", "creater", "code", "type_id", "state", "ctime"]
+					var value = [result[0].user_id, data.user_id, data.cmt_id, type_id, 0, new Date(data.time)]
+					querysimple.insertTable("notify_discussion", field, value, 
+				 		function(result1, fields1, err1){
+						if(err1) throw err1;
+						else
+							res.json({data: result1})
+					}) 
+				}        
+         }
+      })
+	}
+})
+
+//ham tao de truy van vong lap
+var insertTableQueryLoop = function(index, insertvl, Length, array, cb)
+{
+	if(index < Length){
+		//state 0 la trang thai chua doc
+		var field = ["receiver", "creater", "code",  "type_id", "state", "ctime"]
+		var value = [array[index].followers, insertvl.user_id, insertvl.post_id, insertvl.type_id, 0, new Date(insertvl.time)]
+
+		querysimple.insertTable("notify_discussion", field, value, 
+			function(result, fields, err){
+				if(err) throw err;
+				else
+					insertTableQueryLoop(index+1, insertvl, Length, array, cb)
+		}) 
+	}else
+		cb()
+}
+
+//insert notify post posts for follow user
+router.route('/user/notifypostp')
+.post(function(req, res){
+	var data = req.body.data.data
+	var type_id = 2//post
+	
+	if(req.session.user_id && typeof data == 'object'){
+		data.type_id = 2;
+		querysimple.selectTable("follow", ["followers"], [{op: "", field: "tracked", 
+		 	value: req.session.user_id}], null, null, null, function(result, fields, err){
+         if (err) throw err
+         else{
+            console.log(result)    
+            insertTableQueryLoop(0, data, result.length, result, function(){
+            	res.json({data: "Done."})
+            })
+         }
+      })	
+	}
+})
+
+router.route('/user/changestatenofifypost')
+.put(function(req, res){
+	if(req.session.user_id){
+		//state = 1 là đã xem
+		querysimple.updateTable("notify_discussion", [{field: "state", value: 1}], 
+			[{op:"", field: "receiver", value: req.session.user_id}], function(result, err){
+				if(err) throw err
+				else res.json({data: "updated success."})
+			})
+	}
+})
 
 module.exports = router;
