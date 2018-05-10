@@ -25,10 +25,10 @@ var mysql = require('mysql');
 //page: https://www.freemysqlhosting.net/account/
 //      https://www.freemysqlhosting.net/
 var con = mysql.createConnection({
-  host: "sql12.freemysqlhosting.net",
+  host: "sql9.freemysqlhosting.net",
   user: "sql9237381",
   password: "f8vbBJ4EyU",
-  database: "sql12234645",
+  database: "sql9237381",
   charset: "utf8_general_ci"
 });
 
