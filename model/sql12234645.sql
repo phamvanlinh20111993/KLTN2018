@@ -62,6 +62,25 @@ INSERT INTO `blocklist_user` (`id`, `whoblock`, `blockwho`, `reason`, `timeblock
 
 -- --------------------------------------------------------
 
+
+create table if not EXISTS notify_discussion( 
+  id bigint(40) unsigned not null AUTO_INCREMENT PRIMARY KEY, 
+  receiver bigint(30) UNSIGNED not null,
+  creater bigint(30) UNSIGNED, 
+  type_id int(8) unsigned not null, 
+  code bigint(40) unsigned not null,
+  ctime datetime not null 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `notify_discussion` ADD `state` INT(1) NOT NULL AFTER `code`;
+ALTER TABLE `notify_discussion` ADD `language_id` INT(4) UNSIGNED NOT NULL AFTER `type_id`;
+
+ALTER TABLE notify_discussion 
+  ADD CONSTRAINT `type id discussion` FOREIGN KEY (`type_id`) REFERENCES `type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `user id receiver discussion` FOREIGN KEY (`receiver`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE, 
+  ADD CONSTRAINT `language id discussion` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE ON UPDATE CASCADE, 
+  ADD CONSTRAINT `user id send discussion` FOREIGN KEY (`creater`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 --
 -- Cấu trúc bảng cho bảng `blockmessages`
 --
