@@ -871,7 +871,7 @@
 				   if(state == 0 && message.content != null && sessionStorage.getItem("_checkmiss_"+id) != "true")
 					   Misspelling(rid, content, null);
 
-			//	document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
+				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
 
 				//nhan tin nhan
@@ -969,7 +969,7 @@
 			     if(state == 0 &&  message.content != null)
 					   Misspelling(rid, content, null);
 
-			//	document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
+				document.getElementById(id+"_scrollmsg").scrollTop = document.getElementById(id+"_scrollmsg").scrollHeight
 			}
 
 
