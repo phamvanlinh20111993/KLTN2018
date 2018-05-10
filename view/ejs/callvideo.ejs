@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Call Video</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="icon bar" type="text/css" href="https://www.waseda.jp/inst/icc/assets/uploads/2015/10/web_image1.jpg">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <!--<script src="/lib/bootstrap-3.3.7-dist/jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="/lib/bootstrap-3.3.7-dist/font-awesome-4.7.0.min.css">
+  <link rel="stylesheet" href="/lib/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <script src="/lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script> -->
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 450px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: #f1f1f1;
+      height: 100%;
+    }
+    
+    /* Set black background color, white text and some padding */
+    footer {
+      background-color: #555;
+      color: white;
+      padding: 15px;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height:auto;} 
+    }
+  
+  html,body { height: 100%; margin: 0px; padding: 0px; }
+
+    .active{
+      border-left: 0px;
+      border-right: 0px;
+      border-radius: 0px;
+    }
+
+
+    .card {
+      max-width: 300px;
+      margin: auto;
+      text-align: center;
+      font-family: arial;
+   }
+
+   .title {
+      color: grey;
+      font-size: 16px;
+   }
+
+   .icon{
+      text-decoration: none;
+      font-size: 22px;
+      color: black;
+   }
+
+   button:hover, a:hover {
+      opacity: 0.7;
+   }
+
+   .inf-content{
+       border:1px solid #DDDDDD;
+      -webkit-border-radius: 10px;
+      -moz-border-radius: 10px;
+       border-radius: 10px;
+      -moz-box-shadow: 0 0 8px #828282;
+      -webkit-box-shadow: 0 0 8px #828282;
+       box-shadow: 0 0 8px #828282;
+   }  
+
+
+   .popup122 {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+   }
+
+/* The actual popup */
+.popup122 .popuptext {
+    width: 160px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: fixed;
+    z-index: 1;
+    margin-left:85%;
+    margin-top: 10%;
+}
+
+ .notifymessage td{
+    padding: 2%;
+    cursor: pointer;
+ }
+
+ .notifymessage tr{
+    border-top: 2px solid brown;
+ }
+
+ .notifymessage tr:hover { 
+   background-color: #ccc;
+}
+
+/* Add animation (fade in the popup) */
+/*@-webkit-keyframes fadeIn {
+    from {opacity: 0;} 
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+} */
+
+  </style>
+  <link rel="stylesheet" href="/css/processboxchat.css">
+  <!--<script src="/socket.io/socket.io.js"></script>-->
+  <script type="text/javascript">
+     const MYID = parseInt("<%= session.user_id  %>")
+     const MYEMAIL = "<%= session.email %>"
+     const MYPHOTO = "<%= session.photo %>"
+    // var socket = io.connect();
+  // var socket = io('http://localhost:5050');
+  </script>
+</head>
+
+<body>
+
+<noscript>
+  <div class="alert alert-warning">
+      <strong>Cảnh báo!</strong> Bạn đã tắt javascript trên trang web này. Ứng dụng này sử dụng javacript
+      để phát triển, vui lòng bật lại script. Thân ái.
+  </div>
+</noscript>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+       <a class="navbar-brand" href="#">Dịch vụ thực hành ngôn ngữ</a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <img src="http://inperugia.com/wp-content/uploads/2011/08/language-exchange-perugia.png" alt="Logo" style="width:40px;margin-top:10px;">
+    </div>
+  </div>
+</nav>
+
+<video width="320" height="240" id="video" controls>
+</video>
+</br>
+<textarea id="key"></textarea>
+
+<script src="/js/callvideo/bundle.js">
+</script>
+<!--<script type="text/javascript">
+   var socket = require('socket.io-client')('http://localhost:5050');
+
+   socket.on('connect', function(data) {
+      //ban dau la khi nguoi dung ket noi         
+      socket.emit('notifyOnline', MYID);//client bao voi server la t online roi
+      console.log("khoi tao connect")
+   });
+
+       //loi ket noi
+   socket.on('connect_error', function(err){
+      alert(err + ". Lỗi kết nối server.")
+   })
+
+   //loi timeout
+   socket.on('connect_timeout', function(err){
+      alert(err + ". Thời gian phản hồi quá lâu.")
+   })
+   console.log("id la " + MYID)
+
+   socket.on('xinchao', function(err){
+      alert(data + ". Thời gian phản hồi quá lâu.")
+   })
+
+
+</script> -->
+
+</body>
+
+
+</html>

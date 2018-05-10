@@ -195,19 +195,39 @@ var loadRequirePost = function(){
 }
 loadRequirePost()
 
+
 function viewProfileByName(uid){
-	console.log("sdsfdsfsdf")
-  location.href = "/languageex/user/profile?uid="+encodeURIComponent(uid)
+   location.href = "/languageex/user/profile?uid="+encodeURIComponent(uid)
+}
+
+
+var showSpecificPostNotify = function(id, type){
+    $('#Notify_post').modal('toggle');
+    document.getElementById("showpostusers").innerHTML = ""
+    requestServer('/languageex/user/post/findpostnotify','POST',{id:id,type:type},0,function(err, data){
+       if(err) alert(err)
+       else{
+         var Length = data.data.length
+         if(Length > 0){
+            showPost(data.data[0].user, data.data[0].posts, 0)
+            requestComment({id: data.data[0].posts.pid, own: data.data[0].user.id})
+            document.getElementById("showpostusers").innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại trang chính</button>"
+         }else{
+            alert("Bài đăng không tồn tại. Chủ bài đăng đã xóa bài đăng này.")
+            location.reload()
+         }
+       }
+    })
 }
 
 var showNotifyDiscussion = function(obj){
-	var element = '<tr style="border-top: 0px;">'+
+	var element = '<tr style="border-top:0px;">'+
               '<td style="padding:2%;"><img src="'+obj.photo+'" class="img-circle" alt="Avatar" height="45" width="45"></td>'+
               '<td style="width: 85%;">'+
                 '<div style="height: auto;width: auto;margin-left: 4%;">'+
                   '<span style="font-style: italic;font-size: 120%;font-weight: bold;">'+
                       '<a style="cursor:pointer;color:black;text-decoration: none;" onclick="viewProfileByName('+obj.id+')">'+obj.name+'</a></span>'+
-                  '<span style="font-size: 95%;"><a style="cursor:pointer;text-decoration: none;"> '+obj.content+'</a></span></br>'+
+                  '<span style="font-size:95%;"><a style="cursor:pointer;text-decoration:none;" onclick="showSpecificPostNotify('+obj.code+','+obj.typeid+')"> '+obj.content+'</a></span></br>'+
                   '<span style="font-size: 95%;font-style:italic;">'+formatAMPMDate(obj.time)+'</span>'+
                 '</div>'+
               '</td>'+
@@ -242,6 +262,7 @@ var loadNotifyDiscussion = function()
 						name: data.notify[ind].notifier.name,
 						photo: data.notify[ind].notifier.photo,
 						type: data.notify[ind].kind.type,
+                  typeid: data.notify[ind].kind.id,
 						code: data.notify[ind].kind.typecodeid,//mã bài đăng hoặc mã bình luận,
 						content: content,
 						state: data.notify[ind].state,
@@ -490,12 +511,14 @@ var likeOrDis = function(id){
 					user_id: MYID,//mã người thích bài đăng
 					myname: MYNAME,
 					photo: MYPHOTO,
+               language: MYPRIOEXID,
 					time: new Date()
 				})
 
 				var data = {
 					post_id: id, //mã bài đăng
 					user_id: MYID,//mã người thích bài đăng
+               language: MYPRIOEXID,
 					time: new Date()
 				}
 
@@ -871,6 +894,7 @@ var submitPost = function(){
 		      var data = {
 					post_id: data.resp, //mã bài đăng
 					user_id: MYID,//mã người thích bài đăng
+               language: MYPRIOEXID,
 					time: new Date()
 				}
 
@@ -928,6 +952,7 @@ var submitComment = function(e, postid, ownpostid){
 						post_id: postid,
 						cmt_id: dataid.res, //mã bài đăng
 						user_id: MYID,//mã người thích bài đăng
+                  language: MYPRIOEXID,
 						time: new Date()
 					}
 

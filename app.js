@@ -87,6 +87,7 @@ var filter = require('./controller/filter')
 var msgsetting = require('./controller/home/msgsetting')
 var profile = require('./controller/home/profile')
 var post_setting =  require('./controller/home/posts_setting')
+var callvideo = require('./controller/home/callvideo')
 
 //admin's controller
 var adminlg = require('./controller/admin/login')
@@ -109,6 +110,7 @@ app.use('/languageex', messenger)
 app.use('/languageex', msgsetting)
 app.use('/languageex', profile)
 app.use('/languageex', post_setting)
+app.use('/languageex', callvideo)
 
 //use for admin
 app.use('/languageex', adminlg)
@@ -591,7 +593,7 @@ io.on('connection', function(client)
                      }
 
                      data.listwasfollowed = listwasfollowed
-                     io.sockets.in(client.handshake.session.community).emit('notifypostdone', data)
+                    client.in(client.handshake.session.community).emit('notifypostdone', data)
                   }
             })
                   
@@ -609,7 +611,7 @@ io.on('connection', function(client)
                   if (err) {throw err}
                   else{
                      data.ownpost = result[0].user_id
-                     io.sockets.in(client.handshake.session.community).emit('notifycmtdone', data)
+                     client.in(client.handshake.session.community).emit('notifycmtdone', data)
                   }
             })
          }
@@ -625,13 +627,93 @@ io.on('connection', function(client)
                   if (err) {throw err}
                   else{
                      data.ownpost = result[0].user_id
-                     io.sockets.in(client.handshake.session.community).emit('notifylikedone', data)
+                     client.in(client.handshake.session.community).emit('notifylikedone', data)
                   }
             })
          }
         
       }
    })
+
+
+
+
+   //goi video truc tuyen theo cach so 2
+   //gui ma ket noi goi video page Callvideo1.js
+   client.on('signalcallvideo', function(data){
+      if(data && parseInt(data.pid) && parseInt(data.myid)){
+         var myid = data.myid.toString();
+         var pid = data.pid.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
+
+         client.broadcast.emit('receivesignalcallvideo', data)
+      }
+   })
+
+
+
+    client.on('acceptcallvideo', function(data){
+      // if(data && parseInt(data.pid) && parseInt(data.myid)){
+      //    var myid = data.myid.toString();
+      //    var pid = data.pid.toString();
+      //    if(myid > pid)
+      //       client.room = myid + pid
+      //    else
+      //       client.room = pid + myid
+
+         client.broadcast.emit('callercreatecode', data)
+    //  }
+   })
+
+    client.on('sendcodetoreceiver', function(data){
+      // if(data && parseInt(data.caller) && parseInt(data.receiver)){
+      //    var myid = data.caller.toString();
+      //    var pid = data.receiver.toString();
+      //    if(myid > pid)
+      //       client.room = myid + pid
+      //    else
+      //       client.room = pid + myid
+        setTimeout(function(){
+            console.log("nhan tin hieu")
+            client.broadcast.emit('receivertakecode', data)
+        }, 3000)
+         
+        
+  //    }
+   })
+
+     client.on('sendcodetocaller', function(data){
+      // if(data && parseInt(data.caller) && parseInt(data.receiver)){
+      //    var myid = data.caller.toString();
+      //    var pid = data.receiver.toString();
+      //    if(myid > pid)
+      //       client.room = myid + pid
+      //    else
+      //       client.room = pid + myid
+
+         client.broadcast.emit('createdcall', data)
+        
+  //    }
+   })
+
+
+  /*  client.on('signalendcall', function(data){
+      if(data && parseInt(data.caller) && parseInt(data.receiver)){
+         var myid = data.caller.toString();
+         var pid = data.receiver.toString();
+         if(myid > pid)
+            client.room = myid + pid
+         else
+            client.room = pid + myid
+
+         client.broadcast.emit('endcalled', data)
+        
+      }
+   }) */
+
 
 })
 

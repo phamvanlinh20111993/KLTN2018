@@ -81,3 +81,6 @@ socket.io p2p
  FROM exchangelg WHERE user_id = 804260829616815200) 
  GROUP BY p.id 
  ORDER BY p.ctime DESC, ex.prio DESC
+
+
+browserify public/js/callvideo/main.js -o public/js/callvideo/bundle.js

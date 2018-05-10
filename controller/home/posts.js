@@ -248,8 +248,8 @@ router.route('/user/notifylike')
          if (err) {throw err}
          else{
          	if(result[0].user_id != data.user_id){
-					var field = ["receiver", "creater", "type_id","code", "state", "ctime"]
-					var value = [result[0].user_id, data.user_id, type_id, data.post_id, 0, new Date(data.time)]
+					var field = ["receiver", "creater", "type_id","code", "state", "language_id", "ctime"]
+					var value = [result[0].user_id, data.user_id, type_id, data.post_id, 0, data.language, new Date(data.time)]
 					querysimple.insertTable("notify_discussion", field, value, 
 		  				function(result1, fields1, err1){
 							if(err1) throw err1;
@@ -273,8 +273,8 @@ router.route('/user/notifycmt')
          if (err) {throw err}
          else{
          	if(result[0].user_id != data.user_id){
-	            var field = ["receiver", "creater", "code", "type_id", "state", "ctime"]
-					var value = [result[0].user_id, data.user_id, data.cmt_id, type_id, 0, new Date(data.time)]
+	            var field = ["receiver", "creater", "code", "type_id", "state", "language_id", "ctime"]
+					var value = [result[0].user_id, data.user_id, data.cmt_id, type_id, 0, data.language, new Date(data.time)]
 					querysimple.insertTable("notify_discussion", field, value, 
 				 		function(result1, fields1, err1){
 						if(err1) throw err1;
@@ -292,8 +292,8 @@ var insertTableQueryLoop = function(index, insertvl, Length, array, cb)
 {
 	if(index < Length){
 		//state 0 la trang thai chua doc
-		var field = ["receiver", "creater", "code",  "type_id", "state", "ctime"]
-		var value = [array[index].followers, insertvl.user_id, insertvl.post_id, insertvl.type_id, 0, new Date(insertvl.time)]
+		var field = ["receiver", "creater", "code",  "type_id", "state", "language_id", "ctime"]
+		var value = [array[index].followers, insertvl.user_id, insertvl.post_id, insertvl.type_id, 0, insertvl.language, new Date(insertvl.time)]
 
 		querysimple.insertTable("notify_discussion", field, value, 
 			function(result, fields, err){
@@ -335,6 +335,35 @@ router.route('/user/changestatenofifypost')
 				if(err) throw err
 				else res.json({data: "updated success."})
 			})
+	}
+})
+
+//filter post by name or filter
+router.route('/user/post/findpostnotify')
+.post(function(req, res){
+	if(req.session.user_id){
+		var type = req.body.data.type
+		var id = req.body.data.id
+
+		if(id && type){
+			if(type==1){//comment
+				querysimple.selectTable("comment", ["post_id"], [{op:"", field: "id", value:type}],  
+					null, null, null, function(result, fields, err){
+						if(err) throw err
+						else{
+							postcomment.selectPostById(req.session.user_id, result[0].post_id, function(data){
+								res.json({data: data})
+							})
+						}
+				})
+				
+			}else{
+				postcomment.selectPostById(req.session.user_id, id, function(data){
+					res.json({data: data})
+				})
+			}
+		}
+		
 	}
 })
 
