@@ -275,7 +275,7 @@ var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(
 				Listmessages.userB.score = result[1].score
 
 				//delete conversation
-				var sqlString1 = "SELECT del.whodel, del.delwho, del.ctime" +
+				var sqlString1 = "SELECT del.whodel, del.delwho, del.ctime AS ctime" +
 	                 " FROM delconversation del WHERE del.whodel = " +mysql.escape(idme)+ 
 	                 " AND del.delwho = "+mysql.escape(idB)+
 	                 " ORDER BY del.ctime DESC LIMIT 1"
@@ -285,7 +285,9 @@ var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(
 	            	else{
 
 	            		var deltime = ""
-	            		console.log(result1)
+	            		//console.log(result1[0].ctime)
+	            		//console.log(getDateTime(new Date(result1[0].time)))
+
 	            		if(result1.length > 0)
 	            			deltime = " AND me.time > '" + getDateTime(new Date(result1[0].ctime))+"'"
 
@@ -355,6 +357,8 @@ var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(
 	 									}
 	 								}
 	 							}
+
+	 						//	console.log(Listmessages)
 	 					
 	 							cb(null, Listmessages)
 	 						}

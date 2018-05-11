@@ -55,7 +55,15 @@ router.route('/user/post')
 		}else{
 			querysimple.selectUser(req.session.email, function(result, fields, err){
 				if(err) throw err
-				else res.render('ejs/discussion', {user: result})
+				else{
+				 	anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+						req.session.mynative = data[0].natsy//kí hieu ngon ngu
+						req.session.myexchange = data[0].exsy
+						req.session.mynativeid = data[0].natid//kí hieu ma ngon ngu
+						req.session.myexchangeid = data[0].exid
+						res.render('ejs/discussion', {user: result})
+					})
+				}
 			})
 		}
 		
@@ -92,8 +100,15 @@ router.route('/user/post')
 		//do something
 		querysimple.selectUser(req.session.email, function(result, fields, err){
 			if(err) throw err
-			else
-				res.render('ejs/discussion', {user: result})
+			else{
+				anotherquery.select_max_prio_Ex_and_Navtive(result[0].id, function(data){
+					req.session.mynative = data[0].natsy//kí hieu ngon ngu
+					req.session.myexchange = data[0].exsy
+					req.session.mynativeid = data[0].natid//kí hieu ma ngon ngu
+					req.session.myexchangeid = data[0].exid
+					res.render('ejs/discussion', {user: result})
+				})
+			}
 		})
 		
 	}
@@ -153,7 +168,7 @@ router.route('/user/post/filter')
 .post(function(req, res){
 	if(req.session.user_id){
 		var valuefilter = req.body.data.value
-		postcomment.selectNotMyposts(req.session.user_id, null, valuefilter, 
+		postcomment.selectNotMyposts(req.session.user_id, null, null, null, valuefilter, 
 		 function(data){
 			res.json({data: data})
 		})
@@ -248,12 +263,12 @@ router.route('/user/notifylike')
          if (err) {throw err}
          else{
          	if(result[0].user_id != data.user_id){
-					var field = ["receiver", "creater", "type_id","code", "state", "language_id", "ctime"]
-					var value = [result[0].user_id, data.user_id, type_id, data.post_id, 0, data.language, new Date(data.time)]
-					querysimple.insertTable("notify_discussion", field, value, 
-		  				function(result1, fields1, err1){
-							if(err1) throw err1;
-							else
+					 var field = ["receiver", "creater", "type_id","code", "state", "language_id", "ctime"]
+					 var value = [result[0].user_id, data.user_id, type_id, data.post_id, 0, data.language, new Date(data.time)]
+					 querysimple.insertTable("notify_discussion", field, value, 
+		  	 			function(result1, fields1, err1){
+					 		if(err1) throw err1;
+					 		else
 								res.json({data: result1})
 					})
 				}
@@ -272,14 +287,15 @@ router.route('/user/notifycmt')
             null, null, null, function(result, fields, err){
          if (err) {throw err}
          else{
-         	if(result[0].user_id != data.user_id){
-	            var field = ["receiver", "creater", "code", "type_id", "state", "language_id", "ctime"]
-					var value = [result[0].user_id, data.user_id, data.cmt_id, type_id, 0, data.language, new Date(data.time)]
-					querysimple.insertTable("notify_discussion", field, value, 
-				 		function(result1, fields1, err1){
-						if(err1) throw err1;
+         	console.log(data)
+          	if(result[0].user_id != data.user_id){
+	             var field = ["receiver", "creater", "code", "type_id", "state", "language_id", "ctime"]
+					 var value = [result[0].user_id, data.user_id, data.cmt_id, type_id, 0, data.language, new Date(data.time)]
+					 querysimple.insertTable("notify_discussion", field, value, 
+				  		function(result1, fields1, err1){
+					 	if(err1) throw err1;
 						else
-							res.json({data: result1})
+							res.json({data: "Done"})
 					}) 
 				}        
          }

@@ -511,7 +511,7 @@ var likeOrDis = function(id){
 					user_id: MYID,//mã người thích bài đăng
 					myname: MYNAME,
 					photo: MYPHOTO,
-               language: MYPRIOEXID,
+          language: MYPRIOEXID,
 					time: new Date()
 				})
 
@@ -1204,7 +1204,8 @@ var SearchUsersEnter = function(e, id){
 
 //back to communypost
 var backToStart = function(){
-   document.getElementById("fitlerbytopicpost").selectedIndex = "0";
+ //  document.getElementById("fitlerbytopicpost").selectedIndex = "0";
+   COUNTLOADPOST = 0;
    selectComunityPost();
 }
 
@@ -1297,12 +1298,13 @@ socket.on('turnoncmtnotify', function(data){
 })
 
 var showPostByid = function(pid){
-	document.getElementById("showpostusers").innerHTML = ""
 	document.getElementById("myPopupdivNotify").style.display = "none"
-	  requestServer('/languageex/user/post/findpost', 'POST', {value: pid}, 0, function(err, data){
+	requestServer('/languageex/user/post/findpost', 'POST', {value: pid}, 0, function(err, data){
 		 if(err) alert(err)
 		 else{
-			var Length = data.data.length
+			 var Length = data.data.length
+          console.log(data)
+          document.getElementById("showpostusers").innerHTML = ""
 			if(Length > 0){
 		 		showPost(data.data[0].user, data.data[0].posts, 0)
 		 		requestComment({id: data.data[0].posts.pid, own: data.data[0].user.id})
@@ -1312,7 +1314,7 @@ var showPostByid = function(pid){
 		 		location.reload()
 		 	}
 		 }
-	 })
+	})
 }
 
 

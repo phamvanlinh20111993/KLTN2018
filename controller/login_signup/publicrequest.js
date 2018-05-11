@@ -77,7 +77,8 @@ function Error(id, req, cb){
      			if(req.session)
 					req.session.destroy()
 				var timebl = (new Date(result[0].timeblock) - new Date(result[0].time))/31536000000
-				errstr.err = "Tài khoản của bạn bị khóa vì "+result[0].content + ". Thời gian khóa " + timebl*365+ " ngày."
+				errstr.err = "Tài khoản của bạn bị khóa vì "+result[0].content + ". Thời gian khóa " + timebl*365+ " ngày."+
+				              " Thời gian còn lại "+parseInt((new Date(result[0].timeblock) - new Date())/3600000)+ " giờ."
 				if(timebl > 50)
 					errstr.err = "Tài khoản của bạn bị xóa khỏi hệ thống vì "+result[0].content +"."
 				errstr.link =  "/languageex/user"

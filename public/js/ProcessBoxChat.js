@@ -361,11 +361,13 @@
 									 //show all message
 									 document.getElementById(id+"_content").innerHTML = "";
 									 for(var ind = myMessages.length-1; ind >= 0; ind--){
+									 	if( myMessages[ind] != null){
 										  if(MYID == myMessages[ind].idA){//toi la nguoi gui
 												Message_send(id, myMessages[ind].time, myInfo.photo, myMessages[ind], 1)
 										  }else{
 												Message_receiver(id, myMessages[ind].time, pInfo.photo, myMessages[ind], 1)
 										  }
+										}
 									 }   
 								}
 

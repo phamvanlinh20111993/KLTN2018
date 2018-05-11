@@ -384,7 +384,7 @@ io.on('connection', function(client)
             //chen du lieu vao bang
             querysimple.insertTable("message", 
                ["userA", "userB", "data", "content", "ischeck", "time", "misspelling"], //field
-               [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, data.time, data.content.misspelling], 
+               [parseInt(data.myid), parseInt(data.pid), data.content.data, data.content.content, 1, new Date(data.time), data.content.misspelling], 
               function(result, err){
                  if(err)  throw err;
                   else{

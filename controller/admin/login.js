@@ -5,7 +5,7 @@ var CryptoJS = require("crypto-js")
 var md5 = require('md5') 
 var libfunction = require('../../local_modules/customfunction')
 var querysimple = require('../../model/QuerysingletableSimple')
-
+var anotherquery = require('../../model/Anotherquery')
 
 router.route('/admin')
 .get(function(req, res){
