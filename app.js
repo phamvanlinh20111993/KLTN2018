@@ -143,7 +143,7 @@ io.on('connection', function(client)
 
        	for(index = 0; index < userOnorOffline_id.length; index ++){
            	if(userOnorOffline_id[index] == id){
-   	     		io.to(client.handshake.session.community).emit('numofuseronline',  client.handshake.session.numOn)
+   	     		io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)
                client.in(client.handshake.session.community).emit('whoonline', {id: id, state:true})//ca 
              	flag = true;
              	break;
@@ -188,7 +188,9 @@ io.on('connection', function(client)
                            }
                            client.handshake.session.save();
 
-                           console.log("my community room " + client.handshake.session.community)
+                           console.log("My community room " + client.handshake.session.community)
+                           console.log(data)
+                           console.log("so nguoi on: " +client.handshake.session.numOn)
                            console.log('Transaction Complete.');
                            client.join(client.handshake.session.community)
                            io.to(client.handshake.session.community).emit('numofuseronline', client.handshake.session.numOn)

@@ -139,7 +139,7 @@ var selectListUsermyCommunityEx = function(id, cb){
 	//select my id, my exchangelanguage
 	var sqlstr = "SELECT exchangelg.language_id AS exid FROM "+
 			  "exchangelg WHERE exchangelg.user_id = "+ parseInt(id)+
-			  " AND prio = 1"
+			  " AND prio = 1"//ngon ngu dang chon de trao doi
 
 	con.query(sqlstr, function(err, result, fields){
 		if(err)	throw err;
@@ -156,13 +156,12 @@ var selectListUsermyCommunityEx = function(id, cb){
 			if(result.length > 1) orcondi +=")"
 
 			var sqlString = "SELECT ex.user_id AS id, u.state, ex.language_id FROM exchangelg ex "+
-							" JOIN user u ON ex.user_id = u.id "+
+							" JOIN user u ON ex.user_id = u.id AND ex.prio = 1"+//dang su dung ngon ngu trao doi
 							" WHERE "+//"ex.user_id != "+mysql.escape(id) +" AND "+ //comment 12:56AM 13/4
 							orcondi+
 							" GROUP BY ex.user_id"//add 12:56AM 13/4
             
-         //   console.log(sqlString)
-
+          console.log(sqlString)
 		    con.query(sqlString, function(err1, result1, fields1){
 		    	if(err1) throw err1;
 		    	else  cb(result1)

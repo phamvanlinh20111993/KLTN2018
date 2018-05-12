@@ -348,13 +348,13 @@ var SearchUsersClick = function(id){
           if(data.community.length == 0){
             MycommunityExchange.innerHTML = "<div class='alert alert-danger' style='margin-top:10%;'>"+
                "<strong>Danger!</strong>Không tìm thấy kết quả nào phù hợp.</div>"+
-               "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
+               "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button>"
           }else{
             MycommunityExchange.innerHTML = "("+data.community.length+") Kết quả phù hợp."
             for(ind = 0; ind <  data.community.length; ind++){
                showUserCommunity(data.community[ind])
             }
-            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button"
+            MycommunityExchange.innerHTML  +=  "<button type='button' class='btn btn-link' onclick='backToStart()'>Quay lại</button>"
          }
       })
     }
@@ -394,12 +394,13 @@ var backToStart = function(){
    getListUserCommnunity(MYID, COUNTLOADUSER, function(data, err){
       if(err) alert(err)
       else{
+         console.log("toi da chay dong nay")
          document.getElementById("MycommunityExchange").innerHTML = ""
          var size = data.community.length;
          var ind = 0;
             //  console.log(data)
          for(ind = 0; ind < size; ind++)
-               showUserCommunity(data.community[ind])
+            showUserCommunity(data.community[ind])
       }
    })
 }
