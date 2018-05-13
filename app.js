@@ -665,9 +665,7 @@ io.on('connection', function(client)
       //    else
       //       client.room = pid + myid
 
-         setTimeout(function(){
-            client.broadcast.emit('callercreatecode', data)
-         }, 2000) 
+         client.broadcast.emit('callercreatecode', data)
     //  }
    })
 
