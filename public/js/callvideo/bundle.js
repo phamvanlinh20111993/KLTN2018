@@ -13324,7 +13324,9 @@ module.exports = yeast;
 			function gotMedia (stream) {
 
 				var Peer = require('simple-peer')
-				var peer1 = new Peer({ initiator: true, reconnectTimer: 3000, trickle: false , stream : stream});
+				var peer1 = new Peer({ initiator: true, reconnectTimer: 3000, iceTransports: 'relay',
+					 config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ] },
+					 trickle: false , stream : stream});
 				console.log(peer1);
 
 				peer1.on('signal', function (data) {
@@ -13378,7 +13380,9 @@ module.exports = yeast;
 			function gotMedia (stream) {
 
 				var Peer = require('simple-peer')
-				var peer1 = new Peer({initiator: false, trickle: false, reconnectTimer: 3000, stream : stream});
+				var peer1 = new Peer({initiator: false, trickle: false, iceTransports: 'relay',
+					  config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ] },
+						reconnectTimer: 3000, stream : stream});
 				console.log(peer1);
 
 				console.log(data1.code)
