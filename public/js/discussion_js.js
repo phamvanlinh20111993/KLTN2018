@@ -972,11 +972,12 @@ var submitComment = function(e, postid, ownpostid){
  auto return all of posts
 **/
 var selectComunityPost = function(){
-	document.getElementById("showpostusers").innerHTML = ""
 	document.getElementById("fitlerbytopicpost").selectedIndex = "0";
+  COUNTLOADPOST = 0;
 	requestServer('/languageex/user/loadpost', 'POST', {limit: COUNTLOADPOST}, 0, function(err, data){
 		if(err) alert(err)
 		else{
+      document.getElementById("showpostusers").innerHTML = ""
 			var Length = data.data.length
 			if(Length){
 				console.log(data)
