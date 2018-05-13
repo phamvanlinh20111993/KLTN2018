@@ -342,7 +342,7 @@
 									Show_pop_up_message(id, name, photo, setting); 
 								var myMessages = {}
 
-							 //  console.log(content)
+							   console.log(content)
 								if(content.listmessage)
 									 myMessages = content.listmessage.messages
 
@@ -1230,7 +1230,7 @@
 										  break;
 									 }
 								}
-								data = doTask(message.content, message.edit[0].newcontent)
+								data = doTask(message.content, message.edit[1].newcontent)
 								anotheredit = '<tr><td><image src='+avatar1+' class="img-circle" height="35" width="35" alt="Avatar"></td><td>'+data.add+' (mới)</td><td>'+getDateTime(new Date(message.edit[1].time))+'</td><td><input type="checkbox" checked disabled></td></tr>' 
 						  }
 					 

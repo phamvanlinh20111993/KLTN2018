@@ -189,7 +189,6 @@ io.on('connection', function(client)
                            client.handshake.session.save();
 
                            console.log("My community room " + client.handshake.session.community)
-                           console.log(data)
                            console.log("so nguoi on: " +client.handshake.session.numOn)
                            console.log('Transaction Complete.');
                            client.join(client.handshake.session.community)
@@ -666,7 +665,9 @@ io.on('connection', function(client)
       //    else
       //       client.room = pid + myid
 
-         client.broadcast.emit('callercreatecode', data)
+         setTimeout(function(){
+            client.broadcast.emit('callercreatecode', data)
+         }, 2000) 
     //  }
    })
 

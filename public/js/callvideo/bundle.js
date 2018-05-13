@@ -13310,41 +13310,56 @@ module.exports = yeast;
       alert(err + ". Thời gian phản hồi quá lâu.")
    })
 
-
+  //nguoi gui tao ma
    socket.on('callercreatecode', function(data1){
-   	console.log("nguoi gui tao ma")
 
-		navigator.getUserMedia = navigator.getUserMedia ||
-		                         navigator.webkitGetUserMedia ||
-		                         navigator.mozGetUserMedia;
-								 
-		navigator.getUserMedia({ video: true, audio: true }, gotMedia, function () {})
+   	if(data1.pid == MYID){
+	   	console.log("ben gui da chay")
+			navigator.getUserMedia = navigator.getUserMedia ||
+			                         navigator.webkitGetUserMedia ||
+			                         navigator.mozGetUserMedia;
+									 
+			navigator.getUserMedia({ video: true, audio: true }, gotMedia, function () {})
 
-		function gotMedia (stream) {
+			function gotMedia (stream) {
 
-			var Peer = require('simple-peer')
-			var peer1 = new Peer({ initiator: true, trickle: false , stream : stream});
-			console.log(peer1);
+				var Peer = require('simple-peer')
+				var peer1 = new Peer({ initiator: true, trickle: false , stream : stream});
+				console.log(peer1);
 
-			peer1.on('signal', function (data) {
-				socket.emit('sendcodetoreceiver', {caller:data1.myid, receiver:data1.pid, code:JSON.stringify(data)})
-				document.getElementById('key').value = JSON.stringify(data)
-			})
+				peer1.on('signal', function (data) {
+					console.log("code " + JSON.stringify(data))
+					socket.emit('sendcodetoreceiver', {caller:data1.myid, receiver:data1.pid, code:JSON.stringify(data)})
+					document.getElementById('key').value = JSON.stringify(data)
+				})
 
-			socket.on('createdcall', function(data){
-				console.log(data.code)
-				console.log("da xong")
-				if(typeof data.code.type !== undefined){
-					console.log("run naod")
-					peer1.signal(JSON.parse(data.code));
-				}
-			})
+				socket.on('createdcall', function(data){
+					console.log(data.code)
+					console.log("da xong")
+					if(typeof data.code.type !== undefined){
+						console.log("run nao")
+						peer1.signal(JSON.parse(data.code));
+					}
+				})
 
-			peer1.on('stream', function(stream){
-				var video = document.querySelector('video');
-				video.srcObject = stream;
-				video.play();
-			});
+				peer1.on('stream', function(stream){
+					var video = document.querySelector('video');
+					video.srcObject = stream;
+					//video.play();
+					var playPromise = video.play();
+
+				  	if (playPromise !== undefined) {
+				    	playPromise.then(_ => {
+				      // Automatic playback started!
+				      // Show playing UI.
+				    	})
+				    	.catch(error => {
+				      	// Auto-play was prevented
+				      	// Show paused UI.
+				    	});
+				  	}
+				});
+			}
 		}
 
 	})
@@ -13353,40 +13368,53 @@ module.exports = yeast;
    //nguoi nhan lay ma cua nguoi gui de tao ma va gui lai ma cho nguoi nhan
 	socket.on('receivertakecode', function(data1){
 
-		console.log("nguoi nhan ")
-		console.log(data1.code)
+		if(data1.caller == MYID)
+		{
+			console.log("ben nhan da chay")
+			navigator.getUserMedia = navigator.getUserMedia ||
+			                         navigator.webkitGetUserMedia ||
+			                         navigator.mozGetUserMedia;
+									 
+			navigator.getUserMedia({ video: true, audio: true }, gotMedia, function () {})
 
-		navigator.getUserMedia = navigator.getUserMedia ||
-		                         navigator.webkitGetUserMedia ||
-		                         navigator.mozGetUserMedia;
-								 
-		navigator.getUserMedia({ video: true, audio: true }, gotMedia, function () {})
+			function gotMedia (stream) {
 
-		function gotMedia (stream) {
+				var Peer = require('simple-peer')
+				var peer1 = new Peer({ initiator: false, trickle: false, stream : stream});
+				console.log(peer1);
 
-			var Peer = require('simple-peer')
-			var peer1 = new Peer({ initiator: false, trickle: false, stream : stream});
-			console.log(peer1);
+				peer1.signal(JSON.parse(data1.code));
+				//nguoi nhan tao ma
+				peer1.on('signal', function(data) {
+					console.log(data)
+					console.log("nguoi nhan dã tao xong ma.")
+					document.getElementById('key').value = JSON.stringify(data)
 
-			//nguoi nhan tao ma
-			peer1.on('signal', function (data) {
-				console.log(data)
-				console.log("nguoi nhan dã tao xong ma.")
-				document.getElementById('key').value = JSON.stringify(data)
+					if(typeof data.type !== 'undefined'){
+						console.log(data.type)
+						socket.emit('sendcodetocaller', {caller:data1.caller,receiver:data1.receiver,code:JSON.stringify(data)})
+					}
+				})
+				
 
-				if(typeof data1.code.type !== undefined){
-					console.log("toi da renegotiate")
-					socket.emit('sendcodetocaller', {caller:data1.caller,receiver:data1.receiver,code:JSON.stringify(data)})
-				}
-			})
+				peer1.on('stream', function(stream){
+					var video = document.querySelector('video');
+					video.srcObject = stream;
+					//video.play();
+					var playPromise = video.play();
 
-			peer1.signal(JSON.parse(data1.code));
-
-			peer1.on('stream', function(stream){
-				var video = document.querySelector('video');
-				video.srcObject = stream;
-				video.play();
-			});
+				  if (playPromise !== undefined) {
+				    playPromise.then(_ => {
+				      // Automatic playback started!
+				      // Show playing UI.
+				    })
+				    .catch(error => {
+				      // Auto-play was prevented
+				      // Show paused UI.
+				    });
+				  }
+				});
+			}
 		}
 
 	})

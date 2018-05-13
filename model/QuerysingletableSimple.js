@@ -300,7 +300,7 @@ var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(
 	 					 	" OR (me.userA = "+mysql.escape(idB)+" AND me.userB = "+mysql.escape(idme)+"))" +
 	 					 	deltime +
 	 					 	" ORDER BY me.time DESC"+
-	 					 	" LIMIT "+ lmp + " ," +lmn
+	 					 	" LIMIT "+ lmp + ", " +lmn
 
 	 					   console.log(sqlString2)
 
@@ -310,7 +310,7 @@ var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(
 	 						else{
 
 	 							Listmessages.messages = []
-	 							var ind = 0, ind1 = 0;
+	 							var ind = 0, ind1 = 0, indexmsg = -1;
 	 							var mark = []
 
 	 							for(ind = 0; ind < result2.length; ind++) mark[ind] = 0;
@@ -318,48 +318,47 @@ var selectMessage = function(idme, idB, lmp, lmn, cb){//nhan tin voi nguoi khac(
 	 							for(ind = 0; ind < result2.length; ind++)
 	 							{
 	 								if(mark[ind] == 0){
-	 									Listmessages.messages[ind] = {}
-	 									Listmessages.messages[ind].messageid = result2[ind].id
-										Listmessages.messages[ind].idA = result2[ind].userA
-										Listmessages.messages[ind].idB = result2[ind].userB
+	 									indexmsg ++;
+	 									Listmessages.messages[indexmsg] = {}
+	 									Listmessages.messages[indexmsg].messageid = result2[ind].id
+										Listmessages.messages[indexmsg].idA = result2[ind].userA
+										Listmessages.messages[indexmsg].idB = result2[ind].userB
 
-										Listmessages.messages[ind].data = result2[ind].data
+										Listmessages.messages[indexmsg].data = result2[ind].data
 										//console.log(result2[ind].data)
 
-										Listmessages.messages[ind].content = result2[ind].content
-										Listmessages.messages[ind].time = result2[ind].time
-										Listmessages.messages[ind].ischeck = result2[ind].ischeck
-										Listmessages.messages[ind].misspelling = result2[ind].misspelling
+										Listmessages.messages[indexmsg].content = result2[ind].content
+										Listmessages.messages[indexmsg].time = result2[ind].time
+										Listmessages.messages[indexmsg].ischeck = result2[ind].ischeck
+										Listmessages.messages[indexmsg].misspelling = result2[ind].misspelling
 
 										var pos = 0;
-										Listmessages.messages[ind].edit = []
+										Listmessages.messages[indexmsg].edit = []
 
 										if(result2[ind].idedit){
-											Listmessages.messages[ind].edit[pos] = {}
-											Listmessages.messages[ind].edit[pos].whoedit = result2[ind].idedit 
-											Listmessages.messages[ind].edit[pos].newcontent = result2[ind].ncontent
-											Listmessages.messages[ind].edit[pos].time = result2[ind].ntime
-											Listmessages.messages[ind].edit[pos].misspelling = result2[ind].emissspell
+											Listmessages.messages[indexmsg].edit[pos] = {}
+											Listmessages.messages[indexmsg].edit[pos].whoedit = result2[ind].idedit 
+											Listmessages.messages[indexmsg].edit[pos].newcontent = result2[ind].ncontent
+											Listmessages.messages[indexmsg].edit[pos].time = result2[ind].ntime
+											Listmessages.messages[indexmsg].edit[pos].misspelling = result2[ind].emissspell
 											pos++;
-										}else	continue;
+										}else	
+											continue;
 							
-
 	 									for(ind1 = ind + 1; ind1 < result2.length; ind1++){
 	 										if(result2[ind].id == result2[ind1].id && mark[ind1]== 0){
 	 											mark[ind1] = 1;
-	 											Listmessages.messages[ind].edit[pos] = {}
-	 											Listmessages.messages[ind].edit[pos].whoedit = result2[ind1].idedit 
-												Listmessages.messages[ind].edit[pos].newcontent = result2[ind1].ncontent
-												Listmessages.messages[ind].edit[pos].time = result2[ind1].ntime
-												Listmessages.messages[ind].edit[pos].misspelling = result2[ind1].emissspell
+	 											Listmessages.messages[indexmsg].edit[pos] = {}
+	 											Listmessages.messages[indexmsg].edit[pos].whoedit = result2[ind1].idedit 
+												Listmessages.messages[indexmsg].edit[pos].newcontent = result2[ind1].ncontent
+												Listmessages.messages[indexmsg].edit[pos].time = result2[ind1].ntime
+												Listmessages.messages[indexmsg].edit[pos].misspelling = result2[ind1].emissspell
 	 											pos++;
 	 										}
 	 									}
 	 								}
 	 							}
 
-	 						//	console.log(Listmessages)
-	 					
 	 							cb(null, Listmessages)
 	 						}
 	 					})

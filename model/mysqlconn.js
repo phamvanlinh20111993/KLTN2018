@@ -2,13 +2,13 @@
 var mysql = require('mysql');
 
 //server local
-// var con = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "KLTN_ExLanguage",
-//   charset: "utf8_general_ci"
-// }); 
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "KLTN_ExLanguage",
+  charset: "utf8_general_ci"
+}); 
 
 
 //server online
@@ -24,13 +24,14 @@ var mysql = require('mysql');
 //pass: G!$!7RYPwwFg7OHL
 //page: https://www.freemysqlhosting.net/account/
 //      https://www.freemysqlhosting.net/
-var con = mysql.createConnection({
-  host: "sql9.freemysqlhosting.net",
-  user: "sql9237381",
-  password: "f8vbBJ4EyU",
-  database: "sql9237381",
-  charset: "utf8_general_ci"
-});
+//      http://www.phpmyadmin.co/
+// var con = mysql.createConnection({
+//   host: "sql9.freemysqlhosting.net",
+//   user: "sql9237381",
+//   password: "f8vbBJ4EyU",
+//   database: "sql9237381",
+//   charset: "utf8_general_ci"
+// });
 
 con.connect(function(err) {
   if (err) throw err;
