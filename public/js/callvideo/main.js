@@ -1,4 +1,4 @@
-   /* var socket = require('socket.io-client')();
+    var socket = require('socket.io-client')();
 
    socket.on('connect', function(data) {
       //ban dau la khi nguoi dung ket noi         
@@ -48,6 +48,10 @@
 						peer1.signal(JSON.parse(data.code));
 					}
 				})
+
+				 peer1.on('connect', function(){
+     				 console.log('Đã kết nối');
+    			 });
 
 				peer1.on('stream', function(stream){
 					var video = document.querySelector('video');
@@ -104,6 +108,9 @@
 					}
 				})
 				
+				 peer1.on('connect', function(){
+      				console.log('Đã kết nối');
+    			 });
 
 				peer1.on('stream', function(stream){
 					var video = document.querySelector('video');
@@ -125,10 +132,10 @@
 			}
 		}
 
-	}) */
+	})
 
 
-	var Peer = require('simple-peer')
+/*	var Peer = require('simple-peer')
 navigator.getUserMedia = navigator.getUserMedia ||
                          navigator.webkitGetUserMedia ||
                          navigator.mozGetUserMedia;
@@ -159,4 +166,4 @@ function gotMedia (stream) {
 		video.srcObject = stream;
 		video.play();
 	});
-}
+} */
