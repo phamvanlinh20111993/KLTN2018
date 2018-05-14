@@ -13325,7 +13325,7 @@ module.exports = yeast;
 
 				var Peer = require('simple-peer')
 				var peer1 = new Peer({ initiator: true, reconnectTimer: 3000,
-					 config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'replay' },
+					 config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'all' },
 					 trickle: false , stream : stream});
 				console.log(peer1);
 
@@ -13385,7 +13385,7 @@ module.exports = yeast;
 
 				var Peer = require('simple-peer')
 				var peer1 = new Peer({initiator: false, trickle: false,
-					  config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'replay' },
+					  config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'all' },
 						reconnectTimer: 3000, stream : stream});
 				console.log(peer1);
 
@@ -13429,8 +13429,8 @@ module.exports = yeast;
 
 	})
 
-
-/*	var Peer = require('simple-peer')
+/*document.getElementById("start").onclick = function(){
+var Peer = require('simple-peer')
 navigator.getUserMedia = navigator.getUserMedia ||
                          navigator.webkitGetUserMedia ||
                          navigator.mozGetUserMedia;
@@ -13443,7 +13443,7 @@ function gotMedia (stream) {
 	var peer1 = new Peer({ initiator: location.hash === '#1', trickle: false , stream : stream});
 	//var peer2 = new Peer({ initiator: false,stream: stream });
 	console.log(peer1);
-	peer1.on('signal', function (data) {
+	peer1.on('signal', function (data){
 		//peer2.signal(data)
 		console.log('fefefee');
 		document.getElementById('key').value = JSON.stringify(data);
@@ -13461,5 +13461,6 @@ function gotMedia (stream) {
 		video.srcObject = stream;
 		video.play();
 	});
+}
 } */
 },{"simple-peer":42,"socket.io-client":57}]},{},[70]);
