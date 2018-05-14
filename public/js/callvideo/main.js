@@ -1,4 +1,4 @@
-    var socket = require('socket.io-client')();
+   /* var socket = require('socket.io-client')();
 
    socket.on('connect', function(data) {
       //ban dau la khi nguoi dung ket noi         
@@ -125,4 +125,38 @@
 			}
 		}
 
+	}) */
+
+
+	var Peer = require('simple-peer')
+navigator.getUserMedia = navigator.getUserMedia ||
+                         navigator.webkitGetUserMedia ||
+                         navigator.mozGetUserMedia;
+						 
+// get video/voice stream
+navigator.getUserMedia({ video: true, audio: true }, gotMedia, function () {})
+
+function gotMedia (stream) {
+	//var peer1 = new Peer({ initiator: location.hash === '#1', stream: stream })
+	var peer1 = new Peer({ initiator: location.hash === '#1', trickle: false , stream : stream});
+	//var peer2 = new Peer({ initiator: false,stream: stream });
+	console.log(peer1);
+	peer1.on('signal', function (data) {
+		//peer2.signal(data)
+		console.log('fefefee');
+		document.getElementById('key').value = JSON.stringify(data);
 	})
+  
+	document.getElementById('submit').onclick = function(){
+		console.log("create key to creater " +document.getElementById('key2').value);
+		peer1.signal(JSON.parse(document.getElementById('key2').value));
+	};
+  
+	//peer1.on('connect', function(){console.log('Đã kết nối'});
+  
+	peer1.on('stream', function(stream){
+		var video = document.querySelector('video');
+		video.srcObject = stream;
+		video.play();
+	});
+}

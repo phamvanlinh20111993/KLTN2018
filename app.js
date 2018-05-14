@@ -678,9 +678,9 @@ io.on('connection', function(client)
       //    else
       //       client.room = pid + myid
         setTimeout(function(){
-            console.log("nhan tin hieu")
+            console.log("nhan tin hieu di nao")
             client.broadcast.emit('receivertakecode', data)
-        }, 3000)
+        }, 2000)
          
         
   //    }

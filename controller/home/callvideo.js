@@ -5,7 +5,8 @@ var router = express.Router()
 router.route('/user/callvideo')
 .get(function(req, res){
 	//res.render('ejs/callvideo.html')
-	res.render('ejs/callvideo.ejs')
+	if(req.session.user_id)
+		res.render('ejs/callvideo.html')
 })
 
 module.exports = router;

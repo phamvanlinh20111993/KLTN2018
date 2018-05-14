@@ -1,7 +1,7 @@
 
 //người dùng bat dau goi video bang ham này
 var callVideoOneToOne = function(id, name, photo){
-	window.open("/languageex/user/callvideo?sender="+MYID);
+	window.open("/languageex/user/callvideo?sender="+MYID + "#1");
 	var userinfo = {name: MYEMAIL, photo: MYPHOTO}  
 	socket.emit('signalcallvideo', {myid: MYID, pid: id, info:userinfo, code: "call"})//gui tin hieu
 }
