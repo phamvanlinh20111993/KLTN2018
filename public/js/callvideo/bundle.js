@@ -13325,7 +13325,7 @@ module.exports = yeast;
 
 				var Peer = require('simple-peer')
 				var peer1 = new Peer({ initiator: true, reconnectTimer: 3000,
-					 config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'all' },
+					 config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'replay' },
 					 trickle: false , stream : stream});
 				console.log(peer1);
 
@@ -13385,7 +13385,7 @@ module.exports = yeast;
 
 				var Peer = require('simple-peer')
 				var peer1 = new Peer({initiator: false, trickle: false,
-					  config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'all' },
+					  config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'replay' },
 						reconnectTimer: 3000, stream : stream});
 				console.log(peer1);
 
