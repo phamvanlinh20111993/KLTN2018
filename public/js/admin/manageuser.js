@@ -61,9 +61,16 @@ var requestServer = function(url, type, data, choose, cb){
     }
 }
 
+var CONSTANTSTRING = 38492124245347//random number
+//thay the tat ca string 'search' trong 'string' bang string 'replacement'
+var replaceAll = function(str, search, replacement) {
+   return str.replace(new RegExp(search, 'g'), replacement);
+}
+
 var showUser = function(ele, data){
 
-   var edit = '<td class="center"><button class="btn btn-warning" onclick="editUser()">Sửa</button></td>'
+   var dataOBJ = replaceAll(JSON.stringify(data), '"', CONSTANTSTRING)
+   var edit = '<td class="center"><button class="btn btn-warning" onclick="editUser(\''+dataOBJ+'\')">Sửa</button></td>'
    var block = '<td class="center"><button class="btn btn-primary" onclick="lockUser('+data.id+')">Khóa</button></td>'
    var notdel = ""
    if(data.provider !="admin")
@@ -87,7 +94,46 @@ var showUser = function(ele, data){
    ele.innerHTML += element
 }
 
-var editUser = function(){
+var editUser = function(userString){
+  var userOBJ = replaceAll(userString, CONSTANTSTRING, '"')
+  var userinfo = JSON.parse(userOBJ)
+  console.log(userinfo)
+
+  requestServer('/languageex/admin/loadlg', 'GET', {}, 0, function(err, data){
+       if(err) alert(err)
+       else{
+            console.log(data)
+         if(data.Lang.length > 0 && data.De.length > 0){
+            //hien thi ngon ngu trao doi
+            console.log("length "+data.Lang.length)
+            var exchangelg = document.getElementById("editexchangelg")
+            var nativelg = document.getElementById("editnativelg")
+            var degree = document.getElementById("editdegree")
+
+            for(var i = 0; i < data.Lang.length; i++){
+               exchangelg.innerHTML += '<option value="'+data.Lang[i].id+'">'+data.Lang[i].name+'</option>'
+               nativelg.innerHTML += '<option value="'+data.Lang[i].id+'">'+data.Lang[i].name+'</option>'
+            }
+
+            for(var ind = 0; ind < data.De.length; ind++){
+                degree.innerHTML+='<option value="'+data.De[ind].id+'">'+data.De[ind].name+'</option>'
+            }
+
+         }
+       }
+            
+   })
+
+  var editemail = document.getElementById("editemail")
+  var editpass = document.getElementById("editpassword")
+  var editname = document.getElementById("editname")
+  var editdes = document.getElementById("editdes")
+  var editdofb = document.getElementById("editdateofbirth")
+  editemail.value = userinfo.email
+  editname.value = userinfo.name
+  //editdofb.value = "2004-02-09"
+
+  $("#editusermodal").modal()
 
 }
 

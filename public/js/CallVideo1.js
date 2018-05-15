@@ -1,7 +1,8 @@
 
 //người dùng bat dau goi video bang ham này
 var callVideoOneToOne = function(id, name, photo){
-	window.open("/languageex/user/callvideo?sender="+MYID + "#1");
+	window.open("/languageex/user/callvideo?sender="+MYID + "#1", "_blank", 
+		"toolbar=yes,scrollbars=yes,resizable=yes,top=30,left=400,width=600,height=600");
 	var userinfo = {name: MYEMAIL, photo: MYPHOTO}  
 	socket.emit('signalcallvideo', {myid: MYID, pid: id, info:userinfo, code: "call"})//gui tin hieu
 }
@@ -31,7 +32,8 @@ socket.on('receivesignalcallvideo', function(data)//nhan tin hieu
 			//socket.emit('createroomchat', {myid: MYID, pid: data.myid})//tham gia room chat
 			socket.emit('acceptcallvideo', {myid: MYID, pid: data.myid})
 			audio1.pause();
-			window.open("/languageex/user/callvideo?receiver="+data.pid);
+			window.open("/languageex/user/callvideo?receiver="+data.pid, "_blank",
+			 "toolbar=yes,scrollbars=yes,resizable=yes,top=30,left=400,width=600,height=600");
 		}
 
 		//tu choi cuoc goi

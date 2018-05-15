@@ -13293,7 +13293,10 @@ yeast.decode = decode;
 module.exports = yeast;
 
 },{}],70:[function(require,module,exports){
-    var socket = require('socket.io-client')();
+   
+   var PARTNERID = 0;
+
+   var socket = require('socket.io-client')();
 
    socket.on('connect', function(data) {
       //ban dau la khi nguoi dung ket noi         
@@ -13314,6 +13317,7 @@ module.exports = yeast;
    socket.on('callercreatecode', function(data1){
 
    	if(data1.pid == MYID){
+   		PARTNERID = MYID
 	   	console.log("ben gui da chay")
 			navigator.getUserMedia = navigator.getUserMedia ||
 			                         navigator.webkitGetUserMedia ||
@@ -13324,8 +13328,21 @@ module.exports = yeast;
 			function gotMedia (stream) {
 
 				var Peer = require('simple-peer')
-				var peer1 = new Peer({ initiator: true, reconnectTimer: 3000,
-					 config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'all' },
+				var peer1 = new Peer({ initiator: true, reconnectTimer: 300, iceTransportPolicy: 'relay',
+					 config: {
+				        iceServers: [
+				          {
+				            "urls": "stun:numb.viagenie.ca",
+				            "username": 'phamvanlinh20111993@gmail.com',
+				            "credential": 'a12345'
+				          },
+				          {
+				            "urls": "turn:numb.viagenie.ca",
+				            "username": "phamvanlinh20111993@gmail.com",
+				            "credential": "a12345"
+				          }
+				        ]
+				      },	
 					 trickle: false , stream : stream});
 				console.log(peer1);
 
@@ -13347,6 +13364,8 @@ module.exports = yeast;
 				 peer1.on('connect', function(){
      				 console.log('Đã kết nối');
     			 });
+
+    			 peer1.on('error', function (err) { console.log('error', err) })
 
 				peer1.on('stream', function(stream){
 					var video = document.querySelector('video');
@@ -13374,6 +13393,7 @@ module.exports = yeast;
 
 		if(data1.caller == MYID)
 		{
+			PARTNERID = data1.receiver
 			console.log("ben nhan da chay")
 			navigator.getUserMedia = navigator.getUserMedia ||
 			                         navigator.webkitGetUserMedia ||
@@ -13384,9 +13404,22 @@ module.exports = yeast;
 			function gotMedia (stream) {
 
 				var Peer = require('simple-peer')
-				var peer1 = new Peer({initiator: false, trickle: false,
-					  config: { iceServers: [ { urls: 'stun:stun.l.google.com:19302' } ], iceTransports: 'all' },
-						reconnectTimer: 3000, stream : stream});
+				var peer1 = new Peer({initiator: false, trickle: false, iceTransportPolicy: 'relay',
+					  config: {
+				        iceServers: [
+				          {
+				            "urls": "stun:numb.viagenie.ca",
+				            "username": 'phamvanlinh20111993@gmail.com',
+				            "credential": 'a12345'
+				          },
+				          {
+				            "urls": "turn:numb.viagenie.ca",
+				            "username": "phamvanlinh20111993@gmail.com",
+				            "credential": "a12345"
+				          }
+				        ]
+				      },
+						reconnectTimer: 300, stream : stream});
 				console.log(peer1);
 
 				console.log(data1.code)
@@ -13406,6 +13439,8 @@ module.exports = yeast;
 				 peer1.on('connect', function(){
       				console.log('Đã kết nối');
     			 });
+
+    			 peer1.on('error', function (err) { console.log('error', err) })
 
 				peer1.on('stream', function(stream){
 					var video = document.querySelector('video');
@@ -13428,6 +13463,12 @@ module.exports = yeast;
 		}
 
 	})
+
+	//end call
+	document.getElementById("ketthuc").onclick = function(){
+		socket.emit("signalendcall", {caller: PARTNERID, receiver:MYID, code:"end call"})
+		window.close()
+	}
 
 /*document.getElementById("start").onclick = function(){
 var Peer = require('simple-peer')

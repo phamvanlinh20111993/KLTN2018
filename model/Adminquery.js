@@ -126,9 +126,14 @@ var selectReportUser = function(myid, tbname, tbname1, cb){
 	}) 
 }
 
+var loadMoreInforU = function(id, cb) {
+	// body...
+}
+
 
 module.exports = {
 	selectUser: selectUser,
 	selectReportPost: selectReportPost,
-	selectReportUser: selectReportUser
+	selectReportUser: selectReportUser,
+	loadMoreInforU: loadMoreInforU
 }

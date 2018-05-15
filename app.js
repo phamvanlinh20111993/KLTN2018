@@ -701,19 +701,10 @@ io.on('connection', function(client)
    })
 
 
-  /*  client.on('signalendcall', function(data){
-      if(data && parseInt(data.caller) && parseInt(data.receiver)){
-         var myid = data.caller.toString();
-         var pid = data.receiver.toString();
-         if(myid > pid)
-            client.room = myid + pid
-         else
-            client.room = pid + myid
-
+    client.on('signalendcall', function(data){
+        console.log(data)
          client.broadcast.emit('endcalled', data)
-        
-      }
-   }) */
+   })
 
 
 })

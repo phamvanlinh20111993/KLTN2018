@@ -57,11 +57,11 @@
                 <form action="/languageex/admin/home/manage/user" method="POST">
                     <div class="form-group">
                         <label for="usr">Email: </label>
-                        <input type="email" class="form-control" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" autocomplete="off">
+                        <input type="email" class="form-control" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" autocomplete="on" value="">
                     </div>
                     <div class="form-group">
                         <label for="pwd">Mật khẩu:</label>
-                        <input type="password" class="form-control" name="password" value="a12345" required pattern="(?=.*\d)(?=.*[a-z]).{6,}" title="Must contain at least one number and lowercase letter, and at least 6 or more characters" autocomplete="off">
+                        <input type="text" class="form-control" name="password" value="a12345" required pattern="(?=.*\d)(?=.*[a-z]).{6,}" title="Must contain at least one number and lowercase letter, and at least 6 or more characters" autocomplete="on">
                     </div>
                     <div class="form-group">
                         <label for="usr">Tên: </label>
@@ -134,26 +134,26 @@
                 <form action="/languageex/admin/home/manage/user" method="POST">
                     <div class="form-group">
                         <label for="usr">Email: </label>
-                        <input type="email" class="form-control" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" autocomplete="off">
+                        <input type="email" class="form-control" name="email" id="editemail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label for="pwd">Mật khẩu:</label>
-                        <input type="password" class="form-control" name="password" value="a12345" required pattern="(?=.*\d)(?=.*[a-z]).{6,}" title="Must contain at least one number and lowercase letter, and at least 6 or more characters" autocomplete="off">
+                        <input type="text" class="form-control" name="password" value="a12345" required pattern="(?=.*\d)(?=.*[a-z]).{6,}" title="Must contain at least one number and lowercase letter, and at least 6 or more characters" autocomplete="off" id="editpassword">
                     </div>
                     <div class="form-group">
                         <label for="usr">Tên: </label>
-                        <input type="text" class="form-control" name="name" value=""  minlength="6" maxlength="30" pattern="[A-Za-z0-9 ]{6,30}" required> 
+                        <input type="text" class="form-control" name="name" value=""  minlength="6" maxlength="30" pattern="[A-Za-z0-9 ]{6,30}" required id="editname"> 
                     </div>
                     <div class="form-group">
                         <label for="comment">Mô tả:</label>
-                        <textarea class="form-control" rows="5" name="describeuser"> Sau khi duoc cap tai khoan vui long thay doi lai mo ta va anh dai dien cua minh it nhat 40 ki tu.
+                        <textarea class="form-control" rows="5" name="describeuser" id="editdes"> Sau khi duoc cap tai khoan vui long thay doi lai mo ta va anh dai dien cua minh it nhat 40 ki tu.
                         </textarea>
                     </div>
 
                     <div class="form-group">
                         <label for="comment">Giới tính:</label>
                         <label class="radio-inline">
-                            <input type="radio" name="gender" value="male" checked>male
+                            <input type="radio" name="gender" value="male">male
                         </label>
                         <label class="radio-inline">
                             <input type="radio" name="gender" value="female">female
@@ -165,26 +165,26 @@
 
                      <div class="form-group">
                          <label for="comment">Ngày sinh:</label>
-                         <input type="date" name="bday" max="2012-12-31" min="1900-12-31" required>
+                         <input type="date" name="bday" max="2012-12-31" min="1900-12-31" required id="editdateofbirth>
                     </div>
 
                     <div class="form-group">
                         <label for="comment">Ngôn ngữ trao đổi:</label>
-                        <select class="form-control" style="width:30%;color: #3366ff;" name="languageexchange" id="selectexlg">
+                        <select class="form-control" style="width:30%;color: #3366ff;" name="languageexchange" id="editexchangelg">
                         
                         </select>
                     </div>
 
                      <div class="form-group">
                         <label for="comment">Trình độ trao đổi:</label>
-                        <select class="form-control" style="width:30%;color: #3366ff;" name="selectlevel"  id="selectde">
+                        <select class="form-control" style="width:30%;color: #3366ff;" name="selectlevel"  id="editdegree">
                             
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="comment">Ngôn ngữ tự nhiên:</label>
-                        <select class="form-control" style="width:30%;color: #3366ff;" name="selectnative"   id="selectnativelg">
+                        <select class="form-control" style="width:30%;color: #3366ff;" name="selectnative"   id="editnativelg">
                   
                         </select>
                     </div>
@@ -382,8 +382,12 @@
                     <div class="col-lg-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                Dữ liệu người dùng
+                              <div class="form-group">
+                                <input type="text" id= "searchuserex" class="form-control" placeholder="Tìm kiếm người dùng..." data="tooltip" title="Search users by name or email">
                             </div>
+                        <input type="button" class="btn btn-default" value="Tìm kiếm" onclick="SearchUsersClick()">
+                            </div>
+
                             <!-- /.panel-heading -->
                             <div class="panel-body">
                                 <div class="dataTable_wrapper">

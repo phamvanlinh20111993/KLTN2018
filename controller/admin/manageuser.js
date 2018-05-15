@@ -96,7 +96,7 @@ router.route('/admin/home/manage/user')
 
 .put(function(req, res){
 	if(req.session.user_id){
-
+		
 	}
 })
 
