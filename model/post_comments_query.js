@@ -244,7 +244,7 @@ var selectPostById = function(myid, pid, cb)
                " p.turnof_cmt, ti.id AS tid, u.email, u.name AS uname, u.photo, u.score, p.isedit, "+
                " le.level, (SELECT COUNT(*) FROM comment c WHERE p.id=c.post_id) AS totalc,"+
                " fo.tracked AS istracked, li1.id_user AS melike, COUNT(p.id) AS totallike, "+
-               " li.id_user AS solikep, "+
+               " li.id_user AS solikep "+
                " FROM post p"+
                " JOIN user u ON p.user_id = u.id"+
                " JOIN post_title ti ON ti.id = p.title_id"+
