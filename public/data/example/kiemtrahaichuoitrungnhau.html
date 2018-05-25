@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	
+	<textarea id="chuoi1" style="width:400px;">hello linh van</textarea></br>
+	<textarea id="chuoi2" style="width:400px;">hello</textarea>
+	<input type="button" value="so sanh" id="sosanh">
+	<h5>Ket qua</h5>
+	<p id="kq1"></p>
+	<p id="kq2"></p>
+<script>	
+	//1234 abcd xin cai cuc cut 1234 hahahaa dasdsadasd 1234 abcd
+	//xin chao abcd xin chao xin 1234
+	document.getElementById("sosanh").onclick = function(){
+		var ostring = document.getElementById("chuoi1").value
+		var nstring = document.getElementById("chuoi2").value;
+		console.log("chuoi cu: " + ostring)
+		console.log("chuoi moi: " + nstring)
+		
+		splitostring =  ostring.split(" ")
+		splitnstring = nstring.split(" ")
+
+		var chutrungnhau = [], pos = 0, mark = []
+		
+		for(var ind = 0; ind < splitostring.length; ind++){
+			for(var index = 0; index < splitnstring.length; index++){
+				if(splitostring[ind] == splitnstring[index]){
+					chutrungnhau[pos] = splitostring[ind]
+					pos++
+					break;
+				}
+			}
+		}
+		console.log(chutrungnhau)
+		
+		//tim do tang dai nhat
+		var trungnhaulonnhat = [], vitri = [], max = 0
+		for(var ind = 0; ind < chutrungnhau.length; ind++){
+			var lonnhat = 0, tamvitri = [], position = 0
+			for(var ind1 = ind; ind1 < chutrungnhau.length; ind1++){
+				for(var index = position; index < splitnstring.length; index++){
+					if(chutrungnhau[ind1] == splitnstring[index]){
+						tamvitri[lonnhat] = chutrungnhau[ind1]
+						lonnhat++;
+						console.log("toi da chay")
+						position = index+1;
+						break;
+					}
+				}
+			}
+			
+			if(max < lonnhat){
+				max = lonnhat
+				for(var index = 0; index < lonnhat; index++)
+					vitri[index] = tamvitri[index]
+			}
+			
+			if(chutrungnhau.length == lonnhat) break;
+		}
+		
+		console.log(vitri)
+		
+		var ptagdelete = "<span style='color:red;'>", endtag = "</span>",
+			ptagadd = "<span style='color:blue;'>"
+		//chay kiem tra chuoi
+		var strOld = "",strNew = "", position = 0
+		for(var ind = 0; ind < vitri.length; ind++){
+			for(var pos = position; pos < splitostring.length; pos++){
+				if(splitostring[pos] == vitri[ind]){
+					strOld += splitostring[pos]+ " ";
+					position = pos+1;
+					break;
+				}else{
+					strOld += ptagdelete +  splitostring[pos] + endtag + " ";
+				}
+			}
+		}
+		
+		for(var pos = position; pos < splitostring.length; pos++){
+			strOld += ptagdelete +  splitostring[pos] + endtag + " ";
+		}
+		
+		position = 0
+		for(var ind = 0; ind < vitri.length; ind++){
+			for(var pos = position; pos < splitnstring.length; pos++){
+				if(splitnstring[pos] == vitri[ind]){
+					strNew += splitnstring[pos] + " "
+					position = pos+1;
+					break;
+				}else{
+					strNew += ptagadd +  splitnstring[pos] + endtag + " ";
+				}
+			}
+		}
+		
+		for(var pos = position; pos < splitnstring.length; pos++){
+			strNew += ptagadd +  splitnstring[pos] + endtag + " ";
+		}
+		
+		document.getElementById("kq1").innerHTML = strOld.trim()
+		document.getElementById("kq2").innerHTML = strNew.trim()
+	}
+	
+</script> 
+	
+</body>
+</html>
