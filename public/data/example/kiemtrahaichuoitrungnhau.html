@@ -2,8 +2,8 @@
 <html lang="en">
 <body>
 	
-	<textarea id="chuoi1" style="width:400px;">hello linh van</textarea></br>
-	<textarea id="chuoi2" style="width:400px;">hello</textarea>
+	<textarea id="chuoi1" style="width:400px;">1234 abcd xin cai cuc cut 1234 hahahaa dasdsadasd 1234 abcd</textarea></br>
+	<textarea id="chuoi2" style="width:400px;">xin chao abcd xin chao xin 1234</textarea>
 	<input type="button" value="so sanh" id="sosanh">
 	<h5>Ket qua</h5>
 	<p id="kq1"></p>
@@ -11,15 +11,121 @@
 <script>	
 	//1234 abcd xin cai cuc cut 1234 hahahaa dasdsadasd 1234 abcd
 	//xin chao abcd xin chao xin 1234
-	document.getElementById("sosanh").onclick = function(){
-		var ostring = document.getElementById("chuoi1").value
-		var nstring = document.getElementById("chuoi2").value;
-		console.log("chuoi cu: " + ostring)
-		console.log("chuoi moi: " + nstring)
+	function standardizeString(s) {
+        // change string to lowercase
+        var lower = s.toLowerCase();
+		lower = lower.trim()//loai bo ki tu trống o dau va cuoi xau
+        // abandoned the space character
+        var index;
+        for (index = 0; index < lower.length;) {
+            if (lower[index] == ' ') {
+                var pos = index + 1;
+                if (pos < lower.length) {
+                    while (lower[pos] == ' ') {
+                        pos++;
+                        if (pos == lower.length)
+                            break;
+                    }
+                }
+                if (pos > index + 1) {
+                    var end = lower.substring(pos, lower.length);
+                    lower = lower.substring(0, index + 1);
+                    lower = lower + end;
+                }
+            }
+            index++;
+        }
+
+        return lower;
+    }
+	
+	function rewriteString(splitostring, vitri, status){
+		var ptagdelete = "<span style='color:red;'>", endtag = "</span>"
+		if(status == 1){
+			ptagdelete = "<span style='color:blue;'>"
+		}
+		//chay kiem tra chuoi
+		var strOld = "",strNew = "", position = 0
+		for(var ind = 0; ind < vitri.length; ind++){
+			for(var pos = position; pos < splitostring.length; pos++){
+				if(splitostring[pos] == vitri[ind]){
+					strOld += splitostring[pos]+ " ";
+					position = pos+1;
+					break;
+				}else{
+					strOld += ptagdelete +  splitostring[pos] + endtag + " ";
+				}
+			}
+		}
 		
+		for(var pos = position; pos < splitostring.length; pos++){
+			strOld += ptagdelete +  splitostring[pos] + endtag + " ";
+		}
+		
+		return strOld.trim()
+	}
+	
+	function recoverString(origin, newstring) {
+    	// body...
+    	var arrorigin = origin.split(" "), ind = 0, index = 0, 
+		pos = 0, recoverstr = {}, mark = true, position = 0;
+    	while(true){
+    		if(ind == arrorigin.length)
+    			break;
+    		//bo ki tu trang
+    		if(arrorigin[ind] == ""){
+    			arrorigin.splice(ind, 1)
+				ind--
+			}
+    		ind++;
+    	}
+		
+		console.log(arrorigin)
+			
+    	//khoi phuc chuoi
+		recoverstr.str = []
+    	for(ind = 0; ind < newstring.str.length; ind++){
+    		if(arrorigin[ind].toLowerCase() == newstring.str[ind].toLowerCase()){
+			    recoverstr.str[ind] = arrorigin[ind]
+    		}else{
+    			mark = false;
+    			break;
+    		}
+    	}
+
+    	//khoi phuc vi tri trung nhau
+		recoverstr.pos = []
+    	for(ind = 0; ind < newstring.pos.length; ind++){
+    		for(index = pos; index < arrorigin.length; index++){
+    			if(newstring.pos[ind].toLowerCase() == arrorigin[index].toLowerCase()){
+    				recoverstr.pos[position] = arrorigin[index]
+    				pos = index + 1;
+					position++;
+					break;
+    			}
+    		}
+    	}
+
+    	if(!mark)
+    		return newstring
+    	else 
+    		return recoverstr
+    }
+	var origin = "", newstring = ""
+	document.getElementById("sosanh").onclick = function(){
+		
+		origin = document.getElementById("chuoi1").value
+		newstring = document.getElementById("chuoi2").value;
+		var ostring = standardizeString(origin)
+		var nstring = standardizeString(newstring)
+
 		splitostring =  ostring.split(" ")
 		splitnstring = nstring.split(" ")
-
+		//splitostring = [1, 5, 7, 8, 6, 9, 6, 40]
+		//splitnstring = [1, 2, 3, 7, 9, 6, 40]
+		console.log("chuoi cu: " + splitostring)
+		console.log("chuoi moi: " + splitnstring)
+	    //cach 1:  duyệt trâu
 		var chutrungnhau = [], pos = 0, mark = []
 		
 		for(var ind = 0; ind < splitostring.length; ind++){
@@ -42,7 +148,6 @@
 					if(chutrungnhau[ind1] == splitnstring[index]){
 						tamvitri[lonnhat] = chutrungnhau[ind1]
 						lonnhat++;
-						console.log("toi da chay")
 						position = index+1;
 						break;
 					}
@@ -59,46 +164,73 @@
 		}
 		
 		console.log(vitri)
+		 
+	/*	//cách 2: dùng quy hoạch động, su dung mang 2 chieu cho bai toan goi nhau
+		//tham khảo linhk: https://www.youtube.com/watch?v=zg4kcv9eEDM,
+		//teen: thuật toán quy hoạch động - giải bài toán tìm xâu con chung lớn nhất.
+		//bởi: Because It's Free
 		
-		var ptagdelete = "<span style='color:red;'>", endtag = "</span>",
-			ptagadd = "<span style='color:blue;'>"
-		//chay kiem tra chuoi
-		var strOld = "",strNew = "", position = 0
-		for(var ind = 0; ind < vitri.length; ind++){
-			for(var pos = position; pos < splitostring.length; pos++){
-				if(splitostring[pos] == vitri[ind]){
-					strOld += splitostring[pos]+ " ";
-					position = pos+1;
-					break;
-				}else{
-					strOld += ptagdelete +  splitostring[pos] + endtag + " ";
-				}
+		var duplicatePos = [], index = 0, ind = 0
+		//khoi tao mang
+		for(ind = 0; ind <= splitostring.length; ind++){
+			duplicatePos[ind] = []
+			for(index = 0; index <= splitnstring.length; index++){
+				duplicatePos[ind][index] = 0;
 			}
 		}
 		
-		for(var pos = position; pos < splitostring.length; pos++){
-			strOld += ptagdelete +  splitostring[pos] + endtag + " ";
-		}
-		
-		position = 0
-		for(var ind = 0; ind < vitri.length; ind++){
-			for(var pos = position; pos < splitnstring.length; pos++){
-				if(splitnstring[pos] == vitri[ind]){
-					strNew += splitnstring[pos] + " "
-					position = pos+1;
-					break;
+		//chay thuat toan quy hoach dong
+		for(ind = 1; ind <= splitostring.length; ind++){
+			for(index = 1; index <= splitnstring.length; index++){
+				if(splitostring[ind-1] == splitnstring[index-1]){
+					duplicatePos[ind][index] = duplicatePos[ind-1][index-1] + 1;
 				}else{
-					strNew += ptagadd +  splitnstring[pos] + endtag + " ";
-				}
+					duplicatePos[ind][index] = duplicatePos[ind-1][index] >= duplicatePos[ind][index-1] ? 
+												duplicatePos[ind-1][index] : duplicatePos[ind][index-1]
+				}		
 			}
 		}
 		
-		for(var pos = position; pos < splitnstring.length; pos++){
-			strNew += ptagadd +  splitnstring[pos] + endtag + " ";
+		//tien hanh truy vet chuoi
+		ind = splitostring.length, index = splitnstring.length;
+		var vitri = [], position = duplicatePos[ind][index]-1;
+		while(ind > 0){
+			console.log(ind + "   " + index)
+			if(splitostring[ind-1] == splitnstring[index-1]){
+				console.log("vi tri " + ind + "   " + index)
+				vitri[position] = splitnstring[index-1];
+				position--;
+				ind--;
+				index--;
+			}else{
+				if(duplicatePos[ind-1, index] >= duplicatePos[ind, index-1])
+					ind--;
+				else
+					index--
+			}
 		}
+
+		console.log(duplicatePos)
+		console.log(vitri) */
+		var oldrecover = recoverString(origin, {
+			str: splitostring,
+			pos: vitri
+		})
 		
-		document.getElementById("kq1").innerHTML = strOld.trim()
-		document.getElementById("kq2").innerHTML = strNew.trim()
+	//	console.log(oldrecover)
+
+		var newrecover = recoverString(newstring, {
+			str: splitnstring,
+			pos: vitri
+		})
+		
+	//	console.log(newrecover)
+
+		
+		document.getElementById("kq1").innerHTML = 
+					rewriteString(oldrecover.str, oldrecover.pos, 0)
+		document.getElementById("kq2").innerHTML = 
+					rewriteString(newrecover.str, newrecover.pos, 1)
 	}
 	
 </script> 
