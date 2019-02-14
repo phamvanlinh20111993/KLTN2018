@@ -3,10 +3,10 @@ var mysql = require('mysql');
 
 //server local
 var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
+  host: "sql303.byethost.com",
+  user: "b31_22948334",
   password: "",
-  database: "KLTN_ExLanguage",
+  database: "b31_22948334_KLTN_ExLanguage",
   charset: "utf8_general_ci"
 }); 
 
