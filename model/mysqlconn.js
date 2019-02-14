@@ -6,7 +6,7 @@ var con = mysql.createConnection({
   host: "sql303.byethost.com",
   user: "b31_22948334",
   password: "cuong123",
-  database: "b31_22948334_quanlytintuc",
+  database: "b31_22948334_KLTN_ExLanguage",
   charset: "utf8_general_ci"
 }); 
 
